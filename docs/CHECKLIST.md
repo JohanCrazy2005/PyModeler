@@ -26,7 +26,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Scene graph (objects, hierarchy, transforms)
 - [ ] Selection system (object / vertex / edge / face modes)
 - [ ] Undo/Redo stack (command pattern)
-- [ ] Basic primitives: Cube, Sphere, Plane, Cylinder, Cone
+- [x] Basic primitives: Cube, Sphere, Plane, Cylinder, Cone
 
 ## Phase 2 – Viewport & Interaction
 - [ ] OpenGL / moderngl viewport widget inside PyQt6
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (research docs + restored foundation modules)
+Last updated: 2026-11-14 (Phase 1 primitives complete: plane/sphere/cylinder/cone + menu + tests)
