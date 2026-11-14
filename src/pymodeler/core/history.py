@@ -135,3 +135,38 @@ class SetTransformCommand(Command):
 
     def undo(self) -> None:
         self.obj.transform = self._old
+
+
+class ExtrudeMeshCommand(Command):
+    """Extrude faces on a SceneObject's mesh. Stores previous mesh state for undo."""
+
+    def __init__(
+        self,
+        obj: SceneObject,
+        face_indices: Optional[list[int]] = None,
+        direction: list[float] | tuple[float, float, float] = (0.0, 0.0, 1.0),
+        distance: float = 1.0,
+    ) -> None:
+        self.obj = obj
+        self.face_indices = list(face_indices) if face_indices is not None else None
+        self.direction = list(direction)
+        self.distance = float(distance)
+        # Snapshot current mesh for undo
+        self._old_vertices = [list(v) for v in obj.mesh.vertices]
+        self._old_faces = [list(f) for f in obj.mesh.faces]
+        self._old_edges = obj.mesh.edges
+        self._old_normals = obj.mesh.normals
+
+    def execute(self) -> None:
+        self.obj.mesh.extrude_faces(
+            face_indices=self.face_indices,
+            direction=self.direction,
+            distance=self.distance,
+        )
+
+    def undo(self) -> None:
+        self.obj.mesh.vertices = self._old_vertices
+        self.obj.mesh.faces = self._old_faces
+        self.obj.mesh.edges = self._old_edges
+        self.obj.mesh.normals = self._old_normals
+        self.obj.mesh.validate()
