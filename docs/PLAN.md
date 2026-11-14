@@ -47,7 +47,7 @@
 5. Viewport polish complete (wireframe, lighting/normals, frame-selected/all, click-to-select). Transform gizmos (translate/rotate/scale) implemented with undo support.
 6. Additional Phase 2 items done: shading modes (solid / wireframe / solid+edges), standard views, orthographic toggle, full-transform world-space calculations for framing and selection.
 7. Gizmo now oriented to object rotation with visual feedback during drag. MainWindow fully functional with Help menu.
-8. Phase 3 started: research on Extrude documented; basic region extrude (Mesh.extrude_faces + ExtrudeMeshCommand) implemented and tested. Next: UI integration and normal-based direction.
+8. Phase 3 started: research on Extrude documented; basic region extrude (Mesh.extrude_faces + ExtrudeMeshCommand) implemented and tested. UI wired: Mesh menu + E shortcut extrudes selected objects in object mode along average normal. Next: improve topology/winding and face-mode support.
 9. Prioritized feature inventory drives all future planning.
 
 ## Risk Management

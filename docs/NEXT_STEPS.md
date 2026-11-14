@@ -12,14 +12,14 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Wire Extrude into the UI: Mesh menu item + keyboard E (object mode: extrude all faces of selected object; later face mode).
-2. Improve extrude: average normal of selection, per-face normals option, better side-face winding, support for individual faces.
-3. Add overlay options (normals, edge highlighting toggle).
-4. Continue refining PLAN.md with more detailed Phase 3 steps based on research.
-5. Ensure CI remains green.
-6. Add standard view shortcuts (1/3/7) and orthographic toggle if missing (already present; verify).
+1. Improve extrude: better side-face winding, support for individual faces, optional per-face normals, distance/axis locking UI.
+2. Add overlay options (normals, edge highlighting toggle).
+3. Continue refining PLAN.md with more detailed Phase 3 steps based on research.
+4. Ensure CI remains green.
+5. Add standard view shortcuts (1/3/7) and orthographic toggle if missing (already present; verify).
 
 ## Recently Completed
+- Wired Extrude into the UI: Mesh menu item + keyboard E (object mode: extrudes all faces of selected objects along the average face normal by distance 1.0). Uses existing ExtrudeMeshCommand for undo/redo. Updated keyboard shortcuts docs and tests.
 - Basic Extrude operator: Mesh.extrude_faces (region extrude of selected face indices or whole mesh along a direction), ExtrudeMeshCommand for undo/redo, research document docs/research/extrude-operator.md, unit tests.
 - Transform gizmos now respect object rotation (oriented local axes). Drag applies movement along the local axis using screen-space projection. Visual feedback: active axis drawn thicker and brighter during drag.
 - Restored functional MainWindow (was placeholder): menus for Add/Edit/View/Gizmo/Help, outliner sync, undo/redo integration via CommandStack, Help → Keyboard Shortcuts dialog.

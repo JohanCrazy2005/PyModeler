@@ -33,6 +33,7 @@ from pymodeler.core import (
     AddObjectCommand,
     RemoveObjectCommand,
     SetTransformCommand,
+    ExtrudeMeshCommand,
 )
 from pymodeler.render import ViewportWidget
 
@@ -115,6 +116,13 @@ class MainWindow(QMainWindow):
         delete_act.triggered.connect(self.delete_selected)
         edit_menu.addAction(delete_act)
 
+        # Mesh
+        mesh_menu = menubar.addMenu("&Mesh")
+        extrude_act = QAction("Extrude", self)
+        extrude_act.setShortcut(QKeySequence("E"))
+        extrude_act.triggered.connect(self.extrude_selected)
+        mesh_menu.addAction(extrude_act)
+
         # View
         view_menu = menubar.addMenu("&View")
         wire_act = QAction("Toggle Wireframe", self)
@@ -172,6 +180,7 @@ class MainWindow(QMainWindow):
             "  Ctrl+Z: Undo\n"
             "  Ctrl+Shift+Z: Redo\n"
             "  Delete: Delete selected\n"
+            "  E: Extrude selected objects (object mode)\n"
         )
         QMessageBox.information(self, "Keyboard Shortcuts", text)
 
@@ -220,6 +229,43 @@ class MainWindow(QMainWindow):
             cmd = RemoveObjectCommand(self.scene, obj)
             self.history.push(cmd)
         self._refresh_outliner()
+        self.viewport.update()
+
+    def extrude_selected(self) -> None:
+        """Extrude all faces of every selected object along the average face normal (object mode).
+
+        Uses a default distance of 1.0. Fully undoable via the command stack.
+        """
+        selected = self.scene.selected_objects()
+        if not selected:
+            return
+
+        import numpy as np
+
+        for obj in selected:
+            mesh = obj.mesh
+            if not mesh.faces:
+                continue
+            # Compute average face normal for a sensible default direction
+            normals = []
+            for i in range(len(mesh.faces)):
+                n = mesh.compute_face_normal(i)
+                normals.append(n)
+            if normals:
+                avg = np.mean(normals, axis=0)
+                length = np.linalg.norm(avg)
+                direction = (avg / length).tolist() if length > 1e-8 else [0.0, 0.0, 1.0]
+            else:
+                direction = [0.0, 0.0, 1.0]
+
+            cmd = ExtrudeMeshCommand(
+                obj,
+                face_indices=None,  # all faces
+                direction=direction,
+                distance=1.0,
+            )
+            self.history.push(cmd)
+
         self.viewport.update()
 
     def undo(self) -> None:
