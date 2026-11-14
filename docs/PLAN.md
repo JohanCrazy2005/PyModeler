@@ -45,7 +45,8 @@
 3. Phase 1 complete: primitives, object-mode selection, and Undo/Redo command stack.
 4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, mesh drawing, and selection highlighting.
 5. Viewport polish complete (wireframe, lighting/normals, frame-selected/all, click-to-select). Transform gizmos (translate/rotate/scale) implemented with undo support.
-6. Prioritized feature inventory drives all future planning.
+6. Additional Phase 2 items done: shading modes (solid / wireframe / solid+edges), standard views, orthographic toggle, full-transform world-space calculations for framing and selection.
+7. Prioritized feature inventory drives all future planning.
 
 ## Risk Management
 - Scope is enormous. Never claim "feature complete" until checklist items are truly done and tested against the researched inventory.
