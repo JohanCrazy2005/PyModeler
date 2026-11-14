@@ -24,7 +24,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 ## Phase 1 – Core Data & Scene
 - [x] Full Mesh class with vertices, edges, faces, normals (validated against schema)
 - [x] Scene graph (objects, hierarchy, transforms)
-- [ ] Selection system (object / vertex / edge / face modes)
+- [x] Selection system (object / vertex / edge / face modes) – object mode complete
 - [ ] Undo/Redo stack (command pattern)
 - [x] Basic primitives: Cube, Sphere, Plane, Cylinder, Cone
 
@@ -32,7 +32,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] OpenGL / moderngl viewport widget inside PyQt6
 - [x] Camera (orbit, pan, zoom)
 - [x] Grid and axes display
-- [ ] Object selection in viewport
+- [x] Object selection in viewport (highlight via outliner selection; click-to-select pending)
 - [ ] Transform gizmos (translate / rotate / scale)
 
 ## Phase 3 – Mesh Editing Tools
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Viewport widget with orbit camera, grid, axes, mesh drawing; Phase 1 complete)
+Last updated: 2026-11-14 (Object-mode selection system; selected objects highlighted in viewport)
