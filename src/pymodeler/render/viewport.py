@@ -1,1 +1,1 @@
-PLACEHOLDER_FOR_VIEWPORT_UPDATE
+PLACEHOLDER - will replace with real content in next if needed
