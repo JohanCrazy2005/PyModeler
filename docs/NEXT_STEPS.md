@@ -12,17 +12,15 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Polish Phase 2 Viewport**:
-   - Wireframe toggle.
-   - Better lighting / flat shading using normals.
-   - Frame-selected / frame-all camera shortcuts.
-   - Click-to-select in the viewport (raycast or picking).
-2. Transform gizmos (translate / rotate / scale) once selection is solid.
-3. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
-4. Ensure CI remains green.
-5. Add keyboard shortcuts documentation and more Edit menu polish.
+1. **Transform gizmos** (translate / rotate / scale) for selected objects.
+2. Improve wireframe (edge overlay on solid, or better line rendering) and add shading mode menu.
+3. Standard views (front/side/top) and perspective/ortho toggle.
+4. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
+5. Ensure CI remains green.
+6. Add keyboard shortcuts documentation.
 
 ## Recently Completed
+- Phase 2 viewport polish: wireframe toggle (edge lines), flat shading with computed normals + simple lighting, Frame All / Frame Selected (Home/F), click-to-select via AABB raycast with outliner sync.
 - Undo/Redo command stack (Command pattern) supporting AddObject, RemoveObject, and SetTransform.
 - Integrated into MainWindow: Add primitives and Delete Selected use the history; Undo/Redo menu + Ctrl+Z / Ctrl+Shift+Z.
 - Object-mode selection system on Scene (select / deselect / clear, by name or object).
