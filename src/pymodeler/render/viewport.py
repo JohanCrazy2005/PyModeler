@@ -111,6 +111,8 @@ class ViewportWidget(QOpenGLWidget):
         self._scene = None
         self.camera = Camera()
         self.wireframe = False
+        self.show_normals = False
+        self.show_edges = False
         self.gizmo_mode = "translate"  # "translate", "rotate", "scale"
         self._ctx: Optional["moderngl.Context"] = None
         self._prog = None
@@ -139,6 +141,16 @@ class ViewportWidget(QOpenGLWidget):
 
     def toggle_wireframe(self) -> None:
         self.wireframe = not self.wireframe
+        self.update()
+
+    def toggle_normals(self) -> None:
+        """Toggle visual face-normal overlay."""
+        self.show_normals = not self.show_normals
+        self.update()
+
+    def toggle_edges(self) -> None:
+        """Toggle edge overlay (useful with solid shading)."""
+        self.show_edges = not self.show_edges
         self.update()
 
     def frame_all(self) -> None:
@@ -366,6 +378,14 @@ class ViewportWidget(QOpenGLWidget):
         vbo.release()
         vao.release()
 
+        # Optional normal overlay
+        if self.show_normals:
+            self._draw_normals(obj, mvp, model)
+
+        # Optional edge overlay (in addition to wireframe mode)
+        if self.show_edges and not self.wireframe:
+            self._draw_edges(obj, mvp, model, color)
+
     def _model_matrix(self, transform) -> np.ndarray:
         """Build column-major model matrix from Transform (loc, Euler XYZ, scale)."""
         loc = np.array(transform.location, dtype=np.float32)
@@ -424,6 +444,63 @@ class ViewportWidget(QOpenGLWidget):
             rot @ np.array([0.0, length, 0.0], dtype=np.float32),
             rot @ np.array([0.0, 0.0, length], dtype=np.float32),
         ]
+
+    def _draw_normals(self, obj, mvp: np.ndarray, model: np.ndarray) -> None:
+        """Draw face normal lines from face centroids (local space)."""
+        if self._ctx is None or self._prog_unlit is None:
+            return
+        mesh = obj.mesh
+        length = max(0.3, self.camera.distance * 0.05)
+        lines = []
+        for fi, face in enumerate(mesh.faces):
+            if len(face) < 3:
+                continue
+            # Centroid
+            pts = [np.array(mesh.vertices[vi], dtype=np.float32) for vi in face]
+            centroid = np.mean(pts, axis=0)
+            normal = np.array(mesh.compute_face_normal(fi), dtype=np.float32)
+            tip = centroid + normal * length
+            lines.extend([*centroid, *tip])
+        if not lines:
+            return
+        data = np.array(lines, dtype=np.float32)
+        vbo = self._ctx.buffer(data.tobytes())
+        vao = self._ctx.simple_vertex_array(self._prog_unlit, vbo, "in_position")
+        mvp_model = mvp @ model
+        self._prog_unlit["mvp"].write(mvp_model.tobytes())
+        self._prog_unlit["color"].value = (0.2, 1.0, 0.4)  # green normals
+        self._ctx.line_width = 1.5
+        vao.render(moderngl.LINES)
+        vbo.release()
+        vao.release()
+
+    def _draw_edges(self, obj, mvp: np.ndarray, model: np.ndarray, color: tuple) -> None:
+        """Draw edge overlay lines."""
+        if self._ctx is None or self._prog_unlit is None:
+            return
+        mesh = obj.mesh
+        edges = set()
+        for face in mesh.faces:
+            for i in range(len(face)):
+                a, b = face[i], face[(i + 1) % len(face)]
+                edges.add((min(a, b), max(a, b)))
+        line_verts = []
+        for a, b in edges:
+            for idx in (a, b):
+                p = np.array(mesh.vertices[idx], dtype=np.float32)
+                line_verts.extend(p.tolist())
+        if not line_verts:
+            return
+        data = np.array(line_verts, dtype=np.float32)
+        vbo = self._ctx.buffer(data.tobytes())
+        vao = self._ctx.simple_vertex_array(self._prog_unlit, vbo, "in_position")
+        mvp_model = mvp @ model
+        self._prog_unlit["mvp"].write(mvp_model.tobytes())
+        self._prog_unlit["color"].value = tuple(min(1.0, c * 0.6) for c in color)  # darker edges
+        self._ctx.line_width = 1.0
+        vao.render(moderngl.LINES)
+        vbo.release()
+        vao.release()
 
     def _draw_gizmo(self, mvp: np.ndarray) -> None:
         """Draw oriented axis gizmo for the primary selected object.

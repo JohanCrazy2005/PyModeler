@@ -233,9 +233,18 @@ class Mesh:
                 continue
             da, db = directed
             na, nb = vert_map[da], vert_map[db]
-            # Side quad: da, db, nb, na  → produces outward normal when extruding along face normal
-            # (assuming the original face winding is consistent)
-            new_faces.append([da, db, nb, na])
+            # Side quad: try the conventional order, then flip if the normal
+            # does not point roughly outward relative to the extrusion direction.
+            candidate = [da, db, nb, na]
+            # Compute a quick normal of the candidate (using first three verts)
+            c0 = np.asarray(new_vertices[candidate[0]])
+            c1 = np.asarray(new_vertices[candidate[1]])
+            c2 = np.asarray(new_vertices[candidate[2]])
+            sn = np.cross(c1 - c0, c2 - c0)
+            # Prefer the orientation whose normal has positive dot with dir_vec
+            if np.dot(sn, dir_vec) < 0:
+                candidate = [da, na, nb, db]
+            new_faces.append(candidate)
 
         self.vertices = new_vertices
         self.faces = new_faces

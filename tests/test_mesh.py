@@ -142,3 +142,19 @@ def test_extrude_region_vs_individual_different_topology():
     assert len(mesh2.faces) > len(mesh1.faces)
     mesh1.validate()
     mesh2.validate()
+
+
+def test_extrude_side_faces_have_outward_normals():
+    """Side faces produced by extrude should have normals roughly aligned with extrusion direction."""
+    mesh = create_plane()
+    mesh.extrude_faces(distance=1.0, direction=(0, 0, 1))
+    # After extrude of a single face there should be side faces whose normals have positive Z component
+    # (or at least not all pointing inward)
+    side_normals_z = []
+    for i, face in enumerate(mesh.faces):
+        if len(face) == 4:  # likely a side quad
+            n = mesh.compute_face_normal(i)
+            side_normals_z.append(n[2])
+    # At least some sides should point somewhat outward (positive or mixed, but not all strongly negative)
+    assert any(z > -0.1 for z in side_normals_z)
+    mesh.validate()

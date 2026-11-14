@@ -9,6 +9,8 @@
 
 ## View
 - Z: Cycle shading mode (Solid / Wireframe / Solid+Edges)
+- N: Toggle Normals Overlay
+- Ctrl+E: Toggle Edge Overlay
 - 1: Front view
 - 3: Right view
 - 7: Top view

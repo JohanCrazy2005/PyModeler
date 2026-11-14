@@ -35,12 +35,13 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Object selection in viewport (outliner sync + click-to-select via raycast)
 - [x] Transform gizmos (translate / rotate / scale) – now with oriented local axes + drag visual feedback
 - [x] Shading modes (solid, wireframe, solid+edges) + menu
+- [x] Normal and edge overlay toggles (N / Ctrl+E)
 - [x] Standard views (front/side/top) and perspective/ortho toggle
 - [x] Full transform (loc/rot/scale) applied in frame and raycast
 - [x] Functional MainWindow with menus, outliner, Help → Keyboard Shortcuts
 
 ## Phase 3 – Mesh Editing Tools
-- [~] Extrude (region + individual modes, per-face normals, ExtrudeMeshCommand with undo, Mesh menu + E / Shift+E, distance/axis dialog)
+- [~] Extrude (region + individual modes, per-face normals, ExtrudeMeshCommand with undo, Mesh menu + E / Shift+E, distance/axis dialog, improved side-face winding)
 - [ ] Inset / Bevel
 - [ ] Loop cut / Knife
 - [ ] Boolean operations (via trimesh or manifold)
@@ -67,4 +68,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 3: Extrude distance / axis-locking dialog added)
+Last updated: 2026-11-14 (Phase 3: improved extrude side winding + normal/edge overlays)

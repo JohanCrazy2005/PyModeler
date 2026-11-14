@@ -191,6 +191,16 @@ class MainWindow(QMainWindow):
         wire_act.triggered.connect(self.viewport.toggle_wireframe)
         view_menu.addAction(wire_act)
 
+        normals_act = QAction("Toggle Normals Overlay", self)
+        normals_act.setShortcut(QKeySequence("N"))
+        normals_act.triggered.connect(self.viewport.toggle_normals)
+        view_menu.addAction(normals_act)
+
+        edges_act = QAction("Toggle Edge Overlay", self)
+        edges_act.setShortcut(QKeySequence("Ctrl+E"))
+        edges_act.triggered.connect(self.viewport.toggle_edges)
+        view_menu.addAction(edges_act)
+
         frame_all_act = QAction("Frame All", self)
         frame_all_act.setShortcut(QKeySequence("Home"))
         frame_all_act.triggered.connect(self.viewport.frame_all)
@@ -232,7 +242,9 @@ class MainWindow(QMainWindow):
             "  Home: Frame All\n"
             "  F: Frame Selected\n\n"
             "View\n"
-            "  Z: Toggle Wireframe\n\n"
+            "  Z: Toggle Wireframe\n"
+            "  N: Toggle Normals Overlay\n"
+            "  Ctrl+E: Toggle Edge Overlay\n\n"
             "Gizmo\n"
             "  G: Translate\n"
             "  R: Rotate\n"
