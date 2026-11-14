@@ -27,5 +27,6 @@
 - Delete: Delete selected
 - E: Extrude Region (object mode; opens distance / axis dialog)
 - Shift+E: Extrude Individual (object mode; opens distance / axis dialog)
+- I: Inset Faces (object mode; opens thickness / depth dialog)
 
 These are also available via the menus.
