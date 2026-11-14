@@ -12,14 +12,15 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Begin Phase 3: basic Extrude operator on selected faces (object mode first, or simple whole-mesh extrude). Research extrude/bevel/loopcut behavior in Blender/Maya first and document under docs/research/.
-2. Add overlay options (normals, edge highlighting toggle).
-3. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
-4. Ensure CI remains green.
-5. Improve shading modes (solid+edges overlay) if not fully complete.
-6. Add standard view shortcuts (1/3/7) and orthographic toggle if missing.
+1. Wire Extrude into the UI: Mesh menu item + keyboard E (object mode: extrude all faces of selected object; later face mode).
+2. Improve extrude: average normal of selection, per-face normals option, better side-face winding, support for individual faces.
+3. Add overlay options (normals, edge highlighting toggle).
+4. Continue refining PLAN.md with more detailed Phase 3 steps based on research.
+5. Ensure CI remains green.
+6. Add standard view shortcuts (1/3/7) and orthographic toggle if missing (already present; verify).
 
 ## Recently Completed
+- Basic Extrude operator: Mesh.extrude_faces (region extrude of selected face indices or whole mesh along a direction), ExtrudeMeshCommand for undo/redo, research document docs/research/extrude-operator.md, unit tests.
 - Transform gizmos now respect object rotation (oriented local axes). Drag applies movement along the local axis using screen-space projection. Visual feedback: active axis drawn thicker and brighter during drag.
 - Restored functional MainWindow (was placeholder): menus for Add/Edit/View/Gizmo/Help, outliner sync, undo/redo integration via CommandStack, Help → Keyboard Shortcuts dialog.
 - Shading modes: solid, wireframe, solid+edges (edge overlay). Menu + Z toggle. Orthographic projection toggle (key 5). Standard views (front/right/top etc., keys 1/3/7).
