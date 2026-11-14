@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/mesh.schema.json",
+  "title": "Mesh",
+  "description": "Core mesh data model for PyModeler. All meshes must validate against this schema.",
+  "type": "object",
+  "required": ["vertices", "faces"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "default": "Mesh",
+      "description": "Human-readable name of the mesh"
+    },
+    "vertices": {
+      "type": "array",
+      "description": "List of 3D points [x, y, z]",
+      "minItems": 3,
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number" }
+      }
+    },
+    "faces": {
+      "type": "array",
+      "description": "List of faces. Each face is a list of vertex indices (triangles or quads preferred).",
+      "minItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "items": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Optional explicit edges [v1, v2]. If omitted they can be derived from faces.",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "normals": {
+      "type": "array",
+      "description": "Optional per-vertex or per-face normals",
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": { "type": "number" }
+      }
+    },
+    "uvs": {
+      "type": "array",
+      "description": "Optional UV coordinates [u, v] corresponding to vertices or face corners",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": { "type": "number" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Free-form metadata",
+      "additionalProperties": true
+    }
+  }
+}
