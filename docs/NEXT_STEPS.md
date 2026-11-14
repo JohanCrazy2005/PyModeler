@@ -12,14 +12,16 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Improve gizmo to respect object rotation (oriented axes) and add visual feedback during drag.
-2. Add keyboard shortcuts documentation (and a Help menu item).
-3. Begin Phase 3: basic Extrude operator on selected faces (object mode first, or simple whole-mesh extrude).
-4. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
-5. Ensure CI remains green.
-6. Add overlay options (normals, edge highlighting toggle).
+1. Begin Phase 3: basic Extrude operator on selected faces (object mode first, or simple whole-mesh extrude). Research extrude/bevel/loopcut behavior in Blender/Maya first and document under docs/research/.
+2. Add overlay options (normals, edge highlighting toggle).
+3. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
+4. Ensure CI remains green.
+5. Improve shading modes (solid+edges overlay) if not fully complete.
+6. Add standard view shortcuts (1/3/7) and orthographic toggle if missing.
 
 ## Recently Completed
+- Transform gizmos now respect object rotation (oriented local axes). Drag applies movement along the local axis using screen-space projection. Visual feedback: active axis drawn thicker and brighter during drag.
+- Restored functional MainWindow (was placeholder): menus for Add/Edit/View/Gizmo/Help, outliner sync, undo/redo integration via CommandStack, Help → Keyboard Shortcuts dialog.
 - Shading modes: solid, wireframe, solid+edges (edge overlay). Menu + Z toggle. Orthographic projection toggle (key 5). Standard views (front/right/top etc., keys 1/3/7).
 - Full object transform (rotation + scale) now applied consistently in Frame All/Selected and click-to-select raycast AABB.
 - Transform gizmos (translate / rotate / scale) for the primary selected object: axis-colored lines, click-drag to constrain, live preview, commit to Undo/Redo via SetTransformCommand. Keyboard G/R/S to switch modes. Full model matrix applied in mesh drawing.
