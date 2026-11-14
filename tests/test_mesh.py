@@ -90,3 +90,32 @@ def test_primitives_are_schema_valid():
         mesh.validate()
         data = mesh.to_dict()
         validate_mesh_data(data)
+
+
+def test_extrude_whole_mesh_increases_geometry():
+    mesh = create_cube()
+    original_verts = len(mesh.vertices)
+    original_faces = len(mesh.faces)
+    mesh.extrude_faces(distance=0.5, direction=(0, 0, 1))
+    assert len(mesh.vertices) > original_verts
+    assert len(mesh.faces) > original_faces
+    mesh.validate()
+    # All original vertices should still exist; new ones offset
+    assert any(abs(v[2] - 0.5) < 1e-6 or abs(v[2] + 0.5) < 1e-6 for v in mesh.vertices)
+
+
+def test_extrude_single_face_on_plane():
+    mesh = create_plane()
+    assert len(mesh.faces) == 1
+    mesh.extrude_faces(face_indices=[0], distance=1.0, direction=(0, 0, 1))
+    # Should have side faces + extruded face
+    assert len(mesh.faces) >= 5  # original + 4 sides + 1 top
+    mesh.validate()
+
+
+def test_extrude_empty_selection_noop():
+    mesh = create_cube()
+    before = (len(mesh.vertices), len(mesh.faces))
+    mesh.extrude_faces(face_indices=[])
+    assert (len(mesh.vertices), len(mesh.faces)) == before
+    mesh.validate()
