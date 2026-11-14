@@ -12,14 +12,15 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Transform gizmos** (translate / rotate / scale) for selected objects.
-2. Improve wireframe (edge overlay on solid, or better line rendering) and add shading mode menu.
-3. Standard views (front/side/top) and perspective/ortho toggle.
+1. Improve wireframe (edge overlay on solid, or better line rendering) and add shading mode menu.
+2. Standard views (front/side/top) and perspective/ortho toggle.
+3. Apply full transform (rotation + scale) consistently in all viewport calculations (frame, raycast, etc.).
 4. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
 5. Ensure CI remains green.
 6. Add keyboard shortcuts documentation.
 
 ## Recently Completed
+- Transform gizmos (translate / rotate / scale) for the primary selected object: axis-colored lines, click-drag to constrain, live preview, commit to Undo/Redo via SetTransformCommand. Keyboard G/R/S to switch modes. Full model matrix applied in mesh drawing.
 - Phase 2 viewport polish: wireframe toggle (edge lines), flat shading with computed normals + simple lighting, Frame All / Frame Selected (Home/F), click-to-select via AABB raycast with outliner sync.
 - Undo/Redo command stack (Command pattern) supporting AddObject, RemoveObject, and SetTransform.
 - Integrated into MainWindow: Add primitives and Delete Selected use the history; Undo/Redo menu + Ctrl+Z / Ctrl+Shift+Z.

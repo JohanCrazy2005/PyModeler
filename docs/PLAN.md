@@ -44,7 +44,7 @@
 2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) present and tested.
 3. Phase 1 complete: primitives, object-mode selection, and Undo/Redo command stack.
 4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, mesh drawing, and selection highlighting.
-5. Viewport polish complete (wireframe, lighting/normals, frame-selected/all, click-to-select). Next: transform gizmos.
+5. Viewport polish complete (wireframe, lighting/normals, frame-selected/all, click-to-select). Transform gizmos (translate/rotate/scale) implemented with undo support.
 6. Prioritized feature inventory drives all future planning.
 
 ## Risk Management

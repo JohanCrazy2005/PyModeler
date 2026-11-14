@@ -33,7 +33,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Camera (orbit, pan, zoom)
 - [x] Grid and axes display
 - [x] Object selection in viewport (outliner sync + click-to-select via raycast)
-- [ ] Transform gizmos (translate / rotate / scale)
+- [x] Transform gizmos (translate / rotate / scale)
 
 ## Phase 3 – Mesh Editing Tools
 - [ ] Extrude
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 2 viewport polish: wireframe, lighting, frame, click-select)
+Last updated: 2026-11-14 (Phase 2: transform gizmos for translate/rotate/scale with undo)
