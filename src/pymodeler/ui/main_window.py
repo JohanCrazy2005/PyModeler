@@ -118,10 +118,15 @@ class MainWindow(QMainWindow):
 
         # Mesh
         mesh_menu = menubar.addMenu("&Mesh")
-        extrude_act = QAction("Extrude", self)
+        extrude_act = QAction("Extrude Region", self)
         extrude_act.setShortcut(QKeySequence("E"))
         extrude_act.triggered.connect(self.extrude_selected)
         mesh_menu.addAction(extrude_act)
+
+        extrude_ind_act = QAction("Extrude Individual", self)
+        extrude_ind_act.setShortcut(QKeySequence("Shift+E"))
+        extrude_ind_act.triggered.connect(self.extrude_individual)
+        mesh_menu.addAction(extrude_ind_act)
 
         # View
         view_menu = menubar.addMenu("&View")
@@ -180,7 +185,8 @@ class MainWindow(QMainWindow):
             "  Ctrl+Z: Undo\n"
             "  Ctrl+Shift+Z: Redo\n"
             "  Delete: Delete selected\n"
-            "  E: Extrude selected objects (object mode)\n"
+            "  E: Extrude Region (object mode)\n"
+            "  Shift+E: Extrude Individual (object mode)\n"
         )
         QMessageBox.information(self, "Keyboard Shortcuts", text)
 
@@ -232,10 +238,20 @@ class MainWindow(QMainWindow):
         self.viewport.update()
 
     def extrude_selected(self) -> None:
-        """Extrude all faces of every selected object along the average face normal (object mode).
+        """Extrude all faces of every selected object as a region along the average face normal (object mode).
 
         Uses a default distance of 1.0. Fully undoable via the command stack.
         """
+        self._do_extrude(individual=False, use_per_face_normals=False)
+
+    def extrude_individual(self) -> None:
+        """Extrude each face of every selected object independently along its own normal.
+
+        Uses a default distance of 1.0. Fully undoable via the command stack.
+        """
+        self._do_extrude(individual=True, use_per_face_normals=True)
+
+    def _do_extrude(self, individual: bool, use_per_face_normals: bool) -> None:
         selected = self.scene.selected_objects()
         if not selected:
             return
@@ -246,7 +262,7 @@ class MainWindow(QMainWindow):
             mesh = obj.mesh
             if not mesh.faces:
                 continue
-            # Compute average face normal for a sensible default direction
+            # Compute average face normal for a sensible default direction (used when not per-face)
             normals = []
             for i in range(len(mesh.faces)):
                 n = mesh.compute_face_normal(i)
@@ -263,6 +279,8 @@ class MainWindow(QMainWindow):
                 face_indices=None,  # all faces
                 direction=direction,
                 distance=1.0,
+                individual=individual,
+                use_per_face_normals=use_per_face_normals,
             )
             self.history.push(cmd)
 

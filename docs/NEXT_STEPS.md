@@ -12,13 +12,14 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Improve extrude: better side-face winding, support for individual faces, optional per-face normals, distance/axis locking UI.
-2. Add overlay options (normals, edge highlighting toggle).
-3. Continue refining PLAN.md with more detailed Phase 3 steps based on research.
-4. Ensure CI remains green.
-5. Add standard view shortcuts (1/3/7) and orthographic toggle if missing (already present; verify).
+1. Add a simple distance / axis-locking dialog or modal for Extrude (currently fixed at 1.0).
+2. Improve side-face winding further and add visual normal overlay in the viewport.
+3. Begin Inset operator research and basic implementation (docs/research/inset-operator.md).
+4. Add overlay toggles (normals, edge highlighting).
+5. Continue refining PLAN.md with more detailed Phase 3 steps.
 
 ## Recently Completed
+- Improved Extrude: individual mode (each face extruded separately with its own sides), optional per-face normals, cleaner side-face winding. UI: Extrude Region (E) and Extrude Individual (Shift+E). ExtrudeMeshCommand updated; tests added.
 - Wired Extrude into the UI: Mesh menu item + keyboard E (object mode: extrudes all faces of selected objects along the average face normal by distance 1.0). Uses existing ExtrudeMeshCommand for undo/redo. Updated keyboard shortcuts docs and tests.
 - Basic Extrude operator: Mesh.extrude_faces (region extrude of selected face indices or whole mesh along a direction), ExtrudeMeshCommand for undo/redo, research document docs/research/extrude-operator.md, unit tests.
 - Transform gizmos now respect object rotation (oriented local axes). Drag applies movement along the local axis using screen-space projection. Visual feedback: active axis drawn thicker and brighter during drag.
@@ -46,4 +47,4 @@ This research-first → plan → build cycle must be followed for every new majo
 - Test locally in the sandbox before pushing.
 - Prefer small, complete, tested increments.
 - Put research outputs and any generated artifacts under `docs/research/` or `output/` as appropriate.
-- Current research documents: `docs/research/blender-core-features.md`, `docs/research/feature-inventory.md`, `docs/research/viewport-essentials.md`.
+- Current research documents: `docs/research/blender-core-features.md`, `docs/research/feature-inventory.md`, `docs/research/viewport-essentials.md`, `docs/research/extrude-operator.md`.

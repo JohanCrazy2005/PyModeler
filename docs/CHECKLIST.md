@@ -40,7 +40,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Functional MainWindow with menus, outliner, Help → Keyboard Shortcuts
 
 ## Phase 3 – Mesh Editing Tools
-- [~] Extrude (basic region extrude on face indices + ExtrudeMeshCommand with undo + UI menu/keyboard E in object mode)
+- [~] Extrude (region + individual modes, per-face normals, ExtrudeMeshCommand with undo, Mesh menu + E / Shift+E)
 - [ ] Inset / Bevel
 - [ ] Loop cut / Knife
 - [ ] Boolean operations (via trimesh or manifold)
@@ -67,4 +67,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 3: Extrude wired into UI with Mesh menu + E shortcut, average-normal direction)
+Last updated: 2026-11-14 (Phase 3: Extrude improved with individual mode + per-face normals + better side winding)

@@ -146,11 +146,15 @@ class ExtrudeMeshCommand(Command):
         face_indices: Optional[list[int]] = None,
         direction: list[float] | tuple[float, float, float] = (0.0, 0.0, 1.0),
         distance: float = 1.0,
+        individual: bool = False,
+        use_per_face_normals: bool = False,
     ) -> None:
         self.obj = obj
         self.face_indices = list(face_indices) if face_indices is not None else None
         self.direction = list(direction)
         self.distance = float(distance)
+        self.individual = bool(individual)
+        self.use_per_face_normals = bool(use_per_face_normals)
         # Snapshot current mesh for undo
         self._old_vertices = [list(v) for v in obj.mesh.vertices]
         self._old_faces = [list(f) for f in obj.mesh.faces]
@@ -162,6 +166,8 @@ class ExtrudeMeshCommand(Command):
             face_indices=self.face_indices,
             direction=self.direction,
             distance=self.distance,
+            individual=self.individual,
+            use_per_face_normals=self.use_per_face_normals,
         )
 
     def undo(self) -> None:

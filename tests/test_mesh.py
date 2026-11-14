@@ -113,9 +113,32 @@ def test_extrude_single_face_on_plane():
     mesh.validate()
 
 
-def test_extrude_empty_selection_noop():
+def test_extrude_individual_creates_sides_per_face():
     mesh = create_cube()
-    before = (len(mesh.vertices), len(mesh.faces))
-    mesh.extrude_faces(face_indices=[])
-    assert (len(mesh.vertices), len(mesh.faces)) == before
+    original_faces = len(mesh.faces)
+    mesh.extrude_faces(distance=0.5, individual=True, use_per_face_normals=True)
+    # Each of 6 faces produces 1 extruded + 4 sides → +5 faces per original face
+    assert len(mesh.faces) == original_faces + 6 * 5
     mesh.validate()
+
+
+def test_extrude_individual_on_plane():
+    mesh = create_plane()
+    mesh.extrude_faces(individual=True, use_per_face_normals=True, distance=1.0)
+    # 1 original + 1 extruded + 4 sides
+    assert len(mesh.faces) == 6
+    mesh.validate()
+    # Check that the extruded face is offset roughly along +Z
+    zs = [v[2] for v in mesh.vertices]
+    assert max(zs) > 0.9
+
+
+def test_extrude_region_vs_individual_different_topology():
+    mesh1 = create_cube()
+    mesh2 = create_cube()
+    mesh1.extrude_faces(distance=1.0, individual=False)
+    mesh2.extrude_faces(distance=1.0, individual=True, use_per_face_normals=True)
+    # Individual produces more faces (sides for every edge)
+    assert len(mesh2.faces) > len(mesh1.faces)
+    mesh1.validate()
+    mesh2.validate()

@@ -23,6 +23,7 @@
 - Ctrl+Z: Undo
 - Ctrl+Shift+Z: Redo
 - Delete: Delete selected
-- E: Extrude selected objects (object mode; all faces along average normal)
+- E: Extrude Region (object mode; all faces along average normal)
+- Shift+E: Extrude Individual (object mode; each face along its own normal)
 
 These are also available via the menus.

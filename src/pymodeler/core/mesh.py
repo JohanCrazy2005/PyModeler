@@ -95,17 +95,32 @@ class Mesh:
         face_indices: Optional[Sequence[int]] = None,
         direction: Sequence[float] = (0.0, 0.0, 1.0),
         distance: float = 1.0,
+        individual: bool = False,
+        use_per_face_normals: bool = False,
     ) -> None:
-        """Extrude selected faces (or all faces if None) along a direction.
+        """Extrude selected faces (or all faces if None).
 
-        Implements a simple region extrude:
-        - Boundary edges of the selection become side faces.
+        Parameters
+        ----------
+        face_indices : optional list of face indices to extrude. None = all faces.
+        direction : shared extrusion direction (normalized). Ignored when
+            use_per_face_normals is True.
+        distance : extrusion distance.
+        individual : if True, each face is extruded independently (every edge
+            becomes a side wall). If False, region extrude: only boundary edges
+            of the selection produce side faces.
+        use_per_face_normals : if True, each face is extruded along its own
+            computed normal (overrides direction). Best combined with individual=True.
+
+        Implements a simple region or individual extrude:
+        - Boundary (or all) edges become side faces.
         - Selected faces are duplicated and translated.
-        - Internal edges are not extruded as walls.
+        - Internal edges of a region are not extruded as walls.
 
         Modifies the mesh in place. Always re-validates.
         """
         import numpy as np
+        from collections import defaultdict
 
         if not self.faces:
             return
@@ -117,6 +132,32 @@ class Mesh:
             if not face_indices:
                 return
 
+        # For individual mode we process faces one-by-one so each has its own sides.
+        # For region mode we treat the whole selection as one region.
+        if individual:
+            # Process in reverse order so earlier indices stay valid while we grow the mesh
+            for fi in reversed(face_indices):
+                self._extrude_region(
+                    [fi],
+                    direction,
+                    distance,
+                    use_per_face_normals,
+                )
+            return
+
+        self._extrude_region(face_indices, direction, distance, use_per_face_normals)
+
+    def _extrude_region(
+        self,
+        face_indices: list[int],
+        direction: Sequence[float],
+        distance: float,
+        use_per_face_normals: bool,
+    ) -> None:
+        """Internal helper that extrudes a contiguous region (or single face)."""
+        import numpy as np
+        from collections import defaultdict
+
         selected = set(face_indices)
         dir_vec = np.asarray(direction, dtype=float)
         norm = np.linalg.norm(dir_vec)
@@ -124,15 +165,13 @@ class Mesh:
             dir_vec = np.array([0.0, 0.0, 1.0])
         else:
             dir_vec = dir_vec / norm
-        offset = dir_vec * float(distance)
 
-        # Collect all unique vertices used by selected faces
+        # Collect vertices used by the selected faces
         selected_verts = set()
         for fi in face_indices:
             selected_verts.update(self.faces[fi])
 
         # Build edge -> list of face indices that use it (within selection)
-        from collections import defaultdict
         edge_faces: dict[tuple[int, int], list[int]] = defaultdict(list)
         for fi in face_indices:
             face = self.faces[fi]
@@ -146,15 +185,29 @@ class Mesh:
         boundary_edges = [e for e, faces in edge_faces.items() if len(faces) == 1]
 
         # Map old vertex index -> new extruded vertex index
+        # When use_per_face_normals we may need per-face offsets, but for simplicity
+        # we still share vertices within the region and use average normal if requested.
+        if use_per_face_normals and len(face_indices) > 1:
+            # Average the normals of the region
+            normals = [self.compute_face_normal(fi) for fi in face_indices]
+            avg = np.mean(normals, axis=0)
+            length = np.linalg.norm(avg)
+            dir_vec = avg / length if length > 1e-8 else np.array([0.0, 0.0, 1.0])
+        elif use_per_face_normals and len(face_indices) == 1:
+            n = self.compute_face_normal(face_indices[0])
+            dir_vec = np.asarray(n, dtype=float)
+
+        offset = dir_vec * float(distance)
+
         vert_map: dict[int, int] = {}
-        new_vertices = [list(v) for v in self.vertices]  # copy
+        new_vertices = [list(v) for v in self.vertices]
         for vi in sorted(selected_verts):
             old = np.asarray(self.vertices[vi])
             new_pos = (old + offset).tolist()
             vert_map[vi] = len(new_vertices)
             new_vertices.append(new_pos)
 
-        # New faces: extruded copies of selected faces (reversed winding for consistent normals if needed)
+        # New faces: extruded copies of selected faces (reversed winding for consistent normals)
         new_faces = [list(f) for f in self.faces]
         for fi in face_indices:
             old_face = self.faces[fi]
@@ -162,25 +215,27 @@ class Mesh:
             # Reverse to keep outward normal roughly consistent when extruding "out"
             new_faces.append(list(reversed(extruded)))
 
-        # Side faces for each boundary edge
+        # Side faces for each boundary edge – improved winding
         for a, b in boundary_edges:
-            # Determine orientation from the face that owns the edge
             owning = edge_faces[(a, b)][0]
             face = self.faces[owning]
-            # Find the directed edge in the face
             n = len(face)
+            # Find the directed edge in the owning face
+            directed = None
             for i in range(n):
                 if face[i] == a and face[(i + 1) % n] == b:
-                    # directed a -> b
-                    na, nb = vert_map[a], vert_map[b]
-                    # side quad: a, b, nb, na  (or reverse depending on desired winding)
-                    new_faces.append([a, b, nb, na])
+                    directed = (a, b)
                     break
                 elif face[i] == b and face[(i + 1) % n] == a:
-                    # directed b -> a
-                    na, nb = vert_map[a], vert_map[b]
-                    new_faces.append([b, a, na, nb])
+                    directed = (b, a)
                     break
+            if directed is None:
+                continue
+            da, db = directed
+            na, nb = vert_map[da], vert_map[db]
+            # Side quad: da, db, nb, na  → produces outward normal when extruding along face normal
+            # (assuming the original face winding is consistent)
+            new_faces.append([da, db, nb, na])
 
         self.vertices = new_vertices
         self.faces = new_faces
