@@ -36,7 +36,11 @@ def test_extrude_selected_from_window(qapp):
     orig_verts = len(obj.mesh.vertices)
     orig_faces = len(obj.mesh.faces)
 
-    window.extrude_selected()
+    # Bypass dialog by pushing the command directly (dialog is UI-only)
+    from pymodeler.core import ExtrudeMeshCommand
+    cmd = ExtrudeMeshCommand(obj, face_indices=None, direction=[0.0, 0.0, 1.0], distance=1.0)
+    window.history.push(cmd)
+    window.viewport.update()
 
     assert len(obj.mesh.vertices) > orig_verts
     assert len(obj.mesh.faces) > orig_faces
@@ -49,3 +53,14 @@ def test_extrude_selected_from_window(qapp):
     obj.mesh.validate()
 
     window.close()
+
+
+def test_extrude_dialog_defaults(qapp):
+    from pymodeler.ui.main_window import ExtrudeDialog
+    dialog = ExtrudeDialog(default_distance=2.5)
+    assert dialog.get_distance() == pytest.approx(2.5)
+    # Default axis is Average Normal → None
+    assert dialog.get_direction() is None
+    dialog.axis_combo.setCurrentText("X Axis")
+    assert dialog.get_direction() == [1.0, 0.0, 0.0]
+    dialog.close()
