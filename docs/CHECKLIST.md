@@ -40,7 +40,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Functional MainWindow with menus, outliner, Help → Keyboard Shortcuts
 
 ## Phase 3 – Mesh Editing Tools
-- [ ] Extrude
+- [~] Extrude (basic region extrude on face indices + ExtrudeMeshCommand with undo)
 - [ ] Inset / Bevel
 - [ ] Loop cut / Knife
 - [ ] Boolean operations (via trimesh or manifold)
@@ -67,4 +67,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 2 gizmo orientation + visual feedback; MainWindow restored with Help menu)
+Last updated: 2026-11-14 (Phase 3 started: basic Extrude operator + research doc + undo command)
