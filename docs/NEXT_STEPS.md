@@ -12,14 +12,12 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Finish Phase 1 primitives** (highest value now that foundation + research are done):
-   - Implement `create_plane`, `create_sphere` (UV sphere), `create_cylinder`, `create_cone` in `src/pymodeler/core/mesh.py`.
-   - Keep them schema-valid.
-   - Add unit tests.
-   - Expose them in the Add → Mesh menu of the main window.
-2. Add a simple GitHub Actions CI workflow that runs the tests (offscreen Qt if needed).
-3. Then start Phase 2: real viewport research note + first moderngl/PyOpenGL widget with camera and grid.
-4. Continue with selection system and Undo/Redo.
+1. **Add a simple GitHub Actions CI workflow** that runs the tests (use `QT_QPA_PLATFORM=offscreen` and/or headless flags so pytest-qt works in CI).
+2. **Start Phase 2 – Viewport**:
+   - First write a short research note in `docs/research/` summarizing essential viewport features from Blender/Maya (camera orbit/pan/zoom, grid, axes, selection highlighting).
+   - Then implement a first moderngl or PyOpenGL widget inside the PyQt6 main window that draws a grid and the currently selected mesh (or all scene meshes) with a basic orbit camera.
+3. After the basic viewport is solid: Selection system (object mode first) and Undo/Redo command stack.
+4. Continue refining PLAN.md with more detailed Phase 2 steps once the research note exists.
 
 ## Notes for Automation
 - Always re-read GOAL.md, CHECKLIST.md, PLAN.md, and this file at the start of a run.
@@ -29,3 +27,4 @@ This research-first → plan → build cycle must be followed for every new majo
 - Prefer small, complete, tested increments.
 - Put research outputs and any generated artifacts under `docs/research/` or `output/` as appropriate.
 - Current research documents: `docs/research/blender-core-features.md` and `docs/research/feature-inventory.md`.
+- Phase 1 primitives (Cube, Plane, Sphere, Cylinder, Cone) are now complete, schema-validated, unit-tested, and exposed in the Add → Mesh menu.
