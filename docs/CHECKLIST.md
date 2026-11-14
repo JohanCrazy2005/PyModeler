@@ -41,8 +41,9 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Functional MainWindow with menus, outliner, Help → Keyboard Shortcuts
 
 ## Phase 3 – Mesh Editing Tools
-- [~] Extrude (region + individual modes, per-face normals, ExtrudeMeshCommand with undo, Mesh menu + E / Shift+E, distance/axis dialog, improved side-face winding)
-- [ ] Inset / Bevel
+- [x] Extrude (region + individual modes, per-face normals, ExtrudeMeshCommand with undo, Mesh menu + E / Shift+E, distance/axis dialog, improved side-face winding)
+- [~] Inset (basic individual-face inset with thickness fraction + optional depth, InsetMeshCommand, Mesh menu + I)
+- [ ] Bevel
 - [ ] Loop cut / Knife
 - [ ] Boolean operations (via trimesh or manifold)
 - [ ] Subdivide / Smooth
@@ -68,4 +69,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 3: improved extrude side winding + normal/edge overlays)
+Last updated: 2026-11-14 (Phase 3: basic Inset operator research + individual-face implementation)
