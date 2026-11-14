@@ -90,6 +90,124 @@ class Mesh:
     def __repr__(self) -> str:
         return f"<Mesh name={self.name!r} verts={len(self.vertices)} faces={len(self.faces)}>"
 
+    def extrude_faces(
+        self,
+        face_indices: Optional[Sequence[int]] = None,
+        direction: Sequence[float] = (0.0, 0.0, 1.0),
+        distance: float = 1.0,
+    ) -> None:
+        """Extrude selected faces (or all faces if None) along a direction.
+
+        Implements a simple region extrude:
+        - Boundary edges of the selection become side faces.
+        - Selected faces are duplicated and translated.
+        - Internal edges are not extruded as walls.
+
+        Modifies the mesh in place. Always re-validates.
+        """
+        import numpy as np
+
+        if not self.faces:
+            return
+
+        if face_indices is None:
+            face_indices = list(range(len(self.faces)))
+        else:
+            face_indices = [int(i) for i in face_indices if 0 <= i < len(self.faces)]
+            if not face_indices:
+                return
+
+        selected = set(face_indices)
+        dir_vec = np.asarray(direction, dtype=float)
+        norm = np.linalg.norm(dir_vec)
+        if norm < 1e-8:
+            dir_vec = np.array([0.0, 0.0, 1.0])
+        else:
+            dir_vec = dir_vec / norm
+        offset = dir_vec * float(distance)
+
+        # Collect all unique vertices used by selected faces
+        selected_verts = set()
+        for fi in face_indices:
+            selected_verts.update(self.faces[fi])
+
+        # Build edge -> list of face indices that use it (within selection)
+        from collections import defaultdict
+        edge_faces: dict[tuple[int, int], list[int]] = defaultdict(list)
+        for fi in face_indices:
+            face = self.faces[fi]
+            n = len(face)
+            for i in range(n):
+                a, b = face[i], face[(i + 1) % n]
+                key = (min(a, b), max(a, b))
+                edge_faces[key].append(fi)
+
+        # Boundary edges: appear in exactly one selected face
+        boundary_edges = [e for e, faces in edge_faces.items() if len(faces) == 1]
+
+        # Map old vertex index -> new extruded vertex index
+        vert_map: dict[int, int] = {}
+        new_vertices = [list(v) for v in self.vertices]  # copy
+        for vi in sorted(selected_verts):
+            old = np.asarray(self.vertices[vi])
+            new_pos = (old + offset).tolist()
+            vert_map[vi] = len(new_vertices)
+            new_vertices.append(new_pos)
+
+        # New faces: extruded copies of selected faces (reversed winding for consistent normals if needed)
+        new_faces = [list(f) for f in self.faces]
+        for fi in face_indices:
+            old_face = self.faces[fi]
+            extruded = [vert_map[vi] for vi in old_face]
+            # Reverse to keep outward normal roughly consistent when extruding "out"
+            new_faces.append(list(reversed(extruded)))
+
+        # Side faces for each boundary edge
+        for a, b in boundary_edges:
+            # Determine orientation from the face that owns the edge
+            owning = edge_faces[(a, b)][0]
+            face = self.faces[owning]
+            # Find the directed edge in the face
+            n = len(face)
+            for i in range(n):
+                if face[i] == a and face[(i + 1) % n] == b:
+                    # directed a -> b
+                    na, nb = vert_map[a], vert_map[b]
+                    # side quad: a, b, nb, na  (or reverse depending on desired winding)
+                    new_faces.append([a, b, nb, na])
+                    break
+                elif face[i] == b and face[(i + 1) % n] == a:
+                    # directed b -> a
+                    na, nb = vert_map[a], vert_map[b]
+                    new_faces.append([b, a, na, nb])
+                    break
+
+        self.vertices = new_vertices
+        self.faces = new_faces
+        # Clear optional derived data so it is recomputed later if needed
+        self.edges = None
+        self.normals = None
+        self.validate()
+
+    def compute_face_normal(self, face_index: int) -> list[float]:
+        """Return approximate face normal (Newell / cross product of first triangle)."""
+        face = self.faces[face_index]
+        if len(face) < 3:
+            return [0.0, 0.0, 1.0]
+        v0 = self.vertices[face[0]]
+        v1 = self.vertices[face[1]]
+        v2 = self.vertices[face[2]]
+        e1 = [v1[i] - v0[i] for i in range(3)]
+        e2 = [v2[i] - v0[i] for i in range(3)]
+        # Cross product
+        n = [
+            e1[1] * e2[2] - e1[2] * e2[1],
+            e1[2] * e2[0] - e1[0] * e2[2],
+            e1[0] * e2[1] - e1[1] * e2[0],
+        ]
+        length = math.sqrt(sum(c * c for c in n)) or 1.0
+        return [c / length for c in n]
+
 
 def create_cube(size: float = 2.0, name: str = "Cube") -> Mesh:
     """Create a unit cube centered at origin, scaled by size/2."""
