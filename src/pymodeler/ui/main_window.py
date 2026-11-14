@@ -122,8 +122,12 @@ class MainWindow(QMainWindow):
         obj = SceneObject(name=name, mesh=mesh)
         self.scene.add_object(obj)
         self.scene.validate()
+        # Select the newly added object
+        self.scene.select(obj, clear=True)
         self.viewport.set_scene(self.scene)
         self._update_outliner()
+        # Select the corresponding outliner item
+        self._select_outliner_item(obj.name)
         self.statusBar().showMessage(f"Added {name}")
 
     def _update_outliner(self) -> None:
@@ -135,27 +139,48 @@ class MainWindow(QMainWindow):
             root.addChild(item)
         self.outliner.expandAll()
 
+    def _select_outliner_item(self, name: str) -> None:
+        """Select the outliner item matching the given object name."""
+        root = self.outliner.topLevelItem(0)
+        if root is None:
+            return
+        for i in range(root.childCount()):
+            child = root.child(i)
+            if child.text(0) == name:
+                self.outliner.setCurrentItem(child)
+                return
+
     def _on_outliner_selection(self) -> None:
         items = self.outliner.selectedItems()
-        if not items:
+        # Sync to scene selection (object mode)
+        self.scene.clear_selection()
+        selected_obj = None
+        if items:
+            name = items[0].text(0)
+            # Ignore the root scene item
+            if name != self.scene.name:
+                self.scene.select(name, clear=True)
+                selected_obj = self.scene.get_object(name)
+
+        # Refresh viewport so selection highlight updates
+        self.viewport.set_scene(self.scene)
+
+        if selected_obj is None:
             self.properties.clear()
             return
-        name = items[0].text(0)
-        for obj in self.scene.objects:
-            if obj.name == name:
-                mesh = obj.mesh
-                text = (
-                    f"Name: {obj.name}\n"
-                    f"Vertices: {len(mesh.vertices)}\n"
-                    f"Faces: {len(mesh.faces)}\n"
-                    f"Location: {obj.transform.location}\n"
-                    f"Rotation: {obj.transform.rotation}\n"
-                    f"Scale: {obj.transform.scale}\n"
-                    f"Visible: {obj.visible}\n"
-                )
-                self.properties.setPlainText(text)
-                return
-        self.properties.setPlainText(f"Selected: {name}")
+
+        mesh = selected_obj.mesh
+        text = (
+            f"Name: {selected_obj.name}\n"
+            f"Vertices: {len(mesh.vertices)}\n"
+            f"Faces: {len(mesh.faces)}\n"
+            f"Location: {selected_obj.transform.location}\n"
+            f"Rotation: {selected_obj.transform.rotation}\n"
+            f"Scale: {selected_obj.transform.scale}\n"
+            f"Visible: {selected_obj.visible}\n"
+            f"Selected: yes\n"
+        )
+        self.properties.setPlainText(text)
 
 
 def run_app() -> None:
