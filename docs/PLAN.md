@@ -43,8 +43,8 @@
 1. Research completed for core modeling features and viewport essentials (see `docs/research/`).
 2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) present and tested.
 3. Phase 1 primitives finished (Cube, Plane, Sphere, Cylinder, Cone).
-4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, and mesh drawing.
-5. Next: selection system (object mode), undo/redo, then viewport polish and gizmos.
+4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, mesh drawing, and selection highlighting.
+5. Next: Undo/Redo command stack (completing Phase 1), then viewport polish (wireframe, lighting, click-select, frame-selected) and transform gizmos.
 6. Prioritized feature inventory drives all future planning.
 
 ## Risk Management
