@@ -42,8 +42,9 @@
 ## Current Focus
 1. Research completed for core modeling features (see `docs/research/`).
 2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) restored and present.
-3. Next: remaining primitives, then real viewport.
-4. Prioritized feature inventory drives all future planning.
+3. Phase 1 primitives finished (Cube, Plane, Sphere, Cylinder, Cone).
+4. Next: GitHub Actions CI, then real viewport (research note + first OpenGL widget).
+5. Prioritized feature inventory drives all future planning.
 
 ## Risk Management
 - Scope is enormous. Never claim "feature complete" until checklist items are truly done and tested against the researched inventory.
