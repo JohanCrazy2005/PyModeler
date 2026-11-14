@@ -12,6 +12,7 @@ from pymodeler.core import (
     RemoveObjectCommand,
     SetTransformCommand,
     ExtrudeMeshCommand,
+    InsetMeshCommand,
 )
 
 
@@ -129,6 +130,33 @@ def test_extrude_mesh_command_undo_redo():
     orig_faces = len(obj.mesh.faces)
 
     cmd = ExtrudeMeshCommand(obj, face_indices=None, direction=(0, 1, 0), distance=0.5)
+    stack.push(cmd)
+
+    assert len(obj.mesh.vertices) > orig_verts
+    assert len(obj.mesh.faces) > orig_faces
+    obj.mesh.validate()
+
+    stack.undo()
+    assert len(obj.mesh.vertices) == orig_verts
+    assert len(obj.mesh.faces) == orig_faces
+    obj.mesh.validate()
+
+    stack.redo()
+    assert len(obj.mesh.vertices) > orig_verts
+    obj.mesh.validate()
+
+
+def test_inset_mesh_command_undo_redo():
+    scene = Scene()
+    mesh = create_cube()
+    obj = SceneObject(name="Cube", mesh=mesh)
+    scene.add_object(obj)
+    stack = CommandStack()
+
+    orig_verts = len(obj.mesh.vertices)
+    orig_faces = len(obj.mesh.faces)
+
+    cmd = InsetMeshCommand(obj, thickness=0.25, depth=0.0)
     stack.push(cmd)
 
     assert len(obj.mesh.vertices) > orig_verts
