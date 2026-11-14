@@ -40,10 +40,10 @@
 - Beyond: Advanced features, performance, community plugins.
 
 ## Current Focus
-1. Complete remaining foundation code (missing modules if any).
-2. Perform initial broad web research on core modeling features of Blender, Maya, 3ds Max, etc.
-3. Produce a prioritized feature inventory and a refined step-by-step plan based on that research.
-4. Then continue building according to the plan (more primitives, real viewport, etc.).
+1. Research completed for core modeling features (see `docs/research/`).
+2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) restored and present.
+3. Next: remaining primitives, then real viewport.
+4. Prioritized feature inventory drives all future planning.
 
 ## Risk Management
 - Scope is enormous. Never claim "feature complete" until checklist items are truly done and tested against the researched inventory.

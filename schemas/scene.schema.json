@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/scene.schema.json",
+  "title": "Scene",
+  "description": "Scene graph for PyModeler. Contains objects with transforms.",
+  "type": "object",
+  "required": ["objects"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "default": "Scene",
+      "description": "Scene name"
+    },
+    "objects": {
+      "type": "array",
+      "description": "List of scene objects",
+      "items": { "$ref": "#/$defs/SceneObject" }
+    }
+  },
+  "$defs": {
+    "Transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "location": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" },
+          "default": [0, 0, 0]
+        },
+        "rotation": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" },
+          "default": [0, 0, 0],
+          "description": "Euler angles in radians (XYZ)"
+        },
+        "scale": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" },
+          "default": [1, 1, 1]
+        }
+      }
+    },
+    "SceneObject": {
+      "type": "object",
+      "required": ["name", "mesh"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "mesh": {
+          "description": "Mesh data (validated separately against mesh schema) or a reference",
+          "type": "object"
+        },
+        "transform": { "$ref": "#/$defs/Transform" },
+        "visible": { "type": "boolean", "default": true },
+        "metadata": { "type": "object", "additionalProperties": true }
+      }
+    }
+  }
+}
