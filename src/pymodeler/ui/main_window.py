@@ -76,6 +76,12 @@ class MainWindow(QMainWindow):
         mesh_menu.addAction("Cylinder", self.add_cylinder)
         mesh_menu.addAction("Cone", self.add_cone)
 
+        view_menu = menubar.addMenu("&View")
+        view_menu.addAction("Frame All", self.frame_all, "Home")
+        view_menu.addAction("Frame Selected", self.frame_selected, "F")
+        view_menu.addSeparator()
+        view_menu.addAction("Toggle Wireframe", self.toggle_wireframe, "Z")
+
     def _build_ui(self) -> None:
         central = QWidget()
         self.setCentralWidget(central)
@@ -92,6 +98,7 @@ class MainWindow(QMainWindow):
         # Viewport (OpenGL)
         self.viewport = ViewportWidget()
         self.viewport.set_scene(self.scene)
+        self.viewport.selection_changed.connect(self._on_viewport_selection)
         splitter.addWidget(self.viewport)
 
         # Properties
@@ -104,6 +111,27 @@ class MainWindow(QMainWindow):
         layout.addWidget(splitter)
 
         self.setStatusBar(QStatusBar())
+
+    def frame_all(self) -> None:
+        self.viewport.frame_all()
+        self.statusBar().showMessage("Framed all")
+
+    def frame_selected(self) -> None:
+        self.viewport.frame_selected()
+        self.statusBar().showMessage("Framed selected")
+
+    def toggle_wireframe(self) -> None:
+        self.viewport.toggle_wireframe()
+        mode = "wireframe" if self.viewport.wireframe else "solid"
+        self.statusBar().showMessage(f"Shading: {mode}")
+
+    def _on_viewport_selection(self) -> None:
+        """Sync outliner when user click-selects in the viewport."""
+        self._update_outliner()
+        selected = self.scene.selected_objects()
+        if selected:
+            self._select_outliner_item(selected[0].name)
+        self.viewport.update()
 
     def new_scene(self) -> None:
         self.scene = Scene(name="Main Scene")
