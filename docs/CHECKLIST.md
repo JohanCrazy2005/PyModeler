@@ -32,7 +32,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] OpenGL / moderngl viewport widget inside PyQt6
 - [x] Camera (orbit, pan, zoom)
 - [x] Grid and axes display
-- [x] Object selection in viewport (highlight via outliner selection; click-to-select pending)
+- [x] Object selection in viewport (outliner sync + click-to-select via raycast)
 - [ ] Transform gizmos (translate / rotate / scale)
 
 ## Phase 3 – Mesh Editing Tools
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Undo/Redo command stack complete; Phase 1 finished)
+Last updated: 2026-11-14 (Phase 2 viewport polish: wireframe, lighting, frame, click-select)
