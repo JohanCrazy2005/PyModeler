@@ -13,6 +13,7 @@ Incrementally build a modeling application that eventually provides the core cap
 - Minimal PyQt6 main window (menu, outliner, viewport placeholder, properties)
 - "Add → Mesh → Cube" works and validates against schema
 - Automated tests for schema + mesh creation
+- GitHub Actions CI (pytest with QT_QPA_PLATFORM=offscreen)
 
 See `docs/GOAL.md`, `docs/CHECKLIST.md`, `docs/PLAN.md`, and `docs/NEXT_STEPS.md` for the full roadmap.
 

@@ -12,12 +12,12 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Add a simple GitHub Actions CI workflow** that runs the tests (use `QT_QPA_PLATFORM=offscreen` and/or headless flags so pytest-qt works in CI).
-2. **Start Phase 2 – Viewport**:
-   - First write a short research note in `docs/research/` summarizing essential viewport features from Blender/Maya (camera orbit/pan/zoom, grid, axes, selection highlighting).
+1. **Start Phase 2 – Viewport** (research note written):
+   - Research note exists: `docs/research/viewport-essentials.md`.
    - Then implement a first moderngl or PyOpenGL widget inside the PyQt6 main window that draws a grid and the currently selected mesh (or all scene meshes) with a basic orbit camera.
-3. After the basic viewport is solid: Selection system (object mode first) and Undo/Redo command stack.
-4. Continue refining PLAN.md with more detailed Phase 2 steps once the research note exists.
+2. After the basic viewport is solid: Selection system (object mode first) and Undo/Redo command stack.
+3. Continue refining PLAN.md with more detailed Phase 2 steps once the research note exists.
+4. Ensure CI remains green; add more platforms (macOS/Windows) later if needed.
 
 ## Notes for Automation
 - Always re-read GOAL.md, CHECKLIST.md, PLAN.md, and this file at the start of a run.
@@ -27,4 +27,4 @@ This research-first → plan → build cycle must be followed for every new majo
 - Prefer small, complete, tested increments.
 - Put research outputs and any generated artifacts under `docs/research/` or `output/` as appropriate.
 - Current research documents: `docs/research/blender-core-features.md` and `docs/research/feature-inventory.md`.
-- Phase 1 primitives (Cube, Plane, Sphere, Cylinder, Cone) are now complete, schema-validated, unit-tested, and exposed in the Add → Mesh menu.
+- Phase 1 primitives (Cube, Plane, Sphere, Cylinder, Cone) are complete. CI workflow is in place (`.github/workflows/ci.yml`) using QT_QPA_PLATFORM=offscreen.

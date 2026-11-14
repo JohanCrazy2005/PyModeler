@@ -43,7 +43,7 @@
 1. Research completed for core modeling features (see `docs/research/`).
 2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) restored and present.
 3. Phase 1 primitives finished (Cube, Plane, Sphere, Cylinder, Cone).
-4. Next: GitHub Actions CI, then real viewport (research note + first OpenGL widget).
+4. CI workflow added (.github/workflows/ci.yml). Next: real viewport (research note + first OpenGL widget).
 5. Prioritized feature inventory drives all future planning.
 
 ## Risk Management

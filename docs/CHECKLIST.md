@@ -11,7 +11,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Basic PyQt6 application window that launches
 - [x] Cross-platform dependency list (requirements.txt)
 - [x] Automated test that the app can start (headless-friendly where possible)
-- [ ] Continuous integration skeleton (GitHub Actions)
+- [x] Continuous integration skeleton (GitHub Actions)
 - [x] Ensure all core source modules (mesh, scene, main_window, tests) are fully present and tested on main
 
 ## Research & Planning (Mandatory before major new work)
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 1 primitives complete: plane/sphere/cylinder/cone + menu + tests)
+Last updated: 2026-11-14 (CI workflow added; Phase 1 primitives complete)
