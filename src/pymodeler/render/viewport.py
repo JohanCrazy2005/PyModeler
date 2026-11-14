@@ -193,7 +193,7 @@ class ViewportWidget(QOpenGLWidget):
         self._grid_vao = None
         self._axes_vbo = None
         self._axes_vao = None
-        self._mesh_vaos: List[Tuple] = []  # (vao, vertex_count, color)
+        self._mesh_vaos: List[Tuple] = []  # (vao, vertex_count, color, model)
         self._last_mouse: Optional[QPoint] = None
         self._gl_ready = False
         self._fallback = False
@@ -272,7 +272,7 @@ class ViewportWidget(QOpenGLWidget):
     def _draw_axes(self, mvp) -> None:
         if self._axes_vao is None:
             return
-        # X red, Y green, Z blue – drawn as three separate segments
+        # X red, Y green, Z blue
         self._prog["mvp"].write(mvp.T.tobytes())
         # X
         self._prog["color"].value = (0.9, 0.2, 0.2)
@@ -338,7 +338,7 @@ class ViewportWidget(QOpenGLWidget):
             for face in mesh.faces:
                 if len(face) < 3:
                     continue
-            for i in range(1, len(face) - 1):
+                for i in range(1, len(face) - 1):
                     tri_indices.extend([face[0], face[i], face[i + 1]])
 
             if not tri_indices:
