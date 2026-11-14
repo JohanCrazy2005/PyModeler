@@ -2,7 +2,7 @@
 
 Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 
-## Phase 0 – Foundation (Current)
+## Phase 0 – Foundation
 - [x] Create public GitHub repository
 - [x] Define GOAL, PLAN, CHECKLIST, NEXT_STEPS
 - [x] Project skeleton with src/, schemas/, tests/, docs/, output/
@@ -12,6 +12,14 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Cross-platform dependency list (requirements.txt)
 - [x] Automated test that the app can start (headless-friendly where possible)
 - [ ] Continuous integration skeleton (GitHub Actions)
+- [ ] Ensure all core source modules (mesh, scene, main_window, tests) are fully present and tested on main
+
+## Research & Planning (Mandatory before major new work)
+- [ ] Create `docs/research/` folder
+- [ ] Web research: Blender core modeling / mesh / viewport / materials / UV / animation features
+- [ ] Web research: key features from Maya, 3ds Max, Cinema 4D (as relevant)
+- [ ] Produce prioritized feature inventory document
+- [ ] Refine PLAN.md and CHECKLIST with detailed step-by-step items based on research
 
 ## Phase 1 – Core Data & Scene
 - [ ] Full Mesh class with vertices, edges, faces, normals (validated against schema)
@@ -53,5 +61,6 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Unit + integration tests for every module before merge
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Document user-facing features as they land
+- [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (initial)
+Last updated: 2026-11-14 (research-first mandate added)

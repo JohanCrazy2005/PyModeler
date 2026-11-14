@@ -15,7 +15,19 @@ Build a free, open-source, cross-platform 3D modeling application in pure Python
   - Tools & Operators
 - **Quality**: Code must be tested before every significant push. Prefer clean, typed, documented code.
 
-## Long-term Capability Targets (inspired by top modeling software)
+## Research-First Mandate
+Before expanding major feature areas, the project (and every automation run that starts a new phase) **must first research the web** for comprehensive feature lists of top modeling software. Document findings in `docs/research/` (or update this GOAL and PLAN). Only after a clear, prioritized feature inventory exists should detailed step-by-step implementation planning and coding begin.
+
+Sources to consult (examples):
+- Official Blender manual / feature overview
+- Autodesk Maya documentation / feature lists
+- 3ds Max, Cinema 4D, Houdini feature pages
+- Wikipedia and comparison articles on 3D modeling software
+- Community lists of essential modeling tools
+
+The goal is a realistic, complete inventory of capabilities so the build plan is grounded in what real top-tier tools actually provide.
+
+## Long-term Capability Targets (initial high-level list – to be expanded/refined via research)
 1. Mesh creation & editing (primitives, extrude, bevel, loop cut, boolean, etc.)
 2. Scene hierarchy / outliner
 3. Materials & textures (PBR basics)
@@ -30,6 +42,6 @@ Build a free, open-source, cross-platform 3D modeling application in pure Python
 12. Add-on / plugin system
 
 ## Success Criteria for "Complete"
-The application is considered to have "all the capabilities the top modeling softwares have" when a professional modeler can create, edit, texture, UV, animate basic objects, and export production-ready assets without needing another tool for core modeling tasks.
+The application is considered to have "all the capabilities the top modeling softwares have" when a professional modeler can create, edit, texture, UV, animate basic objects, and export production-ready assets without needing another tool for core modeling tasks — as validated against the researched feature inventory.
 
 This is a multi-year ambitious project. Progress is incremental, measured by the CHECKLIST and PLAN.
