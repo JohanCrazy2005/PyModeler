@@ -53,3 +53,19 @@ def test_camera_orbit_and_zoom(qapp):
     cam.zoom(120)  # positive wheel-ish
     assert cam.distance != old_dist
     vp.close()
+
+
+def test_wireframe_toggle_and_frame(qapp):
+    vp = ViewportWidget()
+    assert vp.wireframe is False
+    vp.toggle_wireframe()
+    assert vp.wireframe is True
+    scene = Scene(name="Test")
+    obj = SceneObject(name="Cube", mesh=create_cube())
+    scene.add_object(obj)
+    vp.set_scene(scene)
+    # Frame methods should not crash even without GL
+    vp.frame_all()
+    vp.frame_selected()
+    assert vp.camera.distance > 0
+    vp.close()
