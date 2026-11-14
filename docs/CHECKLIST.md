@@ -33,10 +33,11 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Camera (orbit, pan, zoom)
 - [x] Grid and axes display
 - [x] Object selection in viewport (outliner sync + click-to-select via raycast)
-- [x] Transform gizmos (translate / rotate / scale)
+- [x] Transform gizmos (translate / rotate / scale) – now with oriented local axes + drag visual feedback
 - [x] Shading modes (solid, wireframe, solid+edges) + menu
 - [x] Standard views (front/side/top) and perspective/ortho toggle
 - [x] Full transform (loc/rot/scale) applied in frame and raycast
+- [x] Functional MainWindow with menus, outliner, Help → Keyboard Shortcuts
 
 ## Phase 3 – Mesh Editing Tools
 - [ ] Extrude
@@ -66,4 +67,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Phase 2: shading modes, standard views, ortho toggle, full-transform frame/raycast)
+Last updated: 2026-11-14 (Phase 2 gizmo orientation + visual feedback; MainWindow restored with Help menu)
