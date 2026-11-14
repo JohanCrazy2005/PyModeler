@@ -176,3 +176,44 @@ class ExtrudeMeshCommand(Command):
         self.obj.mesh.edges = self._old_edges
         self.obj.mesh.normals = self._old_normals
         self.obj.mesh.validate()
+
+
+class InsetMeshCommand(Command):
+    """Inset faces on a SceneObject's mesh. Stores previous mesh state for undo.
+
+    Basic individual-face inset (thickness as fraction toward centroid + optional depth).
+    """
+
+    def __init__(
+        self,
+        obj: SceneObject,
+        face_indices: Optional[list[int]] = None,
+        thickness: float = 0.2,
+        depth: float = 0.0,
+        individual: bool = True,
+    ) -> None:
+        self.obj = obj
+        self.face_indices = list(face_indices) if face_indices is not None else None
+        self.thickness = float(thickness)
+        self.depth = float(depth)
+        self.individual = bool(individual)
+        # Snapshot current mesh for undo
+        self._old_vertices = [list(v) for v in obj.mesh.vertices]
+        self._old_faces = [list(f) for f in obj.mesh.faces]
+        self._old_edges = obj.mesh.edges
+        self._old_normals = obj.mesh.normals
+
+    def execute(self) -> None:
+        self.obj.mesh.inset_faces(
+            face_indices=self.face_indices,
+            thickness=self.thickness,
+            depth=self.depth,
+            individual=self.individual,
+        )
+
+    def undo(self) -> None:
+        self.obj.mesh.vertices = self._old_vertices
+        self.obj.mesh.faces = self._old_faces
+        self.obj.mesh.edges = self._old_edges
+        self.obj.mesh.normals = self._old_normals
+        self.obj.mesh.validate()
