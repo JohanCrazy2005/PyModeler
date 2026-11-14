@@ -1,5 +1,6 @@
 """Tests for transform gizmo interaction logic (headless-friendly)."""
 
+import math
 import pytest
 from PyQt6.QtWidgets import QApplication
 
@@ -44,7 +45,43 @@ def test_gizmo_hit_and_drag_translate(qapp):
         def x(self): return 450
         def y(self): return 300
     vp._apply_gizmo_drag(FakePos())
-    assert obj.transform.location[0] != 1.0  # moved along X
+    assert obj.transform.location[0] != 1.0  # moved along X (world or local identity)
+    vp.close()
+
+
+def test_gizmo_oriented_translate(qapp):
+    """When object is rotated 90° around Y, local X axis points along world Z."""
+    vp = ViewportWidget()
+    scene = Scene(name="Test")
+    obj = SceneObject(name="Cube", mesh=create_cube())
+    obj.transform.location = [0.0, 0.0, 0.0]
+    obj.transform.rotation = [0.0, math.pi / 2, 0.0]  # 90° Y
+    scene.add_object(obj)
+    scene.select(obj)
+    vp.set_scene(scene)
+    vp.resize(800, 600)
+
+    # Local X should now point mostly along world +Z
+    offsets = vp._local_axes(obj.transform, 1.0)
+    local_x = offsets[0]
+    assert abs(local_x[2]) > abs(local_x[0])  # more Z than X
+
+    # Drag along local X should change world Z more than X
+    vp._gizmo_axis = 0
+    vp._drag_start_mouse = type("P", (), {"x": lambda self: 400, "y": lambda self: 300})()
+    vp._drag_start_transform = Transform(
+        location=[0.0, 0.0, 0.0],
+        rotation=[0.0, math.pi / 2, 0.0],
+    )
+    vp.gizmo_mode = "translate"
+
+    class FakePos:
+        def x(self): return 450
+        def y(self): return 300
+
+    vp._apply_gizmo_drag(FakePos())
+    # After rotation, movement on local X affects Z
+    assert abs(obj.transform.location[2]) > abs(obj.transform.location[0])
     vp.close()
 
 
