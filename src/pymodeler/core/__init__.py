@@ -15,6 +15,7 @@ from .history import (
     AddObjectCommand,
     RemoveObjectCommand,
     SetTransformCommand,
+    ExtrudeMeshCommand,
 )
 
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     "AddObjectCommand",
     "RemoveObjectCommand",
     "SetTransformCommand",
+    "ExtrudeMeshCommand",
 ]
