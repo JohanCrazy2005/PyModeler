@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Basic OpenGL viewport with grid, axes, wireframe meshes, orbit camera)
+Last updated: 2026-11-14 (Viewport widget with orbit camera, grid, axes, mesh drawing; Phase 1 complete)

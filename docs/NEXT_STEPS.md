@@ -12,15 +12,21 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Improve Phase 2 Viewport**:
-   - Add solid/filled shading option (toggle wireframe/solid).
-   - Apply full transform (rotation + scale) in the viewport drawing.
-   - Highlight selected object(s) differently.
-2. **Selection system** (object mode first):
-   - Research note if needed, then implement outliner + viewport click selection.
-   - Store selection on Scene or MainWindow.
-3. **Undo/Redo command stack** (Phase 1 remaining).
-4. Ensure CI remains green; consider software OpenGL fallback if needed.
+1. **Polish Phase 2 Viewport** (basic widget is live):
+   - Improve mesh rendering (wireframe toggle, better lighting / flat shading with normals).
+   - Selection highlighting in the viewport (object mode) once Selection system lands.
+   - Frame-selected / frame-all camera shortcuts.
+2. **Selection system** (object mode first) – mark selected objects, highlight in outliner + viewport.
+3. **Undo/Redo command stack** (command pattern) so add/delete/transform can be reversed.
+4. Continue refining PLAN.md with more detailed Phase 2 steps.
+5. Ensure CI remains green; add more platforms (macOS/Windows) later if needed.
+
+## Recently Completed
+- Phase 1 primitives (Cube, Plane, Sphere, Cylinder, Cone) complete.
+- CI workflow (`.github/workflows/ci.yml`) using QT_QPA_PLATFORM=offscreen.
+- First moderngl + QOpenGLWidget viewport: ground grid, RGB axes, scene meshes, orbit/pan/zoom camera.
+- Viewport gracefully falls back when OpenGL is unavailable (headless CI).
+- Tests for viewport creation, scene binding, camera math, and MainWindow integration.
 
 ## Notes for Automation
 - Always re-read GOAL.md, CHECKLIST.md, PLAN.md, and this file at the start of a run.
@@ -30,4 +36,3 @@ This research-first → plan → build cycle must be followed for every new majo
 - Prefer small, complete, tested increments.
 - Put research outputs and any generated artifacts under `docs/research/` or `output/` as appropriate.
 - Current research documents: `docs/research/blender-core-features.md`, `docs/research/feature-inventory.md`, `docs/research/viewport-essentials.md`.
-- Phase 1 primitives complete. Basic viewport (grid, axes, wireframe meshes, orbit/pan/zoom) is implemented using PyOpenGL + QOpenGLWidget.

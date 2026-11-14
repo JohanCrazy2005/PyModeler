@@ -14,15 +14,11 @@ from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
     QWidget,
-    QVBoxLayout,
     QHBoxLayout,
     QSplitter,
     QTreeWidget,
     QTreeWidgetItem,
-    QLabel,
     QTextEdit,
-    QMenuBar,
-    QMenu,
     QStatusBar,
 )
 
@@ -35,7 +31,7 @@ from pymodeler.core import (
     create_cylinder,
     create_cone,
 )
-from pymodeler.ui.viewport import ViewportWidget
+from pymodeler.render import ViewportWidget
 
 
 class MainWindow(QMainWindow):
@@ -50,7 +46,7 @@ class MainWindow(QMainWindow):
         self._build_menu()
         self._build_ui()
         self._update_outliner()
-        self.statusBar().showMessage("Ready")
+        self.statusBar().showMessage("Ready – drag to orbit, Shift+drag to pan, wheel to zoom")
 
     def _build_menu(self) -> None:
         menubar = self.menuBar()
@@ -80,17 +76,10 @@ class MainWindow(QMainWindow):
         self.outliner.itemSelectionChanged.connect(self._on_outliner_selection)
         splitter.addWidget(self.outliner)
 
-        # Viewport (OpenGL, with graceful fallback)
-        try:
-            self.viewport = ViewportWidget()
-            self.viewport.set_scene(self.scene)
-            splitter.addWidget(self.viewport)
-        except Exception as exc:  # noqa: BLE001
-            fallback = QLabel(f"Viewport unavailable\n({exc})")
-            fallback.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            fallback.setStyleSheet("background-color: #2a2a2a; color: #aaa; font-size: 14px;")
-            splitter.addWidget(fallback)
-            self.viewport = None
+        # Viewport (OpenGL)
+        self.viewport = ViewportWidget()
+        self.viewport.set_scene(self.scene)
+        splitter.addWidget(self.viewport)
 
         # Properties
         self.properties = QTextEdit()
@@ -106,10 +95,9 @@ class MainWindow(QMainWindow):
     def new_scene(self) -> None:
         self.scene = Scene(name="Main Scene")
         self._object_counter = 0
+        self.viewport.set_scene(self.scene)
         self._update_outliner()
         self.properties.clear()
-        if self.viewport is not None:
-            self.viewport.set_scene(self.scene)
         self.statusBar().showMessage("New scene")
 
     def add_cube(self) -> None:
@@ -134,9 +122,8 @@ class MainWindow(QMainWindow):
         obj = SceneObject(name=name, mesh=mesh)
         self.scene.add_object(obj)
         self.scene.validate()
+        self.viewport.set_scene(self.scene)
         self._update_outliner()
-        if self.viewport is not None:
-            self.viewport.set_scene(self.scene)
         self.statusBar().showMessage(f"Added {name}")
 
     def _update_outliner(self) -> None:
@@ -162,6 +149,8 @@ class MainWindow(QMainWindow):
                     f"Vertices: {len(mesh.vertices)}\n"
                     f"Faces: {len(mesh.faces)}\n"
                     f"Location: {obj.transform.location}\n"
+                    f"Rotation: {obj.transform.rotation}\n"
+                    f"Scale: {obj.transform.scale}\n"
                     f"Visible: {obj.visible}\n"
                 )
                 self.properties.setPlainText(text)

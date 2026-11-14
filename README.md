@@ -10,11 +10,10 @@ Incrementally build a modeling application that eventually provides the core cap
 - JSON Schemas for Mesh and Scene
 - Validated Mesh class + primitives (Cube, Plane, Sphere, Cylinder, Cone)
 - Scene / SceneObject with transforms
-- PyQt6 main window with outliner, properties, and **OpenGL viewport**
-- Viewport: ground grid, RGB axes, wireframe meshes, orbit / pan / zoom camera
-- "Add → Mesh → ..." works, validates against schema, and updates the viewport
-- Automated tests for schema + mesh creation + app launch
-- GitHub Actions CI (pytest with QT_QPA_PLATFORM=offscreen)
+- PyQt6 main window (menu, outliner, **OpenGL viewport**, properties)
+- Viewport: moderngl grid + axes + meshes, orbit / pan / zoom camera
+- "Add → Mesh → …" works and validates against schema
+- Automated tests (including viewport) + GitHub Actions CI (offscreen)
 
 See `docs/GOAL.md`, `docs/CHECKLIST.md`, `docs/PLAN.md`, and `docs/NEXT_STEPS.md` for the full roadmap.
 
@@ -45,6 +44,7 @@ PyModeler/
 ├── schemas/        # JSON Schemas (source of truth)
 ├── src/pymodeler/  # Application code
 │   ├── core/       # Mesh, Scene (no Qt)
+│   ├── render/     # Viewport (moderngl)
 │   └── ui/         # PyQt6 windows & widgets
 ├── tests/
 ├── output/         # Build / export artifacts (as requested)

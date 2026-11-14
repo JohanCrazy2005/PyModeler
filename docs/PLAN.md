@@ -1,11 +1,11 @@
-# Master Development Plan
+# Development Plan
 
 ## Guiding Principles
-1. **Research First, Then Plan, Then Build**: Before implementing major new capability areas, research the web for the full feature sets of top modeling software (Blender, Maya, 3ds Max, Cinema 4D, etc.). Document findings. Only then create or refine a detailed step-by-step plan. Coding follows the plan.
-2. **JSON Schema First**: Every persistent or inter-module data structure has a formal JSON Schema. Validate on load/save and at module boundaries.
-3. **Test Before Push**: No code reaches the main branch without automated tests that pass.
-4. **Incremental & Visible Progress**: Each automation run should leave the repo in a better, working state. Prefer small, complete features over large incomplete ones.
-5. **Cross-platform from Day 1**: Use only libraries that work on Windows, macOS, and Linux. Prefer pure-Python or widely available wheels.
+1. **Research First**: Before implementing any major feature area, research how the best tools (Blender, Maya, 3ds Max, Cinema 4D, Houdini) solve the same problem. Document findings under `docs/research/`.
+2. **Living Documents**: GOAL.md, CHECKLIST.md, PLAN.md and NEXT_STEPS.md are continuously updated. They are the single source of truth for the automation loop.
+3. **Small, Tested Increments**: Prefer complete, tested slices over large incomplete features. Main branch must always remain runnable.
+4. **Schema-Driven**: All major data structures (Mesh, Scene, Material, …) are defined by JSON Schemas in `schemas/` and validated at runtime.
+5. **Cross-Platform**: Only public, cross-platform Python libraries. PyQt6 for UI.
 6. **Clean Architecture**:
    - `schemas/` – source of truth for data contracts
    - `src/pymodeler/core/` – pure data & logic (no Qt)
@@ -22,7 +22,7 @@
 - numpy (geometry)
 - jsonschema (validation)
 - trimesh (mesh utilities, optional heavy ops)
-- moderngl or PyOpenGL (viewport)
+- moderngl or PyOpenGL (later for viewport)
 - pillow (textures)
 - pygltflib / gltflib (glTF)
 - pytest (testing)
@@ -40,11 +40,12 @@
 - Beyond: Advanced features, performance, community plugins.
 
 ## Current Focus
-1. Research completed for core modeling features (see `docs/research/`).
-2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) restored and present.
+1. Research completed for core modeling features and viewport essentials (see `docs/research/`).
+2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) present and tested.
 3. Phase 1 primitives finished (Cube, Plane, Sphere, Cylinder, Cone).
-4. CI workflow added (.github/workflows/ci.yml). Basic OpenGL viewport implemented (grid, axes, wireframe scene, orbit camera). Next: selection, full transforms, solid shading.
-5. Prioritized feature inventory drives all future planning.
+4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, and mesh drawing.
+5. Next: selection system (object mode), undo/redo, then viewport polish and gizmos.
+6. Prioritized feature inventory drives all future planning.
 
 ## Risk Management
 - Scope is enormous. Never claim "feature complete" until checklist items are truly done and tested against the researched inventory.
