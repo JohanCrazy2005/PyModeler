@@ -1,9 +1,22 @@
-from .mesh import Mesh, create_cube, validate_mesh_data, MeshValidationError
+from .mesh import (
+    Mesh,
+    create_cube,
+    create_plane,
+    create_sphere,
+    create_cylinder,
+    create_cone,
+    validate_mesh_data,
+    MeshValidationError,
+)
 from .scene import Scene, SceneObject, Transform, validate_scene_data, SceneValidationError
 
 __all__ = [
     "Mesh",
     "create_cube",
+    "create_plane",
+    "create_sphere",
+    "create_cylinder",
+    "create_cone",
     "validate_mesh_data",
     "MeshValidationError",
     "Scene",
