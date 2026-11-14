@@ -12,13 +12,14 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Begin Inset operator research and basic implementation (docs/research/inset-operator.md).
-2. Continue refining PLAN.md with more detailed Phase 3 steps.
+1. Improve Inset: absolute thickness, Offset Even, and basic region mode (shared vertices on internal edges).
+2. Begin Bevel operator research (docs/research/bevel-operator.md) and basic edge bevel.
 3. Consider edit-mode selection (vertex/edge/face) as a foundation for better mesh tools.
 4. Improve normal overlay with optional arrowheads and length control.
 5. Add more overlay options (face indices, vertex indices).
 
 ## Recently Completed
+- Basic Inset operator: research document docs/research/inset-operator.md, Mesh.inset_faces (individual faces, thickness fraction toward centroid + optional depth), InsetMeshCommand for undo/redo, Mesh menu item + I shortcut with thickness/depth dialog, unit tests.
 - Improved side-face winding in extrude (normal-aware flip) and added visual normal overlay + edge overlay toggles in the viewport (View menu, N / Ctrl+E). Updated shortcuts docs, CHECKLIST, and tests.
 - Added Extrude distance / axis-locking dialog (ExtrudeDialog): QDoubleSpinBox for distance, QComboBox for Average Normal / X / Y / Z. Wired into Extrude Region and Individual actions; axis lock overrides per-face normals. Updated tests (bypass dialog in integration test + unit test for dialog defaults), keyboard shortcuts docs, and CHECKLIST.
 - Improved Extrude: individual mode (each face extruded separately with its own sides), optional per-face normals, cleaner side-face winding. UI: Extrude Region (E) and Extrude Individual (Shift+E). ExtrudeMeshCommand updated; tests added.
@@ -49,4 +50,4 @@ This research-first → plan → build cycle must be followed for every new majo
 - Test locally in the sandbox before pushing.
 - Prefer small, complete, tested increments.
 - Put research outputs and any generated artifacts under `docs/research/` or `output/` as appropriate.
-- Current research documents: `docs/research/blender-core-features.md`, `docs/research/feature-inventory.md`, `docs/research/viewport-essentials.md`, `docs/research/extrude-operator.md`.
+- Current research documents: `docs/research/blender-core-features.md`, `docs/research/feature-inventory.md`, `docs/research/viewport-essentials.md`, `docs/research/extrude-operator.md`, `docs/research/inset-operator.md`.
