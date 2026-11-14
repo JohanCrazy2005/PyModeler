@@ -12,21 +12,23 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. **Undo/Redo command stack** (command pattern) so add/delete/transform can be reversed. This completes the remaining Phase 1 item.
-2. **Polish Phase 2 Viewport**:
+1. **Polish Phase 2 Viewport**:
    - Wireframe toggle.
    - Better lighting / flat shading using normals.
    - Frame-selected / frame-all camera shortcuts.
    - Click-to-select in the viewport (raycast or picking).
-3. Transform gizmos (translate / rotate / scale) once selection is solid.
-4. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
-5. Ensure CI remains green.
+2. Transform gizmos (translate / rotate / scale) once selection is solid.
+3. Continue refining PLAN.md with more detailed Phase 2 / 3 steps based on research.
+4. Ensure CI remains green.
+5. Add keyboard shortcuts documentation and more Edit menu polish.
 
 ## Recently Completed
+- Undo/Redo command stack (Command pattern) supporting AddObject, RemoveObject, and SetTransform.
+- Integrated into MainWindow: Add primitives and Delete Selected use the history; Undo/Redo menu + Ctrl+Z / Ctrl+Shift+Z.
 - Object-mode selection system on Scene (select / deselect / clear, by name or object).
 - Outliner selection syncs to scene selection; newly added primitives are auto-selected.
 - Selected objects highlighted with a distinct color in the moderngl viewport.
-- Tests covering selection logic.
+- Tests covering selection logic and history commands.
 - Phase 1 primitives (Cube, Plane, Sphere, Cylinder, Cone) complete.
 - CI workflow (`.github/workflows/ci.yml`) using QT_QPA_PLATFORM=offscreen.
 - First moderngl + QOpenGLWidget viewport: ground grid, RGB axes, scene meshes, orbit/pan/zoom camera.

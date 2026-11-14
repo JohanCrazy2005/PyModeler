@@ -25,7 +25,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Full Mesh class with vertices, edges, faces, normals (validated against schema)
 - [x] Scene graph (objects, hierarchy, transforms)
 - [x] Selection system (object / vertex / edge / face modes) – object mode complete
-- [ ] Undo/Redo stack (command pattern)
+- [x] Undo/Redo stack (command pattern)
 - [x] Basic primitives: Cube, Sphere, Plane, Cylinder, Cone
 
 ## Phase 2 – Viewport & Interaction
@@ -63,4 +63,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Document user-facing features as they land
 - [ ] Maintain research docs as features evolve
 
-Last updated: 2026-11-14 (Object-mode selection system; selected objects highlighted in viewport)
+Last updated: 2026-11-14 (Undo/Redo command stack complete; Phase 1 finished)

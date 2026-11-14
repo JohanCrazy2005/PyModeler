@@ -117,6 +117,16 @@ class Scene:
     def add_object(self, obj: SceneObject) -> None:
         self.objects.append(obj)
 
+    def remove_object(self, name: str) -> Optional[SceneObject]:
+        """Remove and return the object with the given name, or None if not found.
+        Also deselects it if it was selected.
+        """
+        for i, obj in enumerate(self.objects):
+            if obj.name == name:
+                self.deselect(obj)
+                return self.objects.pop(i)
+        return None
+
     def get_object(self, name: str) -> Optional[SceneObject]:
         for obj in self.objects:
             if obj.name == name:

@@ -30,6 +30,9 @@ from pymodeler.core import (
     create_sphere,
     create_cylinder,
     create_cone,
+    CommandStack,
+    AddObjectCommand,
+    RemoveObjectCommand,
 )
 from pymodeler.render import ViewportWidget
 
@@ -41,6 +44,7 @@ class MainWindow(QMainWindow):
         self.resize(1200, 800)
 
         self.scene = Scene(name="Main Scene")
+        self.history = CommandStack()
         self._object_counter = 0
 
         self._build_menu()
@@ -54,6 +58,15 @@ class MainWindow(QMainWindow):
         file_menu = menubar.addMenu("&File")
         file_menu.addAction("New", self.new_scene)
         file_menu.addAction("Quit", self.close)
+
+        edit_menu = menubar.addMenu("&Edit")
+        self.undo_action = edit_menu.addAction("Undo", self.undo)
+        self.undo_action.setShortcut("Ctrl+Z")
+        self.redo_action = edit_menu.addAction("Redo", self.redo)
+        self.redo_action.setShortcut("Ctrl+Shift+Z")
+        edit_menu.addSeparator()
+        delete_action = edit_menu.addAction("Delete Selected", self.delete_selected)
+        delete_action.setShortcut("Delete")
 
         add_menu = menubar.addMenu("&Add")
         mesh_menu = add_menu.addMenu("Mesh")
@@ -94,11 +107,45 @@ class MainWindow(QMainWindow):
 
     def new_scene(self) -> None:
         self.scene = Scene(name="Main Scene")
+        self.history.clear()
         self._object_counter = 0
         self.viewport.set_scene(self.scene)
         self._update_outliner()
         self.properties.clear()
         self.statusBar().showMessage("New scene")
+        self._update_edit_actions()
+
+    def undo(self) -> None:
+        if self.history.undo():
+            self.viewport.set_scene(self.scene)
+            self._update_outliner()
+            self._update_edit_actions()
+            self.statusBar().showMessage("Undo")
+
+    def redo(self) -> None:
+        if self.history.redo():
+            self.viewport.set_scene(self.scene)
+            self._update_outliner()
+            self._update_edit_actions()
+            self.statusBar().showMessage("Redo")
+
+    def delete_selected(self) -> None:
+        selected = self.scene.selected_objects()
+        if not selected:
+            return
+        # Delete in reverse order so indices stay valid if we used index-based, but name-based is fine
+        for obj in reversed(selected):
+            cmd = RemoveObjectCommand(self.scene, obj)
+            self.history.push(cmd)
+        self.viewport.set_scene(self.scene)
+        self._update_outliner()
+        self.properties.clear()
+        self._update_edit_actions()
+        self.statusBar().showMessage(f"Deleted {len(selected)} object(s)")
+
+    def _update_edit_actions(self) -> None:
+        self.undo_action.setEnabled(self.history.can_undo())
+        self.redo_action.setEnabled(self.history.can_redo())
 
     def add_cube(self) -> None:
         self._add_primitive("Cube", create_cube)
@@ -120,7 +167,8 @@ class MainWindow(QMainWindow):
         name = f"{base_name}.{self._object_counter:03d}" if self._object_counter > 1 else base_name
         mesh = factory(name=name)
         obj = SceneObject(name=name, mesh=mesh)
-        self.scene.add_object(obj)
+        cmd = AddObjectCommand(self.scene, obj)
+        self.history.push(cmd)
         self.scene.validate()
         # Select the newly added object
         self.scene.select(obj, clear=True)
@@ -128,6 +176,7 @@ class MainWindow(QMainWindow):
         self._update_outliner()
         # Select the corresponding outliner item
         self._select_outliner_item(obj.name)
+        self._update_edit_actions()
         self.statusBar().showMessage(f"Added {name}")
 
     def _update_outliner(self) -> None:

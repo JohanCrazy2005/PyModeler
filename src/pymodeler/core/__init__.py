@@ -9,6 +9,13 @@ from .mesh import (
     MeshValidationError,
 )
 from .scene import Scene, SceneObject, Transform, validate_scene_data, SceneValidationError
+from .history import (
+    Command,
+    CommandStack,
+    AddObjectCommand,
+    RemoveObjectCommand,
+    SetTransformCommand,
+)
 
 __all__ = [
     "Mesh",
@@ -24,4 +31,9 @@ __all__ = [
     "Transform",
     "validate_scene_data",
     "SceneValidationError",
+    "Command",
+    "CommandStack",
+    "AddObjectCommand",
+    "RemoveObjectCommand",
+    "SetTransformCommand",
 ]
