@@ -12,13 +12,14 @@ This file is updated by every automation run. It should always contain the concr
 This research-first → plan → build cycle must be followed for every new major area.
 
 ## Immediate Priority (Next runs)
-1. Add a simple distance / axis-locking dialog or modal for Extrude (currently fixed at 1.0).
-2. Improve side-face winding further and add visual normal overlay in the viewport.
-3. Begin Inset operator research and basic implementation (docs/research/inset-operator.md).
-4. Add overlay toggles (normals, edge highlighting).
-5. Continue refining PLAN.md with more detailed Phase 3 steps.
+1. Improve side-face winding further and add visual normal overlay in the viewport.
+2. Begin Inset operator research and basic implementation (docs/research/inset-operator.md).
+3. Add overlay toggles (normals, edge highlighting).
+4. Continue refining PLAN.md with more detailed Phase 3 steps.
+5. Consider edit-mode selection (vertex/edge/face) as a foundation for better mesh tools.
 
 ## Recently Completed
+- Added Extrude distance / axis-locking dialog (ExtrudeDialog): QDoubleSpinBox for distance, QComboBox for Average Normal / X / Y / Z. Wired into Extrude Region and Individual actions; axis lock overrides per-face normals. Updated tests (bypass dialog in integration test + unit test for dialog defaults), keyboard shortcuts docs, and CHECKLIST.
 - Improved Extrude: individual mode (each face extruded separately with its own sides), optional per-face normals, cleaner side-face winding. UI: Extrude Region (E) and Extrude Individual (Shift+E). ExtrudeMeshCommand updated; tests added.
 - Wired Extrude into the UI: Mesh menu item + keyboard E (object mode: extrudes all faces of selected objects along the average face normal by distance 1.0). Uses existing ExtrudeMeshCommand for undo/redo. Updated keyboard shortcuts docs and tests.
 - Basic Extrude operator: Mesh.extrude_faces (region extrude of selected face indices or whole mesh along a direction), ExtrudeMeshCommand for undo/redo, research document docs/research/extrude-operator.md, unit tests.
