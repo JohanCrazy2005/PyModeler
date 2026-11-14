@@ -158,3 +158,34 @@ def test_extrude_side_faces_have_outward_normals():
     # At least some sides should point somewhat outward (positive or mixed, but not all strongly negative)
     assert any(z > -0.1 for z in side_normals_z)
     mesh.validate()
+
+
+def test_inset_single_face_on_plane():
+    mesh = create_plane()
+    original_verts = len(mesh.vertices)
+    original_faces = len(mesh.faces)
+    mesh.inset_faces(face_indices=[0], thickness=0.3)
+    # New verts for the inset face + border faces
+    assert len(mesh.vertices) > original_verts
+    assert len(mesh.faces) == original_faces + 4  # 1 inset + 4 borders
+    mesh.validate()
+    # Inset face should be smaller (closer to center)
+    zs = [v[2] for v in mesh.vertices]
+    assert all(abs(z) < 1e-6 for z in zs)  # still planar
+
+
+def test_inset_with_depth():
+    mesh = create_plane()
+    mesh.inset_faces(thickness=0.2, depth=0.5)
+    zs = [v[2] for v in mesh.vertices]
+    assert max(zs) > 0.4
+    mesh.validate()
+
+
+def test_inset_whole_cube_individual():
+    mesh = create_cube()
+    original_faces = len(mesh.faces)
+    mesh.inset_faces(thickness=0.15)
+    # Each of 6 faces produces 4 border faces; original faces are replaced
+    assert len(mesh.faces) == original_faces + 6 * 4
+    mesh.validate()
