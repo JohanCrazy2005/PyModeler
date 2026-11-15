@@ -7,6 +7,11 @@
   "required": ["entities"],
   "additionalProperties": false,
   "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique sketch identifier"
+    },
     "name": {
       "type": "string",
       "default": "Sketch",
@@ -24,14 +29,14 @@
           "items": { "type": "number" },
           "default": [0.0, 0.0, 0.0]
         },
-        "x_dir": {
+        "x_axis": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
           "items": { "type": "number" },
           "default": [1.0, 0.0, 0.0]
         },
-        "y_dir": {
+        "y_axis": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
@@ -64,13 +69,6 @@
     }
   },
   "$defs": {
-    "point2d": {
-      "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
-      "items": { "type": "number" },
-      "description": "[x, y] in sketch plane coordinates"
-    },
     "entity_id": {
       "type": "string",
       "minLength": 1,
@@ -89,16 +87,21 @@
         "construction": {
           "type": "boolean",
           "default": false,
-          "description": "If true, entity is construction geometry (not part of solid profiles)"
+          "description": "If true, entity is construction geometry"
         },
-        "x": { "type": "number", "description": "Point x (sketch plane)" },
-        "y": { "type": "number", "description": "Point y (sketch plane)" },
-        "start": { "$ref": "#/$defs/entity_id", "description": "Line start point entity id" },
-        "end": { "$ref": "#/$defs/entity_id", "description": "Line end point entity id" },
-        "center": { "$ref": "#/$defs/entity_id", "description": "Circle/arc center point entity id" },
-        "radius": { "type": "number", "minimum": 0, "description": "Circle or arc radius" },
-        "start_angle": { "type": "number", "description": "Arc start angle in radians" },
-        "end_angle": { "type": "number", "description": "Arc end angle in radians" }
+        "fixed": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, point is fixed in place"
+        },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "start_point": { "$ref": "#/$defs/entity_id" },
+        "end_point": { "$ref": "#/$defs/entity_id" },
+        "center": { "$ref": "#/$defs/entity_id" },
+        "radius": { "type": "number", "minimum": 0 },
+        "start_angle": { "type": "number" },
+        "end_angle": { "type": "number" }
       },
       "allOf": [
         {
@@ -107,7 +110,7 @@
         },
         {
           "if": { "properties": { "type": { "const": "line" } } },
-          "then": { "required": ["start", "end"] }
+          "then": { "required": ["start_point", "end_point"] }
         },
         {
           "if": { "properties": { "type": { "const": "circle" } } },
@@ -144,8 +147,11 @@
         "entities": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/entity_id" },
-          "description": "Entity ids involved in the constraint"
+          "items": { "$ref": "#/$defs/entity_id" }
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     },
@@ -157,25 +163,26 @@
         "id": { "type": "string", "minLength": 1 },
         "type": {
           "type": "string",
-          "enum": ["distance", "radius", "diameter", "angle"]
+          "enum": ["length", "distance", "radius", "diameter", "angle"]
         },
         "value": {
           "oneOf": [
             { "type": "number" },
-            { "type": "string", "minLength": 1, "description": "Parameter name reference" }
-          ],
-          "description": "Numeric value or name of a user parameter"
+            { "type": "string", "minLength": 1 }
+          ]
         },
         "entities": {
           "type": "array",
           "minItems": 1,
-          "items": { "$ref": "#/$defs/entity_id" },
-          "description": "Entity ids the dimension applies to"
+          "items": { "$ref": "#/$defs/entity_id" }
         },
         "driven": {
           "type": "boolean",
-          "default": false,
-          "description": "If true, dimension is driven (measured) rather than driving"
+          "default": false
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
         }
       }
     }
