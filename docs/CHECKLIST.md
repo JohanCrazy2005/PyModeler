@@ -20,7 +20,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Research notes: Onshape Part Studios, feature history, configurations, collaboration model
 - [x] Research notes: Mozaik cut lists, nesting, joinery, hardware, G-code / manufacturing outputs
 - [x] Prioritized feature inventory document aligned with Fusion/Onshape/Mozaik goal
-- [x] Refine PLAN.md and this CHECKLIST with concrete next implementation steps
+- [~] Refine PLAN.md and this CHECKLIST with concrete next implementation steps
 
 ## Phase 1 – Parametric Core (Sketch + Features)
 - [x] Sketch schema + data model (entities, constraints, dimensions)
@@ -59,4 +59,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-15 (Sketch schema + core data model implemented and tested)
+Last updated: 2026-11-15 (Sketch schema + core data model implemented, tested, exported)

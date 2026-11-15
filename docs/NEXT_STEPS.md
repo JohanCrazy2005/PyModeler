@@ -9,23 +9,34 @@ This file is updated by every automation run.
 4. Implement small, tested increments. Update schemas, tests, and living docs. Push.
 
 ## Immediate Priority
-Sketch data model foundation is complete (`schemas/sketch.schema.json` + `src/pymodeler/core/sketch.py` + tests). Next concrete work:
+
+Sketch data model foundation is complete and tested:
+- `schemas/sketch.schema.json` aligned with core implementation
+- `src/pymodeler/core/sketch.py` with entities, constraints, dimensions, rectangle factory
+- Unit tests (9) all passing; symbols exported from `pymodeler.core`
+
+Next concrete work:
 
 1. **Parameter system stub**
-   - Create `schemas/parameter.schema.json` for user parameters / variables.
-   - Implement `src/pymodeler/core/parameter.py` with a simple ParameterStore that can resolve named values.
-   - Allow sketch dimensions to reference parameter names (already supported as string values).
-   - Unit tests for store, resolution, and schema validation.
+   - Create `schemas/parameter.schema.json` for named user parameters (name, value, expression, unit optional).
+   - Implement `src/pymodeler/core/parameters.py` with a ParameterStore that dimensions can reference by name.
+   - Unit tests for create/update/evaluate (simple numeric + named refs) and schema round-trip.
 
 2. **Keep foundation solid**
-   - Confirm all existing core tests pass.
+   - Confirm all existing tests pass.
    - Any small cleanups needed for main to stay runnable.
 
-After parameters are in place and tested, the next increments will be:
-- Basic Extrude feature (sketch profile → solid mesh or simple geometry), with parameter-driven distance.
-- Feature history data model (timeline entries that store inputs).
-- Timeline / feature tree UI stub.
-- Initial 2D sketch editor widgets.
+After Parameter system is in place and tested, the next increments will be:
+- Basic Extrude feature (sketch profile → solid mesh or simple geometry) with parameter-driven distance
+- Feature history data model (timeline of features)
+- Timeline / feature tree UI stub
+- Initial 2D sketch editor widgets
+
+## Recently Completed
+- Sketch JSON Schema (point, line, circle, arc; constraints; dimensions with numeric or parameter-name values)
+- Sketch class with add_* helpers, create_rectangle_sketch, schema validation
+- Tests for creation, constraints, dimensions, parameter refs, round-trip
+- Core package exports updated
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).
@@ -33,4 +44,4 @@ After parameters are in place and tested, the next increments will be:
 - Keep JSON schemas as the source of truth for all data.
 - Test before every push. Keep main runnable.
 - Put research outputs in `docs/research/` and any generated examples in `output/`.
-- Research documents for Fusion, Onshape, and Mozaik are in place; consult them before expanding Phase 1.
+- Research documents for Fusion, Onshape, and Mozaik are now in place; consult them before expanding Phase 1.
