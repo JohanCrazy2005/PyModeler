@@ -43,8 +43,8 @@
 
 ## Current Focus
 1. Research on parametric modeling (Fusion/Onshape) and manufacturing features (Mozaik) is complete and documented.
-2. Implement the Sketch data model + JSON Schema as the foundation of the parametric core.
-3. Add a simple Parameter system.
+2. Sketch data model + JSON Schema is implemented and tested (entities, constraints, dimensions).
+3. Next: simple Parameter / variable system so dimensions can be driven by named parameters.
 4. Then Extrude feature and feature history.
 5. Keep all changes small, tested, and main-branch safe.
 
