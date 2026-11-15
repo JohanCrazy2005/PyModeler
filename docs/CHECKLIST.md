@@ -26,8 +26,8 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Sketch schema + data model (entities, constraints, dimensions)
 - [x] User Parameters / variables system
 - [ ] Basic 2D sketch editor in UI
-- [ ] Extrude feature (from sketch to solid) with parameters
-- [ ] Feature history / timeline data model + simple UI
+- [x] Extrude feature (from sketch to solid) with parameters
+- [x] Feature history / timeline data model + simple recompute
 - [ ] Revolve feature
 - [ ] Fully constrained sketch validation
 
@@ -59,4 +59,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-15 (ParameterStore schema + implementation, tests, research note)
+Last updated: 2026-11-15 (ExtrudeFeature + FeatureHistory schemas, implementation, tests, research note)

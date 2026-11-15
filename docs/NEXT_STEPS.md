@@ -10,34 +10,36 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Parameter system is complete and tested:
-- `schemas/parameter.schema.json` (name, value, expression, unit, comment)
-- `src/pymodeler/core/parameters.py` — ParameterStore with create/update/evaluate (numeric + named refs + basic arithmetic)
-- Research note in `docs/research/parameters-variables.md`
-- 8 unit tests passing; symbols exported from `pymodeler.core`
+Extrude feature and FeatureHistory are complete and tested:
+- `schemas/extrude.schema.json` + `schemas/feature_history.schema.json`
+- `src/pymodeler/core/features.py` — ExtrudeFeature (sketch + numeric/parameter distance → solid mesh) and FeatureHistory (timeline + recompute)
+- Research note in `docs/research/extrude-feature.md`
+- Unit tests passing; symbols exported from `pymodeler.core`
 
 Next concrete work:
 
-1. **Basic Extrude feature**
-   - Schema for Extrude feature (profile sketch reference + distance parameter or numeric)
-   - Implementation that produces a simple solid (mesh or parametric solid stub) driven by a sketch + distance parameter
-   - Unit tests for creation, parameter-driven distance, schema round-trip
+1. **Timeline / feature tree UI stub**
+   - PyQt6 tree or list that displays FeatureHistory and allows selecting features
+   - Property panel that shows Extrude distance (and allows editing parameter references)
 
-2. **Feature history data model**
-   - Timeline of features (sketch → extrude → …) that can be serialized and recomputed
+2. **Basic 2D sketch editor widgets**
+   - Simple canvas or table-based editor to create/edit sketch entities and dimensions
 
-3. Keep foundation solid; all existing tests must continue to pass.
+3. **Revolve feature**
+   - Schema + implementation analogous to Extrude (profile + axis + angle)
 
-After Extrude + history stubs, next increments:
-- Timeline / feature tree UI stub
-- Initial 2D sketch editor widgets
-- Revolve feature
+4. Keep foundation solid; all existing tests must continue to pass.
+
+After UI stubs, next increments:
+- Better profile support in Extrude (arcs, circles)
+- Start offset / symmetric improvements
+- Boolean operations (join/cut) on generated meshes
 
 ## Recently Completed
-- ParameterStore + JSON Schema + expression evaluation (simple arithmetic + named refs)
-- Research notes for parameters/variables in Fusion, Onshape, Mozaik
-- Sketch JSON Schema + core data model (entities, constraints, dimensions)
-- Core package exports updated
+- ExtrudeFeature + FeatureHistory (schema, parameter-driven distance, mesh generation, recompute)
+- Research notes for parametric Extrude in Fusion 360 and Onshape
+- ParameterStore + JSON Schema + expression evaluation
+- Sketch JSON Schema + core data model
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).

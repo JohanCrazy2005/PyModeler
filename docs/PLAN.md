@@ -45,8 +45,8 @@
 1. Research on parametric modeling (Fusion/Onshape) and manufacturing features (Mozaik) is complete and documented.
 2. Sketch data model + JSON Schema is implemented and tested (entities, constraints, dimensions).
 3. Parameter / variable system implemented and tested (named params, simple expressions).
-4. Next: Extrude feature and feature history data model.
-5. Keep all changes small, tested, and main-branch safe.
+4. Extrude feature + FeatureHistory data model implemented and tested (parameter-driven distance, simple solid generation).
+5. Next: Timeline/feature tree UI stub, basic sketch editor widgets, then Revolve.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.
