@@ -1,13 +1,14 @@
 # Research Notes
 
-This folder holds structured research on features of top 3D modeling applications (Blender, Maya, 3ds Max, Cinema 4D, etc.).
+This folder holds structured research on features of parametric CAD and design-to-manufacture applications (Fusion 360 / Autodesk Fusion, Onshape, Mozaik, and related tools).
 
 **Mandate**: Before starting major new feature areas, consult the web, document findings here, then update PLAN.md / CHECKLIST.md with a concrete step-by-step plan. Only then implement.
 
 ## Contents
-- `blender-core-features.md` – Core modeling, mesh tools, viewport, materials, UV, animation basics from Blender.
-- `feature-inventory.md` – Prioritized inventory of capabilities PyModeler should eventually support.
+- `fusion-360-parametric.md` – Parametric modeling, sketch constraints & dimensions, feature timeline, parameters.
+- `onshape-part-studio.md` – Part Studios, feature history, configurations approach.
+- `mozaik-manufacturing.md` – Cut lists, nesting, joinery, manufacturing outputs.
+- `feature-inventory.md` – Prioritized inventory of capabilities aligned with the CAD/CAM goal.
+- Legacy notes (from earlier Blender-focused research): `blender-core-features.md`, `extrude-operator.md`, `inset-operator.md`, `viewport-essentials.md`.
 
-- `viewport-essentials.md` – Minimal viewport navigation, grid, axes, and drawing requirements for Phase 2 first increment (Blender/Maya).
-
-Last updated: 2026-11-14 (viewport essentials added)
+Last updated: 2026-11-15 (Fusion / Onshape / Mozaik research completed)
