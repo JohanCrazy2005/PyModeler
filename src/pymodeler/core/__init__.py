@@ -18,6 +18,12 @@ from .history import (
     ExtrudeMeshCommand,
     InsetMeshCommand,
 )
+from .sketch import (
+    Sketch,
+    create_rectangle_sketch,
+    validate_sketch_data,
+    SketchValidationError,
+)
 
 __all__ = [
     "Mesh",
@@ -40,4 +46,8 @@ __all__ = [
     "SetTransformCommand",
     "ExtrudeMeshCommand",
     "InsetMeshCommand",
+    "Sketch",
+    "create_rectangle_sketch",
+    "validate_sketch_data",
+    "SketchValidationError",
 ]
