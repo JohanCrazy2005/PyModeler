@@ -35,20 +35,21 @@
 4. Implement + schema + tests + update living docs.
 
 ## High-level Roadmap (CAD/CAM oriented)
-- **Phase 0-1 (Foundation)**: Project structure, basic scene, simple solids, PyQt6 shell, research documents.
+- **Phase 0-1 (Foundation)**: Project structure, basic scene, simple solids, PyQt6 shell, research documents. (mostly complete)
 - **Phase 2 (Sketch + Parametric Core)**: 2D sketch engine with constraints/dimensions, Extrude/Revolve, feature history.
 - **Phase 3 (Parts & Assemblies)**: Multi-feature parts, basic assemblies and mates.
 - **Phase 4 (Manufacturing Helpers)**: Cut lists, BOMs, simple nesting concepts, dimensioned outputs (Mozaik-inspired).
 - **Phase 5 (Advanced + CAM path)**: Sheet metal basics, configurations, early toolpath / G-code stubs, simulation data.
 
 ## Current Focus
-1. Complete any remaining foundation code and ensure tests pass.
-2. Perform and document research on parametric modeling workflows in Fusion 360 and Onshape + manufacturing features in Mozaik.
-3. Create `docs/research/` with clear inventories.
-4. Refine the step-by-step plan for the Sketch + Extrude foundation.
-5. Begin implementing the parametric core according to the plan.
+1. Research on parametric modeling (Fusion/Onshape) and manufacturing features (Mozaik) is complete and documented.
+2. Implement the Sketch data model + JSON Schema as the foundation of the parametric core.
+3. Add a simple Parameter system.
+4. Then Extrude feature and feature history.
+5. Keep all changes small, tested, and main-branch safe.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.
 - Prefer proven libraries for geometry kernels when the pure-Python approach becomes limiting.
 - Main branch always runnable.
+- Constraint solving and robust B-Rep are non-trivial; start with simple validated sketches and mesh-based solids before investing in heavy kernels.
