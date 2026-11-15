@@ -47,7 +47,8 @@
 3. Parameter / variable system implemented and tested (named params, simple expressions).
 4. Extrude feature + FeatureHistory data model implemented and tested (parameter-driven distance, simple solid generation).
 5. Timeline/feature tree UI stub implemented (list + property panel).
-6. Basic table-based 2D sketch editor widget implemented and integrated (add entities, dimensions). Next: Revolve feature.
+6. Basic table-based 2D sketch editor widget implemented and integrated (add entities, dimensions).
+7. Revolve feature implemented and tested (parameter-driven angle, simple solid of revolution). Next: improve sketch editor interactivity.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

@@ -32,9 +32,11 @@ from .parameters import (
 )
 from .features import (
     ExtrudeFeature,
+    RevolveFeature,
     FeatureHistory,
     FeatureValidationError,
     validate_extrude_data,
+    validate_revolve_data,
     validate_history_data,
 )
 
@@ -68,8 +70,10 @@ __all__ = [
     "ParameterEvaluationError",
     "validate_parameter_data",
     "ExtrudeFeature",
+    "RevolveFeature",
     "FeatureHistory",
     "FeatureValidationError",
     "validate_extrude_data",
+    "validate_revolve_data",
     "validate_history_data",
 ]

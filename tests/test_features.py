@@ -1,4 +1,4 @@
-"""Tests for ExtrudeFeature and FeatureHistory."""
+"""Tests for ExtrudeFeature, RevolveFeature, and FeatureHistory."""
 
 import pytest
 
@@ -6,8 +6,10 @@ from pymodeler.core.features import (
     ExtrudeFeature,
     FeatureHistory,
     FeatureValidationError,
+    RevolveFeature,
     validate_extrude_data,
     validate_history_data,
+    validate_revolve_data,
 )
 from pymodeler.core.parameters import ParameterStore
 from pymodeler.core.sketch import create_rectangle_sketch
@@ -83,3 +85,63 @@ def test_positive_distance_required():
     feat = ExtrudeFeature(sketch_id=sketch.id, distance=-1.0)
     with pytest.raises(FeatureValidationError):
         feat.generate_mesh(sketch)
+
+
+def test_revolve_numeric_angle():
+    sketch = create_rectangle_sketch(width=10.0, height=5.0)
+    feat = RevolveFeature(sketch_id=sketch.id, angle=180.0, name="HalfTurn")
+    assert feat.type == "revolve"
+    assert feat.resolved_angle() == 180.0
+    mesh = feat.generate_mesh(sketch)
+    assert len(mesh.vertices) > 0
+    assert len(mesh.faces) > 0
+    feat.validate()
+
+
+def test_revolve_parameter_angle():
+    sketch = create_rectangle_sketch(width=8.0, height=4.0)
+    store = ParameterStore()
+    store.add("Angle", value=90.0, unit="deg")
+    feat = RevolveFeature(sketch_id=sketch.id, angle="Angle")
+    assert feat.resolved_angle(store) == 90.0
+    mesh = feat.generate_mesh(sketch, store)
+    assert len(mesh.vertices) > 8
+
+
+def test_revolve_schema_roundtrip():
+    feat = RevolveFeature(sketch_id="sketch_abc", angle="Turn", symmetric=True, segments=12)
+    data = feat.to_dict()
+    validate_revolve_data(data)
+    restored = RevolveFeature.from_dict(data)
+    assert restored.sketch_id == feat.sketch_id
+    assert restored.angle == feat.angle
+    assert restored.symmetric is True
+    assert restored.segments == 12
+
+
+def test_revolve_invalid_schema():
+    with pytest.raises(FeatureValidationError):
+        RevolveFeature.from_dict({"type": "revolve", "angle": 90.0})  # missing sketch_id
+
+
+def test_revolve_in_history():
+    sketch = create_rectangle_sketch()
+    hist = FeatureHistory(name="PartWithRevolve")
+    feat = RevolveFeature(sketch_id=sketch.id, angle=360.0)
+    hist.add_revolve(feat)
+    assert len(hist.features) == 1
+    hist.validate()
+    restored = FeatureHistory.from_dict(hist.to_dict())
+    assert len(restored.get_revolve_features()) == 1
+    meshes = hist.recompute_meshes({sketch.id: sketch})
+    assert feat.id in meshes
+
+
+def test_revolve_angle_bounds():
+    sketch = create_rectangle_sketch()
+    feat = RevolveFeature(sketch_id=sketch.id, angle=0.0)
+    with pytest.raises(FeatureValidationError):
+        feat.generate_mesh(sketch)
+    feat2 = RevolveFeature(sketch_id=sketch.id, angle=400.0)
+    with pytest.raises(FeatureValidationError):
+        feat2.generate_mesh(sketch)

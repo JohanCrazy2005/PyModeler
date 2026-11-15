@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/revolve.schema.json",
+  "title": "RevolveFeature",
+  "description": "Parametric Revolve feature: rotates a sketch profile around an axis by an angle to create a solid.",
+  "type": "object",
+  "required": ["id", "type", "sketch_id", "angle"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique feature identifier"
+    },
+    "type": {
+      "type": "string",
+      "const": "revolve",
+      "description": "Feature type discriminator"
+    },
+    "name": {
+      "type": "string",
+      "default": "Revolve",
+      "description": "Human-readable feature name"
+    },
+    "sketch_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ID of the driving Sketch"
+    },
+    "angle": {
+      "description": "Revolve angle in degrees: numeric value or parameter name / expression string",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "axis": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Optional axis direction vector (defaults to sketch plane Y-axis / [0,1,0])"
+    },
+    "axis_origin": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Optional point on the axis (defaults to sketch plane origin)"
+    },
+    "symmetric": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, revolve equally in both directions (angle is total)"
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["new", "join", "cut", "intersect"],
+      "default": "new",
+      "description": "Boolean operation intent (currently only 'new' is implemented)"
+    },
+    "segments": {
+      "type": "integer",
+      "minimum": 4,
+      "maximum": 64,
+      "default": 16,
+      "description": "Number of facets used when approximating the solid of revolution"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

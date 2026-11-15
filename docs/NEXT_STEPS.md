@@ -10,32 +10,33 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Basic 2D sketch editor widget is complete and tested (table-based stub):
-- `src/pymodeler/ui/sketch_editor.py` — SketchEditorWidget (tabs for entities/constraints/dimensions, add point/line/circle/rectangle, add dimensions)
-- Integrated into MainWindow via Sketch menu (New / Edit / Add Rectangle)
-- Research note in `docs/research/sketch-editor-ui.md`
-- Unit tests for the widget
+Revolve feature is complete and tested (schema + parameter-driven angle + simple solid-of-revolution mesh):
+- `schemas/revolve.schema.json`
+- `src/pymodeler/core/features.py` — RevolveFeature (angle numeric or parameter, optional axis, segments)
+- Integrated into FeatureHistory (add_revolve, get_revolve_features, recompute_meshes)
+- Research note in `docs/research/revolve-feature.md`
+- Unit tests for the feature and history integration
 
 Next concrete work:
 
-1. **Revolve feature**
-   - Schema + implementation analogous to Extrude (profile + axis + angle)
-   - Research note first
-
-2. **Improve sketch editor**
+1. **Improve sketch editor**
    - Editable table cells for point coordinates and dimension values
    - Better selection of entities when adding lines/dimensions
 
+2. **Better profile support**
+   - Extrude and Revolve should handle simple polygons and circles better
+   - Arc support in profile extraction
+
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After Revolve, next increments:
-- Better profile support in Extrude (arcs, circles)
-- Start offset / symmetric improvements
+After sketch editor improvements, next increments:
+- Start offset / symmetric improvements for Extrude
 - Boolean operations (join/cut) on generated meshes
 - Rollback marker and feature reordering in the timeline
 - Visual 2D canvas for sketching
 
 ## Recently Completed
+- Revolve feature (schema, parameter-driven angle, faceted solid of revolution, FeatureHistory integration)
 - Basic 2D sketch editor widgets (table-based) + research note
 - Feature tree / timeline UI stub + property panel for Extrude features
 - ExtrudeFeature + FeatureHistory (schema, parameter-driven distance, mesh generation, recompute)

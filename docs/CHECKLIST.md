@@ -28,7 +28,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Basic 2D sketch editor in UI
 - [x] Extrude feature (from sketch to solid) with parameters
 - [x] Feature history / timeline data model + simple recompute
-- [ ] Revolve feature
+- [x] Revolve feature
 - [ ] Fully constrained sketch validation
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
@@ -59,4 +59,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-15 (Basic 2D sketch editor widget + integration)
+Last updated: 2026-11-15 (Revolve feature + research note)
