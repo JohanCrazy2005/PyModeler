@@ -1,73 +1,65 @@
-# PyModeler Feature Inventory (Prioritized)
+# PyModeler Feature Inventory (Prioritized) — CAD / CAM Focus
 
-Synthesized from research on Blender (primary), with cross-checks against Maya, 3ds Max, and Cinema 4D.
+Synthesized from research on Fusion 360 / Autodesk Fusion, Onshape, and Mozaik, aligned with the parametric CAD + design-to-manufacture goal.
 
-**Goal**: A professional modeler can create, edit, texture, UV, and export basic production assets without leaving PyModeler for core modeling tasks.
+**Goal**: A user can create parametric parts from constrained sketches and features, build simple assemblies, generate cut lists / basic manufacturing outputs, and export usable geometry in a workflow familiar to Fusion 360 / Onshape users, with practical manufacturing helpers inspired by Mozaik.
 
 ## Priority Tiers
 
-### P0 – Foundation (must exist before anything else)
-- [ ] Robust Mesh data model (vertices, faces, optional edges/normals/UVs) + JSON Schema
-- [ ] Scene graph: objects, hierarchy, transforms (location/rotation/scale)
-- [ ] JSON Schema for Scene / SceneObject
-- [ ] Undo/Redo command stack
-- [ ] Basic PyQt6 application shell (menus, outliner, properties, status)
-- [ ] Cross-platform packaging & CI skeleton
+### P0 – Foundation (largely complete)
+- [x] Robust Mesh data model (legacy utility) + JSON Schema
+- [x] Scene graph basics + JSON Schema
+- [x] Undo/Redo command stack
+- [x] Basic PyQt6 application shell
+- [x] Cross-platform dependencies + CI skeleton
+- [x] Automated tests for core data + smoke test
+- [ ] Ensure remaining foundation modules are complete and all tests pass cleanly
 
-### P1 – Core Modeling Experience (Phase 1–2)
-- Primitives: Cube, Plane, Sphere (UV), Cylinder, Cone
-- Real OpenGL/moderngl viewport
-- Camera: orbit / pan / zoom + orthographic/perspective
-- Grid + axes
-- Object selection in viewport
-- Transform gizmos (translate / rotate / scale)
-- Selection modes: Object / Vertex / Edge / Face
-- Basic mesh display (shaded + wireframe overlay)
+### P1 – Parametric Core: Sketch + Features (next major phase)
+- Sketch schema + data model (entities: line, circle, arc, rectangle, etc.; constraints; dimensions)
+- Basic 2D sketch editor in UI (create on plane, draw, constrain, dimension)
+- User Parameters / variables system (named values that drive dimensions)
+- Extrude feature (from sketch profile to solid) with parameters (distance, direction, operation type)
+- Feature history / timeline data model + simple UI (feature tree)
+- Revolve feature
+- Fully constrained sketch indicators and validation
 
-### P2 – Essential Editing Tools (Phase 3)
-- Extrude (vertices/edges/faces)
-- Inset
-- Loop Cut & Slide
-- Bevel
-- Merge / Dissolve / Delete
-- Subdivide
-- Simple Boolean (via trimesh or similar)
-- Shade Smooth / Flat
+### P2 – Parts, Assemblies & Manufacturing Helpers
+- Multi-feature Part model (solid body from feature history)
+- Simple Assembly + mates / constraints
+- Cut list / part list generation (Mozaik-inspired: materials, sizes, quantities)
+- Basic BOM
+- Material / stock definitions
+- Dimensioned drawing / export stubs
+- Configurations (independent inputs driving parameters and suppressions)
 
-### P3 – Materials, UV & I/O (Phase 4)
-- Simple material system (PBR parameters) + schema
-- Material slots
-- Basic image textures
-- UV editor + at least Smart UV Project / cube projection
-- Import: OBJ, glTF
-- Export: OBJ, glTF, STL
+### P3 – Viewport, Interaction & Polish
+- Real OpenGL / moderngl viewport improvements (already started)
+- Camera controls, selection, feature highlighting
+- Transform tools that respect parametric intent where possible
+- Snapping in sketch and 3D
 
-### P4 – Non-destructive & Productivity
-- Modifier stack (start with: Mirror, Subdivision Surface, Bevel, Array, Solidify)
-- Outliner improvements + collections
-- Keyboard shortcuts matching common conventions where sensible
-- Snapping (grid, vertex, edge, face)
-
-### P5 – Animation & Advanced (Phase 5+)
-- Keyframe system (location/rotation/scale)
-- Timeline + Dope Sheet basics
-- Python console / scripting API
-- Plugin/add-on loader
-- Later: sculpting basics, simple path tracing, armatures
+### P4 – Advanced CAD + Path to CAM
+- Fillet / Chamfer / Shell / Hole features
+- Sheet metal / panel basics
+- Simple nesting concepts and material optimization
+- Early toolpath / G-code generation stubs
+- Import/Export improvements (STEP later if geometry kernel allows)
+- Joinery rules / automatic machining concepts (furniture-focused)
 
 ## Comparison Notes
-- **Blender**: Strong all-rounder; excellent free reference for mesh tools, modifiers, UV, and viewport UX.
-- **Maya**: Industry standard for animation/rigging; deep construction history and constraints. Useful later for animation/rigging design.
-- **3ds Max**: Excellent hard-surface modeling and modifier stack; strong in archviz. Modifier order and editable poly concepts are relevant.
-- **Cinema 4D**: Fast interactive modeling and motion graphics (MoGraph). Good for UX ideas around speed and designer-friendly tools.
+- **Fusion 360**: Excellent reference for sketch constraints, dimensions, parameters, timeline, and mixed parametric/direct workflows.
+- **Onshape**: Strong model for Part Studio + feature list, clean multi-part handling, and modern independent configuration inputs.
+- **Mozaik**: Practical manufacturing focus — automatic cut lists, nesting, joinery rules, BOMs, and CNC outputs. Valuable for design-to-manufacture helpers even if the core is general parametric CAD.
 
-## Recommended Immediate Build Order (after this research)
-1. Complete and test missing foundation modules (Scene, MainWindow, schemas, tests).
-2. Add remaining primitives (Plane, Sphere, Cylinder, Cone).
-3. Implement real viewport (moderngl or PyOpenGL) with camera + grid.
-4. Object selection + transform gizmos.
-5. First mesh tools: Extrude + Inset.
-6. Simple material system.
-7. OBJ import/export.
+## Recommended Immediate Build Order
+1. Complete research documentation (this inventory + detailed notes).
+2. Finish any missing foundation pieces and keep tests green.
+3. Implement Sketch JSON Schema + core data model.
+4. Add basic Parameter system.
+5. Implement simple Extrude feature that produces a solid (initially via mesh or simple geometry).
+6. Add feature history data model and timeline UI stub.
+7. Begin 2D sketch editor UI.
+8. Add cut-list generation stub once parts exist.
 
-This inventory will be refined as more research is performed on specific areas (e.g., before starting UV or animation).
+This inventory will be refined as implementation proceeds and more focused research is done on specific areas (e.g., constraint solver, B-Rep kernel options).
