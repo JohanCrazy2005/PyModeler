@@ -10,30 +10,30 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Profile extraction improvements are complete for simple cases:
-- `extract_simple_profiles` detects closed polygons from connected lines and circle entities
-- Near-full arcs are treated as circles; arcs can be discretized
-- Extrude uses polygon or circle profiles (faceted prism / cylinder) instead of only AABB
-- Revolve uses extracted polygon for better radial/axial profile
-- Research note: `docs/research/profile-extraction.md`
+Extrude offset / symmetric improvements are complete:
+- Schema supports `start_offset` (numeric or parameter/expression)
+- Symmetric treats `distance` as total length (±half around the offset center)
+- Mesh generation applies offset for both polygon and circle profiles
+- Research note: `docs/research/extrude-offset-symmetric.md`
 
 Next concrete work:
 
-1. **Offset / symmetric improvements for Extrude**
-   - Support start offset and symmetric extrude options in schema + feature + mesh generation
-   - Research Fusion 360 / Onshape offset and two-direction extrude behavior
-
-2. **Boolean operations (join/cut) on generated meshes**
+1. **Boolean operations (join/cut) on generated meshes**
    - Basic mesh boolean helpers or stubs for feature operations beyond "new"
+   - Research simple CSG / boolean approaches that stay cross-platform
+
+2. **Rollback marker and feature reordering in the timeline**
+   - Allow suppressing features after a marker and reordering (data model first)
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After offset/symmetric, next increments:
-- Rollback marker and feature reordering in the timeline
+After booleans, next increments:
 - Visual 2D canvas for sketching (mouse drawing, snapping)
 - Better hole/nested profile support
+- UI exposure of offset/symmetric in the property panel
 
 ## Recently Completed
+- Extrude start offset + symmetric refinements (schema, resolution, mesh generation)
 - Better profile support: polygon + circle extraction, arc handling, improved Extrude/Revolve mesh generation
 - Sketch editor editable cells (point coordinates, dimension values) + selection-aware entity addition
 - Revolve feature (schema, parameter-driven angle, faceted solid of revolution, FeatureHistory integration)

@@ -147,6 +147,48 @@ def test_revolve_angle_bounds():
         feat2.generate_mesh(sketch)
 
 
+def test_extrude_start_offset():
+    """Start offset shifts the extrusion along the direction."""
+    sketch = create_rectangle_sketch(width=10.0, height=5.0)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=4.0, start_offset=2.0)
+    mesh = feat.generate_mesh(sketch)
+    zs = [v[2] for v in mesh.vertices]
+    assert min(zs) == pytest.approx(2.0)
+    assert max(zs) == pytest.approx(6.0)
+
+
+def test_extrude_symmetric_with_offset():
+    """Symmetric extrude centered on the offset position."""
+    sketch = create_rectangle_sketch(width=10.0, height=5.0)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=6.0, symmetric=True, start_offset=1.0)
+    mesh = feat.generate_mesh(sketch)
+    zs = [v[2] for v in mesh.vertices]
+    # half = 3, so from 1-3=-2 to 1+3=4
+    assert min(zs) == pytest.approx(-2.0)
+    assert max(zs) == pytest.approx(4.0)
+
+
+def test_extrude_offset_parameter():
+    sketch = create_rectangle_sketch()
+    store = ParameterStore()
+    store.add("Offset", value=1.5)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=3.0, start_offset="Offset")
+    assert feat.resolved_start_offset(store) == 1.5
+    mesh = feat.generate_mesh(sketch, store)
+    zs = [v[2] for v in mesh.vertices]
+    assert min(zs) == pytest.approx(1.5)
+    assert max(zs) == pytest.approx(4.5)
+
+
+def test_extrude_offset_schema_roundtrip():
+    feat = ExtrudeFeature(sketch_id="s1", distance=5.0, start_offset="Off", symmetric=True)
+    data = feat.to_dict()
+    validate_extrude_data(data)
+    restored = ExtrudeFeature.from_dict(data)
+    assert restored.start_offset == "Off"
+    assert restored.symmetric is True
+
+
 def test_extrude_polygon_profile():
     """Extrude should use extracted polygon rather than just AABB when possible."""
     from pymodeler.core.sketch import Sketch

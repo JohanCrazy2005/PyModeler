@@ -31,6 +31,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Revolve feature
 - [ ] Fully constrained sketch validation
 - [x] Better closed-profile extraction (polygons, circles, basic arcs) for features
+- [x] Extrude start offset and improved symmetric (schema + mesh generation)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [ ] Multi-feature Part model
@@ -60,4 +61,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-15 (Better profile extraction for Extrude/Revolve)
+Last updated: 2026-11-15 (Extrude start offset + symmetric improvements)

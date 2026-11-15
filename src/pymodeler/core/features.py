@@ -104,6 +104,7 @@ class ExtrudeFeature:
         name: str = "Extrude",
         direction: Optional[Sequence[float]] = None,
         symmetric: bool = False,
+        start_offset: float | str | None = None,
         operation: str = "new",
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
@@ -115,6 +116,7 @@ class ExtrudeFeature:
         self.distance = distance
         self.direction = list(direction) if direction is not None else None
         self.symmetric = bool(symmetric)
+        self.start_offset = start_offset
         self.operation = operation
         self.metadata = metadata or {}
         self.validate()
@@ -132,6 +134,8 @@ class ExtrudeFeature:
             data["direction"] = self.direction
         if self.symmetric:
             data["symmetric"] = self.symmetric
+        if self.start_offset is not None:
+            data["start_offset"] = self.start_offset
         if self.operation != "new":
             data["operation"] = self.operation
         if self.metadata:
@@ -150,6 +154,7 @@ class ExtrudeFeature:
             name=data.get("name", "Extrude"),
             direction=data.get("direction"),
             symmetric=data.get("symmetric", False),
+            start_offset=data.get("start_offset"),
             operation=data.get("operation", "new"),
             metadata=data.get("metadata"),
             id=data.get("id"),
@@ -157,6 +162,11 @@ class ExtrudeFeature:
 
     def resolved_distance(self, parameters: Optional[ParameterStore] = None) -> float:
         return _resolve_distance(self.distance, parameters)
+
+    def resolved_start_offset(self, parameters: Optional[ParameterStore] = None) -> float:
+        if self.start_offset is None:
+            return 0.0
+        return _resolve_distance(self.start_offset, parameters)
 
     def generate_mesh(
         self,
@@ -173,6 +183,7 @@ class ExtrudeFeature:
         dist = self.resolved_distance(parameters)
         if dist <= 0:
             raise FeatureValidationError("Extrude distance must be positive")
+        offset = self.resolved_start_offset(parameters)
 
         # Default direction: sketch plane normal (cross product of axes)
         if self.direction is not None:
@@ -197,6 +208,9 @@ class ExtrudeFeature:
         dlen = math.sqrt(sum(c * c for c in direction)) or 1.0
         d = [c / dlen for c in direction]
         half_dist = dist / 2.0 if self.symmetric else dist
+        # Start position along direction
+        start_along = offset if not self.symmetric else offset - half_dist
+        end_along = (offset + dist) if not self.symmetric else offset + half_dist
 
         def to_3d(px: float, py: float, along: float = 0.0) -> list[float]:
             return [
@@ -217,17 +231,17 @@ class ExtrudeFeature:
                     ang = 2 * math.pi * i / segs
                     px = cx + r * math.cos(ang)
                     py = cy + r * math.sin(ang)
-                    verts.append(to_3d(px, py, 0.0 if not self.symmetric else -half_dist))
+                    verts.append(to_3d(px, py, start_along))
                 for i in range(segs):
                     ang = 2 * math.pi * i / segs
                     px = cx + r * math.cos(ang)
                     py = cy + r * math.sin(ang)
-                    verts.append(to_3d(px, py, half_dist))
+                    verts.append(to_3d(px, py, end_along))
                 # Centers for caps
                 bot_c = len(verts)
-                verts.append(to_3d(cx, cy, 0.0 if not self.symmetric else -half_dist))
+                verts.append(to_3d(cx, cy, start_along))
                 top_c = len(verts)
-                verts.append(to_3d(cx, cy, half_dist))
+                verts.append(to_3d(cx, cy, end_along))
 
                 faces = []
                 # Sides
@@ -250,12 +264,10 @@ class ExtrudeFeature:
                 pts2d = prof["points"]
                 n = len(pts2d)
                 verts = []
-                z0 = -half_dist if self.symmetric else 0.0
-                z1 = half_dist
                 for px, py in pts2d:
-                    verts.append(to_3d(px, py, z0))
+                    verts.append(to_3d(px, py, start_along))
                 for px, py in pts2d:
-                    verts.append(to_3d(px, py, z1))
+                    verts.append(to_3d(px, py, end_along))
                 faces = []
                 # Bottom (reversed for outward)
                 faces.append(list(reversed(range(n))))

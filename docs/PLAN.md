@@ -51,6 +51,7 @@
 7. Revolve feature implemented and tested (parameter-driven angle, simple solid of revolution).
 8. Sketch editor improved: editable point coordinates and dimension values in tables; selection-aware addition of lines, circles, and dimensions.
 9. Better profile extraction: simple closed polygons and circles for Extrude/Revolve (see docs/research/profile-extraction.md).
+10. Extrude start offset and symmetric refinements implemented and tested (see docs/research/extrude-offset-symmetric.md).
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

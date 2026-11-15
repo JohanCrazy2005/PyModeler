@@ -44,7 +44,14 @@
     "symmetric": {
       "type": "boolean",
       "default": false,
-      "description": "If true, extrude equally in both directions (distance is total or half — see implementation)"
+      "description": "If true, extrude equally in both directions (distance is total length; half each side)"
+    },
+    "start_offset": {
+      "description": "Optional start offset along the extrusion direction from the sketch plane (numeric or parameter/expression). Positive moves start in the positive direction.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "minLength": 1 }
+      ]
     },
     "operation": {
       "type": "string",
