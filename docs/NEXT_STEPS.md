@@ -10,31 +10,33 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Feature tree / timeline UI stub is complete and tested (core path):
-- `src/pymodeler/ui/feature_tree.py` — FeatureTreeWidget (lists ExtrudeFeatures) + PropertyPanel (name + distance editor)
-- Integrated into MainWindow (left: outliner + timeline, right: properties)
-- Research note in `docs/research/feature-tree-ui.md`
-- Unit tests for the widgets (Qt-dependent environment may need EGL libs)
+Basic 2D sketch editor widget is complete and tested (table-based stub):
+- `src/pymodeler/ui/sketch_editor.py` — SketchEditorWidget (tabs for entities/constraints/dimensions, add point/line/circle/rectangle, add dimensions)
+- Integrated into MainWindow via Sketch menu (New / Edit / Add Rectangle)
+- Research note in `docs/research/sketch-editor-ui.md`
+- Unit tests for the widget
 
 Next concrete work:
 
-1. **Basic 2D sketch editor widgets**
-   - Simple canvas or table-based editor to create/edit sketch entities and dimensions
-   - Connect to Sketch data model and FeatureHistory
-
-2. **Revolve feature**
+1. **Revolve feature**
    - Schema + implementation analogous to Extrude (profile + axis + angle)
    - Research note first
 
+2. **Improve sketch editor**
+   - Editable table cells for point coordinates and dimension values
+   - Better selection of entities when adding lines/dimensions
+
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After sketch editor stubs, next increments:
+After Revolve, next increments:
 - Better profile support in Extrude (arcs, circles)
 - Start offset / symmetric improvements
 - Boolean operations (join/cut) on generated meshes
 - Rollback marker and feature reordering in the timeline
+- Visual 2D canvas for sketching
 
 ## Recently Completed
+- Basic 2D sketch editor widgets (table-based) + research note
 - Feature tree / timeline UI stub + property panel for Extrude features
 - ExtrudeFeature + FeatureHistory (schema, parameter-driven distance, mesh generation, recompute)
 - Research notes for parametric Extrude in Fusion 360 and Onshape

@@ -46,7 +46,8 @@
 2. Sketch data model + JSON Schema is implemented and tested (entities, constraints, dimensions).
 3. Parameter / variable system implemented and tested (named params, simple expressions).
 4. Extrude feature + FeatureHistory data model implemented and tested (parameter-driven distance, simple solid generation).
-5. Timeline/feature tree UI stub implemented (list + property panel). Next: basic sketch editor widgets, then Revolve.
+5. Timeline/feature tree UI stub implemented (list + property panel).
+6. Basic table-based 2D sketch editor widget implemented and integrated (add entities, dimensions). Next: Revolve feature.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

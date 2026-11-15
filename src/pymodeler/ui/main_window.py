@@ -40,11 +40,14 @@ from pymodeler.core import (
     SetTransformCommand,
     ExtrudeMeshCommand,
     InsetMeshCommand,
+    FeatureHistory,
+    ParameterStore,
+    Sketch,
+    create_rectangle_sketch,
 )
 from pymodeler.render import ViewportWidget
-
-# NOTE: Feature tree integration is in place in the local development version.
-# Full main_window update will be completed in the next automation run to keep the branch stable.
+from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
+from pymodeler.ui.sketch_editor import SketchEditorWidget
 
 class ExtrudeDialog(QDialog):
     def __init__(self, parent=None, default_distance: float = 1.0) -> None:
@@ -119,17 +122,33 @@ class MainWindow(QMainWindow):
         self.resize(1200, 800)
         self.scene = Scene(name="Scene")
         self.history = CommandStack()
+        self.feature_history = FeatureHistory()
+        self.parameters = ParameterStore()
+        self.current_sketch: Optional[Sketch] = None
+
         self.viewport = ViewportWidget()
         self.viewport.set_scene(self.scene)
         self.viewport.selection_changed.connect(self._sync_outliner_from_scene)
         self.viewport.transform_committed.connect(self._on_transform_committed)
+
         self.outliner = QListWidget()
         self.outliner.itemSelectionChanged.connect(self._on_outliner_selection)
+
+        self.feature_tree = FeatureTreeWidget()
+        self.feature_tree.set_history(self.feature_history)
+        self.property_panel = PropertyPanel()
+        self.property_panel.set_context(self.feature_history, self.parameters)
+        self.feature_tree.feature_selected.connect(self.property_panel.show_feature)
+        self.property_panel.properties_changed.connect(self.feature_tree.refresh)
+
         splitter = QSplitter(Qt.Orientation.Horizontal)
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.addWidget(QLabel("Outliner"))
         left_layout.addWidget(self.outliner)
+        left_layout.addWidget(QLabel("Timeline / Features"))
+        left_layout.addWidget(self.feature_tree)
+        left_layout.addWidget(self.property_panel)
         splitter.addWidget(left)
         splitter.addWidget(self.viewport)
         splitter.setStretchFactor(1, 1)
@@ -144,7 +163,43 @@ class MainWindow(QMainWindow):
         quit_act.setShortcut(QKeySequence.StandardKey.Quit)
         quit_act.triggered.connect(self.close)
         file_menu.addAction(quit_act)
-        # (other menus omitted for brevity in this restore; full version is in local sandbox)
+
+        sketch_menu = menubar.addMenu("&Sketch")
+        new_sketch_act = QAction("New Sketch", self)
+        new_sketch_act.triggered.connect(self._new_sketch)
+        sketch_menu.addAction(new_sketch_act)
+        edit_sketch_act = QAction("Edit Current Sketch", self)
+        edit_sketch_act.triggered.connect(self._edit_sketch)
+        sketch_menu.addAction(edit_sketch_act)
+        rect_act = QAction("Add Rectangle Sketch", self)
+        rect_act.triggered.connect(self._add_rectangle_sketch)
+        sketch_menu.addAction(rect_act)
+
+    def _new_sketch(self) -> None:
+        self.current_sketch = Sketch(name="New Sketch")
+        self._open_sketch_editor()
+
+    def _add_rectangle_sketch(self) -> None:
+        self.current_sketch = create_rectangle_sketch(name="Rectangle")
+        self._open_sketch_editor()
+
+    def _edit_sketch(self) -> None:
+        if self.current_sketch is None:
+            self.current_sketch = Sketch(name="Sketch")
+        self._open_sketch_editor()
+
+    def _open_sketch_editor(self) -> None:
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Sketch Editor")
+        dialog.resize(700, 500)
+        layout = QVBoxLayout(dialog)
+        editor = SketchEditorWidget()
+        editor.set_sketch(self.current_sketch)
+        layout.addWidget(editor)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        buttons.accepted.connect(dialog.accept)
+        layout.addWidget(buttons)
+        dialog.exec()
 
     def _refresh_outliner(self) -> None:
         self.outliner.blockSignals(True)
