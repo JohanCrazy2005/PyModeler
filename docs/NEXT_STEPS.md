@@ -9,25 +9,23 @@ This file is updated by every automation run.
 4. Implement small, tested increments. Update schemas, tests, and living docs. Push.
 
 ## Immediate Priority
-Research phase for the parametric CAD goal is complete. Next concrete work:
+Sketch data model foundation is complete (`schemas/sketch.schema.json` + `src/pymodeler/core/sketch.py` + tests). Next concrete work:
 
-1. **Sketch data model foundation**
-   - Create `schemas/sketch.schema.json` defining entities (point, line, circle, arc, rectangle…), constraints (coincident, horizontal, parallel, tangent, equal…), and dimensions.
-   - Implement `src/pymodeler/core/sketch.py` with classes that validate against the schema.
-   - Add unit tests for creation, constraint application, and schema round-trip.
+1. **Parameter system stub**
+   - Create `schemas/parameter.schema.json` for user parameters / variables.
+   - Implement `src/pymodeler/core/parameter.py` with a simple ParameterStore that can resolve named values.
+   - Allow sketch dimensions to reference parameter names (already supported as string values).
+   - Unit tests for store, resolution, and schema validation.
 
-2. **Parameter system stub**
-   - Schema + simple Parameter / Variable store that dimensions can reference.
-
-3. **Keep foundation solid**
-   - Confirm all existing tests pass.
+2. **Keep foundation solid**
+   - Confirm all existing core tests pass.
    - Any small cleanups needed for main to stay runnable.
 
-After sketch schema + core model are in place and tested, the next increments will be:
-- Basic Extrude feature (sketch profile → solid mesh or simple geometry)
-- Feature history data model
-- Timeline / feature tree UI stub
-- Initial 2D sketch editor widgets
+After parameters are in place and tested, the next increments will be:
+- Basic Extrude feature (sketch profile → solid mesh or simple geometry), with parameter-driven distance.
+- Feature history data model (timeline entries that store inputs).
+- Timeline / feature tree UI stub.
+- Initial 2D sketch editor widgets.
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).
@@ -35,4 +33,4 @@ After sketch schema + core model are in place and tested, the next increments wi
 - Keep JSON schemas as the source of truth for all data.
 - Test before every push. Keep main runnable.
 - Put research outputs in `docs/research/` and any generated examples in `output/`.
-- Research documents for Fusion, Onshape, and Mozaik are now in place; consult them before expanding Phase 1.
+- Research documents for Fusion, Onshape, and Mozaik are in place; consult them before expanding Phase 1.
