@@ -30,3 +30,9 @@
 - Integrate with FeatureHistory so a sketch can be selected and extruded.
 
 Research complete. Proceeding to table-based SketchEditorWidget implementation.
+
+## Implementation Notes (2026-11-15)
+- Table-based editor now supports direct editing of point X/Y and circle/arc radius via table cells.
+- Dimension values are editable (accepts numbers or parameter name strings).
+- Add Line / Circle / Dimension prefer selected entities of the appropriate type when the user has made a selection in the entities table; falls back to first available otherwise.
+- Still table-based (no canvas); full visual sketching remains a later increment.
