@@ -9,20 +9,25 @@ This file is updated by every automation run.
 4. Implement small, tested increments. Update schemas, tests, and living docs. Push.
 
 ## Immediate Priority
-1. **Research & Documentation (do this now)**
-   - Create `docs/research/` folder.
-   - Write structured notes on:
-     - Fusion 360 parametric modeling + sketch + feature workflow
-     - Onshape Part Studio / feature history / configurations approach
-     - Mozaik cut-list, nesting, joinery, and manufacturing output features
-   - Produce a prioritized feature inventory aligned with the new CAD/CAM goal.
-2. Update CHECKLIST and PLAN with more concrete items derived from the research.
-3. Finish any missing foundation modules so the current app runs cleanly and all tests pass.
-4. Then begin the parametric core according to the refined plan:
-   - Sketch data model + schema
-   - Basic constrained sketch
-   - Extrude feature that produces a solid from a sketch
-   - Feature history / timeline UI stub
+Research phase for the parametric CAD goal is complete. Next concrete work:
+
+1. **Sketch data model foundation**
+   - Create `schemas/sketch.schema.json` defining entities (point, line, circle, arc, rectangle…), constraints (coincident, horizontal, parallel, tangent, equal…), and dimensions.
+   - Implement `src/pymodeler/core/sketch.py` with classes that validate against the schema.
+   - Add unit tests for creation, constraint application, and schema round-trip.
+
+2. **Parameter system stub**
+   - Schema + simple Parameter / Variable store that dimensions can reference.
+
+3. **Keep foundation solid**
+   - Confirm all existing tests pass.
+   - Any small cleanups needed for main to stay runnable.
+
+After sketch schema + core model are in place and tested, the next increments will be:
+- Basic Extrude feature (sketch profile → solid mesh or simple geometry)
+- Feature history data model
+- Timeline / feature tree UI stub
+- Initial 2D sketch editor widgets
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).
@@ -30,3 +35,4 @@ This file is updated by every automation run.
 - Keep JSON schemas as the source of truth for all data.
 - Test before every push. Keep main runnable.
 - Put research outputs in `docs/research/` and any generated examples in `output/`.
+- Research documents for Fusion, Onshape, and Mozaik are now in place; consult them before expanding Phase 1.
