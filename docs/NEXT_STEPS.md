@@ -10,32 +10,31 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Revolve feature is complete and tested (schema + parameter-driven angle + simple solid-of-revolution mesh):
-- `schemas/revolve.schema.json`
-- `src/pymodeler/core/features.py` — RevolveFeature (angle numeric or parameter, optional axis, segments)
-- Integrated into FeatureHistory (add_revolve, get_revolve_features, recompute_meshes)
-- Research note in `docs/research/revolve-feature.md`
-- Unit tests for the feature and history integration
+Sketch editor improvements are complete:
+- Editable table cells for point X/Y coordinates and circle/arc radius
+- Editable dimension values (numeric or parameter name)
+- Better selection: Add Line / Add Circle / Add Dimension prefer currently selected entities of the right type when available; otherwise fall back to first available
+- Research note already present in `docs/research/sketch-editor-ui.md`
 
 Next concrete work:
 
-1. **Improve sketch editor**
-   - Editable table cells for point coordinates and dimension values
-   - Better selection of entities when adding lines/dimensions
-
-2. **Better profile support**
+1. **Better profile support**
    - Extrude and Revolve should handle simple polygons and circles better
    - Arc support in profile extraction
+   - Research how Fusion 360 / Onshape extract closed profiles from sketches for features
+
+2. **Offset / symmetric improvements for Extrude**
+   - Support start offset and symmetric extrude options in schema + feature + mesh generation
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After sketch editor improvements, next increments:
-- Start offset / symmetric improvements for Extrude
+After profile improvements, next increments:
 - Boolean operations (join/cut) on generated meshes
 - Rollback marker and feature reordering in the timeline
-- Visual 2D canvas for sketching
+- Visual 2D canvas for sketching (mouse drawing, snapping)
 
 ## Recently Completed
+- Sketch editor editable cells (point coordinates, dimension values) + selection-aware entity addition
 - Revolve feature (schema, parameter-driven angle, faceted solid of revolution, FeatureHistory integration)
 - Basic 2D sketch editor widgets (table-based) + research note
 - Feature tree / timeline UI stub + property panel for Extrude features
