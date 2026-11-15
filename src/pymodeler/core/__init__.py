@@ -20,9 +20,9 @@ from .history import (
 )
 from .sketch import (
     Sketch,
-    create_rectangle_sketch,
-    validate_sketch_data,
     SketchValidationError,
+    validate_sketch_data,
+    create_rectangle_sketch,
 )
 
 __all__ = [
@@ -47,7 +47,7 @@ __all__ = [
     "ExtrudeMeshCommand",
     "InsetMeshCommand",
     "Sketch",
-    "create_rectangle_sketch",
-    "validate_sketch_data",
     "SketchValidationError",
+    "validate_sketch_data",
+    "create_rectangle_sketch",
 ]
