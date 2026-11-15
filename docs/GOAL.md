@@ -1,47 +1,62 @@
 # Project Goal: PyModeler
 
 ## Vision
-Build a free, open-source, cross-platform 3D modeling application in pure Python that eventually matches the core capabilities of leading commercial and open-source modeling softwares (Blender, Maya, 3ds Max, Cinema 4D, Houdini basics, etc.).
+Build a free, open-source, cross-platform **parametric CAD + design-to-manufacture** application in pure Python that works similarly to **Fusion 360**, **Onshape**, and manufacturing-focused tools like **Mozaik**.
+
+The end product should feel like a practical engineering / product-design / small-shop manufacturing tool rather than a pure artistic mesh modeler (Blender-style).
+
+## Target Style & Inspiration (from research)
+
+### Fusion 360-like capabilities
+- Parametric (history-based) modeling driven by sketches, dimensions, and constraints
+- Direct modeling for imported or quick edits
+- Assemblies with relationships / mates
+- Sheet metal basics
+- Integrated path toward manufacturing (CAM-style thinking: toolpaths, nesting concepts, cut lists)
+- Simulation-ready data structures later
+- Clean feature tree / timeline
+
+### Onshape-like capabilities
+- Strong parametric core with feature history
+- Configurations / design variations
+- Clean part + assembly workflow
+- Version-friendly data model (JSON schemas make this natural)
+- Collaboration-ready architecture (even if single-user first)
+
+### Mozaik-like / manufacturing-friendly capabilities
+- Automatic cut lists / part lists from designs
+- Nesting / material optimization concepts
+- Joinery / hardware rules (especially useful for furniture, cabinets, panels)
+- Shop drawings / dimensioned outputs
+- CNC-ready thinking (G-code generation as a later goal)
 
 ## Core Requirements
 - **UI Framework**: PyQt6 for native-feeling, cross-platform GUI (Windows, macOS, Linux).
-- **Data Models**: All major modules use strict JSON Schemas for validation, serialization, and clean inter-module communication.
-- **Libraries**: Prefer mature, well-maintained public Python packages that are cross-platform (numpy, scipy, trimesh, moderngl / PyOpenGL, pillow, jsonschema, pygltflib, etc.).
-- **Architecture**: Modular, plugin-friendly, with clear separation of:
-  - Core data (Scene, Mesh, Material, Object)
-  - UI / Viewports
-  - I/O (import/export)
-  - Rendering / Viewport drawing
-  - Tools & Operators
+- **Data Models**: All major modules use strict JSON Schemas for validation, serialization, and clean inter-module communication. Feature history, parameters, and constraints must be schema-driven.
+- **Libraries**: Prefer mature, well-maintained public Python packages that are cross-platform (numpy, scipy, trimesh, cadquery or similar where helpful, moderngl / PyOpenGL, pillow, jsonschema, etc.).
+- **Architecture**: Modular, with clear separation of:
+  - Core parametric data (Sketch, Feature, Part, Assembly, Parameters)
+  - UI / Viewports / Feature tree
+  - I/O (STEP/IGES later, OBJ/glTF, DXF, cut-list exports)
+  - Manufacturing helpers (cut lists, nesting stubs, toolpath concepts)
 - **Quality**: Code must be tested before every significant push. Prefer clean, typed, documented code.
 
 ## Research-First Mandate
-Before expanding major feature areas, the project (and every automation run that starts a new phase) **must first research the web** for comprehensive feature lists of top modeling software. Document findings in `docs/research/` (or update this GOAL and PLAN). Only after a clear, prioritized feature inventory exists should detailed step-by-step implementation planning and coding begin.
+Before expanding major feature areas, research the web for how Fusion 360, Onshape, Mozaik, and similar tools implement the feature. Document findings under `docs/research/`. Only then create a detailed step-by-step plan and implement.
 
-Sources to consult (examples):
-- Official Blender manual / feature overview
-- Autodesk Maya documentation / feature lists
-- 3ds Max, Cinema 4D, Houdini feature pages
-- Wikipedia and comparison articles on 3D modeling software
-- Community lists of essential modeling tools
+## Long-term Capability Targets (prioritized toward CAD/CAM)
+1. 2D Sketching with constraints and dimensions
+2. Parametric solid features (Extrude, Revolve, Sweep, Loft, Fillet, Chamfer, Shell, Hole…)
+3. Feature history / timeline that can be edited and recomputed
+4. Assemblies with mates / constraints
+5. Configurations and design parameters
+6. Basic sheet metal / panel thinking
+7. Cut lists, BOMs, and dimensioned drawings
+8. Material / stock definitions and simple nesting concepts
+9. Path toward CAM (toolpaths, G-code stubs) and manufacturing outputs
+10. Clean JSON-schema-driven persistence so designs are transparent and versionable
 
-The goal is a realistic, complete inventory of capabilities so the build plan is grounded in what real top-tier tools actually provide.
+## Success Criteria
+A user can sketch a parametric part, add features driven by dimensions, build a small assembly, generate a cut list or basic manufacturing output, and export usable geometry — in a workflow that feels familiar to someone coming from Fusion 360 or Onshape, with practical manufacturing helpers inspired by tools like Mozaik.
 
-## Long-term Capability Targets (initial high-level list – to be expanded/refined via research)
-1. Mesh creation & editing (primitives, extrude, bevel, loop cut, boolean, etc.)
-2. Scene hierarchy / outliner
-3. Materials & textures (PBR basics)
-4. UV unwrapping & mapping
-5. Basic animation & keyframing
-6. Viewport navigation, selection, gizmos
-7. Import/Export: OBJ, glTF/GLB, FBX (via libraries), STL, PLY
-8. Modifiers stack (non-destructive)
-9. Sculpting basics (later)
-10. Simple rendering / path tracing integration or offline render
-11. Python scripting API for users
-12. Add-on / plugin system
-
-## Success Criteria for "Complete"
-The application is considered to have "all the capabilities the top modeling softwares have" when a professional modeler can create, edit, texture, UV, animate basic objects, and export production-ready assets without needing another tool for core modeling tasks — as validated against the researched feature inventory.
-
-This is a multi-year ambitious project. Progress is incremental, measured by the CHECKLIST and PLAN.
+This remains a multi-year project. Progress is incremental and measured by the CHECKLIST and PLAN.

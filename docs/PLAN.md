@@ -1,56 +1,54 @@
-# Development Plan
+# Master Development Plan
 
 ## Guiding Principles
-1. **Research First**: Before implementing any major feature area, research how the best tools (Blender, Maya, 3ds Max, Cinema 4D, Houdini) solve the same problem. Document findings under `docs/research/`.
-2. **Living Documents**: GOAL.md, CHECKLIST.md, PLAN.md and NEXT_STEPS.md are continuously updated. They are the single source of truth for the automation loop.
-3. **Small, Tested Increments**: Prefer complete, tested slices over large incomplete features. Main branch must always remain runnable.
-4. **Schema-Driven**: All major data structures (Mesh, Scene, Material, …) are defined by JSON Schemas in `schemas/` and validated at runtime.
-5. **Cross-Platform**: Only public, cross-platform Python libraries. PyQt6 for UI.
-6. **Clean Architecture**:
-   - `schemas/` – source of truth for data contracts
-   - `src/pymodeler/core/` – pure data & logic (no Qt)
-   - `src/pymodeler/ui/` – PyQt6 views and widgets
-   - `src/pymodeler/render/` – viewport drawing
-   - `src/pymodeler/io/` – importers/exporters
-   - `src/pymodeler/mesh/` – mesh algorithms
-   - `docs/research/` – feature research notes from the web
-7. **Automation Loop**: An hourly Grok automation reads the current GOAL / CHECKLIST / PLAN / NEXT_STEPS, decides the highest-value next task, implements it, tests it, updates the docs, and pushes.
+1. **Research First, Then Plan, Then Build**: Before any major new area, research how Fusion 360, Onshape, and Mozaik (and related tools) implement it. Document under `docs/research/`. Then write a concrete step-by-step plan. Only then code.
+2. **Parametric CAD First**: The core is a history-based parametric modeler (sketches → features → parts → assemblies), not freeform mesh sculpting.
+3. **JSON Schema First**: Every persistent structure (Sketch, Feature, Part, Assembly, Parameter, CutList…) has a formal JSON Schema.
+4. **Test Before Push**: Main branch must stay runnable and tested.
+5. **Incremental & Visible Progress**: Small, complete, tested features.
+6. **Cross-platform**: Windows, macOS, Linux via public Python libraries + PyQt6.
+7. **Design-to-Manufacture Mindset**: Even early features should keep manufacturing usefulness in mind (parameters, cut lists, clear part definitions).
 
-## Technology Stack (Initial)
+## Architecture (updated for CAD focus)
+- `schemas/` – Sketch, Feature, Part, Assembly, Parameter, Material, CutList, etc.
+- `src/pymodeler/core/` – pure parametric logic (no Qt)
+- `src/pymodeler/ui/` – PyQt6 (feature tree, viewport, property panels, sketch editor)
+- `src/pymodeler/render/` – viewport
+- `src/pymodeler/io/` – import/export + manufacturing outputs
+- `src/pymodeler/cam/` or manufacturing helpers (later)
+- `docs/research/` – feature research notes from Fusion / Onshape / Mozaik
+
+## Technology Stack (Initial + CAD direction)
 - Python 3.10+
-- PyQt6 (GUI)
-- numpy (geometry)
-- jsonschema (validation)
-- trimesh (mesh utilities, optional heavy ops)
-- moderngl or PyOpenGL (later for viewport)
-- pillow (textures)
-- pygltflib / gltflib (glTF)
-- pytest (testing)
+- PyQt6
+- numpy, scipy
+- jsonschema
+- trimesh (mesh utilities)
+- Consider CadQuery / OCP / pythonOCC later for robust B-Rep if needed
+- moderngl or PyOpenGL for viewport
+- pytest
 
-## Process for Every Major Phase / New Feature Area
-1. **Web Research**: Search and document features of top modeling softwares relevant to the area.
-2. **Synthesize & Prioritize**: Create a clear inventory and priority ranking in docs/ or docs/research/.
-3. **Step-by-step Build Plan**: Break the prioritized features into small, testable implementation steps.
-4. **Implement + Test + Document**: Code, validate against schemas, write tests, update CHECKLIST and NEXT_STEPS.
+## Process for Every Major Phase
+1. Web research of Fusion 360 / Onshape / Mozaik behavior for that area.
+2. Write structured notes in `docs/research/`.
+3. Produce prioritized, step-by-step implementation plan.
+4. Implement + schema + tests + update living docs.
 
-## Roadmap Overview (high-level – refined after research)
-- **Months 0-2**: Solid foundation – data models, basic UI shell, primitives, simple viewport, selection, transform. (Research mesh tools & viewport capabilities first.)
-- **Months 3-6**: Core modeling tools, materials, UV, reliable I/O. (Research each area on the web before coding.)
-- **Months 7-12**: Animation, modifiers, scripting, polish.
-- Beyond: Advanced features, performance, community plugins.
+## High-level Roadmap (CAD/CAM oriented)
+- **Phase 0-1 (Foundation)**: Project structure, basic scene, simple solids, PyQt6 shell, research documents.
+- **Phase 2 (Sketch + Parametric Core)**: 2D sketch engine with constraints/dimensions, Extrude/Revolve, feature history.
+- **Phase 3 (Parts & Assemblies)**: Multi-feature parts, basic assemblies and mates.
+- **Phase 4 (Manufacturing Helpers)**: Cut lists, BOMs, simple nesting concepts, dimensioned outputs (Mozaik-inspired).
+- **Phase 5 (Advanced + CAM path)**: Sheet metal basics, configurations, early toolpath / G-code stubs, simulation data.
 
 ## Current Focus
-1. Research completed for core modeling features and viewport essentials (see `docs/research/`).
-2. Foundation modules (Mesh, Scene, MainWindow, schemas, tests) present and tested.
-3. Phase 1 complete: primitives, object-mode selection, and Undo/Redo command stack.
-4. Phase 2 started: moderngl + QOpenGLWidget viewport with orbit camera, grid, axes, mesh drawing, and selection highlighting.
-5. Viewport polish complete (wireframe, lighting/normals, frame-selected/all, click-to-select). Transform gizmos (translate/rotate/scale) implemented with undo support.
-6. Additional Phase 2 items done: shading modes (solid / wireframe / solid+edges), standard views, orthographic toggle, full-transform world-space calculations for framing and selection.
-7. Gizmo now oriented to object rotation with visual feedback during drag. MainWindow fully functional with Help menu.
-8. Phase 3 started: Extrude (region + individual, dialog, improved winding) complete. Basic Inset (individual faces, thickness fraction + depth, InsetMeshCommand, Mesh menu + I) implemented and tested. Research for Inset documented. Next: refine Inset (absolute thickness, region mode) then Bevel.
-9. Prioritized feature inventory drives all future planning.
+1. Complete any remaining foundation code and ensure tests pass.
+2. Perform and document research on parametric modeling workflows in Fusion 360 and Onshape + manufacturing features in Mozaik.
+3. Create `docs/research/` with clear inventories.
+4. Refine the step-by-step plan for the Sketch + Extrude foundation.
+5. Begin implementing the parametric core according to the plan.
 
 ## Risk Management
-- Scope is enormous. Never claim "feature complete" until checklist items are truly done and tested against the researched inventory.
-- Prefer wrapping existing mature libraries over re-implementing complex algorithms from scratch.
-- Keep the main branch always runnable.
+- Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.
+- Prefer proven libraries for geometry kernels when the pure-Python approach becomes limiting.
+- Main branch always runnable.
