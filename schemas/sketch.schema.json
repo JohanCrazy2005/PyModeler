@@ -2,130 +2,129 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/sketch.schema.json",
   "title": "Sketch",
-  "description": "Parametric 2D sketch data model for PyModeler. Stores entities, geometric constraints, and dimensions. Designed to support history-based parametric CAD similar to Fusion 360 / Onshape.",
+  "description": "2D parametric sketch: entities, geometric constraints, and dimensions. Source of truth for sketch data in PyModeler.",
   "type": "object",
-  "required": ["id", "name", "plane", "entities", "constraints", "dimensions"],
+  "required": ["entities"],
   "additionalProperties": false,
   "properties": {
-    "id": {
-      "type": "string",
-      "description": "Unique identifier for the sketch"
-    },
     "name": {
       "type": "string",
-      "description": "Human-readable name"
+      "default": "Sketch",
+      "description": "Human-readable sketch name"
     },
     "plane": {
       "type": "object",
-      "description": "Sketch plane definition (origin + basis vectors in world space)",
-      "required": ["origin", "x_axis", "y_axis"],
+      "description": "Sketch plane definition (XY by default). Origin and two axes in 3D world space.",
       "additionalProperties": false,
       "properties": {
         "origin": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
-          "items": { "type": "number" }
+          "items": { "type": "number" },
+          "default": [0.0, 0.0, 0.0]
         },
-        "x_axis": {
+        "x_dir": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
-          "items": { "type": "number" }
+          "items": { "type": "number" },
+          "default": [1.0, 0.0, 0.0]
         },
-        "y_axis": {
+        "y_dir": {
           "type": "array",
           "minItems": 3,
           "maxItems": 3,
-          "items": { "type": "number" }
+          "items": { "type": "number" },
+          "default": [0.0, 1.0, 0.0]
         }
       }
     },
     "entities": {
       "type": "array",
-      "description": "Geometric entities in the sketch (local 2D coordinates)",
-      "items": {
-        "oneOf": [
-          { "$ref": "#/$defs/point" },
-          { "$ref": "#/$defs/line" },
-          { "$ref": "#/$defs/circle" },
-          { "$ref": "#/$defs/arc" }
-        ]
-      }
+      "description": "Geometric entities that make up the sketch",
+      "items": { "$ref": "#/$defs/entity" }
     },
     "constraints": {
       "type": "array",
       "description": "Geometric constraints between entities",
+      "default": [],
       "items": { "$ref": "#/$defs/constraint" }
     },
     "dimensions": {
       "type": "array",
-      "description": "Driving or driven dimensions (can reference parameters)",
+      "description": "Driving or driven dimensions",
+      "default": [],
       "items": { "$ref": "#/$defs/dimension" }
     },
     "metadata": {
       "type": "object",
+      "description": "Free-form metadata",
       "additionalProperties": true
     }
   },
   "$defs": {
-    "point": {
-      "type": "object",
-      "required": ["id", "type", "x", "y"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "type": "string" },
-        "type": { "const": "point" },
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "construction": { "type": "boolean", "default": false },
-        "fixed": { "type": "boolean", "default": false }
-      }
+    "point2d": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "number" },
+      "description": "[x, y] in sketch plane coordinates"
     },
-    "line": {
-      "type": "object",
-      "required": ["id", "type", "start_point", "end_point"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "type": "string" },
-        "type": { "const": "line" },
-        "start_point": { "type": "string", "description": "ID of start Point entity" },
-        "end_point": { "type": "string", "description": "ID of end Point entity" },
-        "construction": { "type": "boolean", "default": false }
-      }
+    "entity_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for an entity within the sketch"
     },
-    "circle": {
+    "entity": {
       "type": "object",
-      "required": ["id", "type", "center", "radius"],
+      "required": ["id", "type"],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string" },
-        "type": { "const": "circle" },
-        "center": { "type": "string", "description": "ID of center Point entity" },
-        "radius": { "type": "number", "minimum": 0 },
-        "construction": { "type": "boolean", "default": false }
-      }
-    },
-    "arc": {
-      "type": "object",
-      "required": ["id", "type", "center", "radius", "start_angle", "end_angle"],
-      "additionalProperties": false,
-      "properties": {
-        "id": { "type": "string" },
-        "type": { "const": "arc" },
-        "center": { "type": "string", "description": "ID of center Point entity" },
-        "radius": { "type": "number", "minimum": 0 },
-        "start_angle": { "type": "number", "description": "Start angle in radians" },
-        "end_angle": { "type": "number", "description": "End angle in radians" },
-        "construction": { "type": "boolean", "default": false }
-      }
+        "id": { "$ref": "#/$defs/entity_id" },
+        "type": {
+          "type": "string",
+          "enum": ["point", "line", "circle", "arc"]
+        },
+        "construction": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, entity is construction geometry (not part of solid profiles)"
+        },
+        "x": { "type": "number", "description": "Point x (sketch plane)" },
+        "y": { "type": "number", "description": "Point y (sketch plane)" },
+        "start": { "$ref": "#/$defs/entity_id", "description": "Line start point entity id" },
+        "end": { "$ref": "#/$defs/entity_id", "description": "Line end point entity id" },
+        "center": { "$ref": "#/$defs/entity_id", "description": "Circle/arc center point entity id" },
+        "radius": { "type": "number", "minimum": 0, "description": "Circle or arc radius" },
+        "start_angle": { "type": "number", "description": "Arc start angle in radians" },
+        "end_angle": { "type": "number", "description": "Arc end angle in radians" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "point" } } },
+          "then": { "required": ["x", "y"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "line" } } },
+          "then": { "required": ["start", "end"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "circle" } } },
+          "then": { "required": ["center", "radius"] }
+        },
+        {
+          "if": { "properties": { "type": { "const": "arc" } } },
+          "then": { "required": ["center", "radius", "start_angle", "end_angle"] }
+        }
+      ]
     },
     "constraint": {
       "type": "object",
       "required": ["id", "type", "entities"],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string" },
+        "id": { "type": "string", "minLength": 1 },
         "type": {
           "type": "string",
           "enum": [
@@ -134,51 +133,49 @@
             "vertical",
             "parallel",
             "perpendicular",
-            "tangent",
             "equal",
+            "tangent",
+            "midpoint",
+            "fixed",
             "concentric",
-            "collinear",
-            "symmetric",
-            "fixed"
+            "collinear"
           ]
         },
         "entities": {
           "type": "array",
-          "items": { "type": "string" },
-          "description": "IDs of entities involved in the constraint"
-        },
-        "parameters": {
-          "type": "object",
-          "additionalProperties": true,
-          "description": "Optional numeric or other parameters for the constraint"
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/entity_id" },
+          "description": "Entity ids involved in the constraint"
         }
       }
     },
     "dimension": {
       "type": "object",
-      "required": ["id", "type", "entities", "value"],
+      "required": ["id", "type", "value", "entities"],
       "additionalProperties": false,
       "properties": {
-        "id": { "type": "string" },
+        "id": { "type": "string", "minLength": 1 },
         "type": {
           "type": "string",
-          "enum": ["distance", "length", "radius", "diameter", "angle"]
-        },
-        "entities": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "IDs of entities the dimension measures"
+          "enum": ["distance", "radius", "diameter", "angle"]
         },
         "value": {
           "oneOf": [
             { "type": "number" },
-            { "type": "string", "description": "Parameter name reference (e.g. 'Width')" }
-          ]
+            { "type": "string", "minLength": 1, "description": "Parameter name reference" }
+          ],
+          "description": "Numeric value or name of a user parameter"
         },
-        "driven": { "type": "boolean", "default": false },
-        "parameters": {
-          "type": "object",
-          "additionalProperties": true
+        "entities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/entity_id" },
+          "description": "Entity ids the dimension applies to"
+        },
+        "driven": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, dimension is driven (measured) rather than driving"
         }
       }
     }
