@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/feature_history.schema.json",
+  "title": "FeatureHistory",
+  "description": "Ordered timeline of parametric features that can be serialized and recomputed.",
+  "type": "object",
+  "required": ["features"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "default": "Feature History"
+    },
+    "features": {
+      "type": "array",
+      "description": "Ordered list of feature objects (extrude, etc.)",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
