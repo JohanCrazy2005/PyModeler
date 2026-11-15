@@ -1,1 +1,186 @@
-PLACEHOLDER
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/sketch.schema.json",
+  "title": "Sketch",
+  "description": "Parametric 2D sketch data model for PyModeler. Stores entities, geometric constraints, and dimensions. Designed to support history-based parametric CAD similar to Fusion 360 / Onshape.",
+  "type": "object",
+  "required": ["id", "name", "plane", "entities", "constraints", "dimensions"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the sketch"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name"
+    },
+    "plane": {
+      "type": "object",
+      "description": "Sketch plane definition (origin + basis vectors in world space)",
+      "required": ["origin", "x_axis", "y_axis"],
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        },
+        "x_axis": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        },
+        "y_axis": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "type": "number" }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "description": "Geometric entities in the sketch (local 2D coordinates)",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/point" },
+          { "$ref": "#/$defs/line" },
+          { "$ref": "#/$defs/circle" },
+          { "$ref": "#/$defs/arc" }
+        ]
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "description": "Geometric constraints between entities",
+      "items": { "$ref": "#/$defs/constraint" }
+    },
+    "dimensions": {
+      "type": "array",
+      "description": "Driving or driven dimensions (can reference parameters)",
+      "items": { "$ref": "#/$defs/dimension" }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": ["id", "type", "x", "y"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "point" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "construction": { "type": "boolean", "default": false },
+        "fixed": { "type": "boolean", "default": false }
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": ["id", "type", "start_point", "end_point"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "line" },
+        "start_point": { "type": "string", "description": "ID of start Point entity" },
+        "end_point": { "type": "string", "description": "ID of end Point entity" },
+        "construction": { "type": "boolean", "default": false }
+      }
+    },
+    "circle": {
+      "type": "object",
+      "required": ["id", "type", "center", "radius"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "circle" },
+        "center": { "type": "string", "description": "ID of center Point entity" },
+        "radius": { "type": "number", "minimum": 0 },
+        "construction": { "type": "boolean", "default": false }
+      }
+    },
+    "arc": {
+      "type": "object",
+      "required": ["id", "type", "center", "radius", "start_angle", "end_angle"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "arc" },
+        "center": { "type": "string", "description": "ID of center Point entity" },
+        "radius": { "type": "number", "minimum": 0 },
+        "start_angle": { "type": "number", "description": "Start angle in radians" },
+        "end_angle": { "type": "number", "description": "End angle in radians" },
+        "construction": { "type": "boolean", "default": false }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["id", "type", "entities"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "coincident",
+            "horizontal",
+            "vertical",
+            "parallel",
+            "perpendicular",
+            "tangent",
+            "equal",
+            "concentric",
+            "collinear",
+            "symmetric",
+            "fixed"
+          ]
+        },
+        "entities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of entities involved in the constraint"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Optional numeric or other parameters for the constraint"
+        }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "required": ["id", "type", "entities", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["distance", "length", "radius", "diameter", "angle"]
+        },
+        "entities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of entities the dimension measures"
+        },
+        "value": {
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string", "description": "Parameter name reference (e.g. 'Width')" }
+          ]
+        },
+        "driven": { "type": "boolean", "default": false },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
