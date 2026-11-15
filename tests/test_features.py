@@ -145,3 +145,42 @@ def test_revolve_angle_bounds():
     feat2 = RevolveFeature(sketch_id=sketch.id, angle=400.0)
     with pytest.raises(FeatureValidationError):
         feat2.generate_mesh(sketch)
+
+
+def test_extrude_polygon_profile():
+    """Extrude should use extracted polygon rather than just AABB when possible."""
+    from pymodeler.core.sketch import Sketch
+    sketch = Sketch(name="Triangle")
+    # Simple triangle
+    p1 = sketch.add_point(0, 0)
+    p2 = sketch.add_point(4, 0)
+    p3 = sketch.add_point(2, 3)
+    sketch.add_line(p1, p2)
+    sketch.add_line(p2, p3)
+    sketch.add_line(p3, p1)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=2.0)
+    mesh = feat.generate_mesh(sketch)
+    assert len(mesh.vertices) == 6  # 3 bottom + 3 top
+    assert len(mesh.faces) >= 5     # bottom, top, 3 sides
+
+
+def test_extrude_circle_profile():
+    """Circle entity should produce a faceted cylinder."""
+    from pymodeler.core.sketch import Sketch
+    sketch = Sketch(name="Circle")
+    center = sketch.add_point(0, 0)
+    sketch.add_circle(center, radius=5.0)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=3.0)
+    mesh = feat.generate_mesh(sketch)
+    # 24 segs * 2 rings + 2 centers
+    assert len(mesh.vertices) > 40
+    assert len(mesh.faces) > 20
+
+
+def test_profile_extraction_arc_near_circle():
+    from pymodeler.core.sketch import Sketch, extract_simple_profiles
+    sketch = Sketch()
+    c = sketch.add_point(0, 0)
+    sketch.add_arc(c, radius=2.0, start_angle=0, end_angle=359)
+    profs = extract_simple_profiles(sketch)
+    assert any(p["type"] == "circle" for p in profs)

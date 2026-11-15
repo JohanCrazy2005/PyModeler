@@ -279,3 +279,127 @@ def create_rectangle_sketch(
     sketch.add_length_dimension(left, height)
 
     return sketch
+
+
+def extract_simple_profiles(sketch: "Sketch") -> list[dict]:
+    """Extract simple closed profiles from a sketch for feature generation.
+
+    Returns a list of profile dicts:
+    - {"type": "polygon", "points": [(x, y), ...]}  # closed, ordered
+    - {"type": "circle", "center": (x, y), "radius": float}
+
+    Currently supports:
+    - Connected line entities forming a simple closed polygon (no holes)
+    - Standalone circle entities
+    - Arcs are discretized and can participate in polygons if connected via points
+
+    This is a pragmatic mesh-oriented helper, not a full region finder.
+    """
+    import math
+
+    profiles: list[dict] = []
+
+    # Map point id -> (x, y)
+    point_map: dict[str, tuple[float, float]] = {}
+    for e in sketch.entities:
+        if e["type"] == "point":
+            point_map[e["id"]] = (float(e["x"]), float(e["y"]))
+
+    # Circles
+    for e in sketch.entities:
+        if e["type"] == "circle" and not e.get("construction", False):
+            cid = e["center"]
+            if cid in point_map:
+                cx, cy = point_map[cid]
+                profiles.append({
+                    "type": "circle",
+                    "center": (cx, cy),
+                    "radius": float(e["radius"]),
+                })
+
+    # Lines: build adjacency for polygon extraction
+    lines = [e for e in sketch.entities if e["type"] == "line" and not e.get("construction", False)]
+    if lines:
+        # Graph: point_id -> list of (other_point_id, line_id)
+        graph: dict[str, list[tuple[str, str]]] = {}
+        for ln in lines:
+            a, b = ln["start_point"], ln["end_point"]
+            if a in point_map and b in point_map:
+                graph.setdefault(a, []).append((b, ln["id"]))
+                graph.setdefault(b, []).append((a, ln["id"]))
+
+        # Find simple cycles (limited search for small sketches)
+        visited_edges: set[tuple[str, str]] = set()
+
+        def edge_key(u: str, v: str) -> tuple[str, str]:
+            return (min(u, v), max(u, v))
+
+        for start in list(graph.keys()):
+            # DFS for cycles starting from each node, limited depth
+            stack = [(start, [start], set())]  # node, path, used_edges
+            while stack:
+                node, path, used = stack.pop()
+                if len(path) > 12:  # safety
+                    continue
+                for neigh, _lid in graph.get(node, []):
+                    ek = edge_key(node, neigh)
+                    if ek in used or ek in visited_edges:
+                        continue
+                    if neigh == path[0] and len(path) >= 3:
+                        # Found a cycle
+                        poly = [point_map[pid] for pid in path]
+                        # Ensure closed and simple (area > 0)
+                        if _polygon_area(poly) > 1e-8:
+                            profiles.append({"type": "polygon", "points": poly})
+                        visited_edges.update(edge_key(path[i], path[(i + 1) % len(path)]) for i in range(len(path)))
+                        continue
+                    if neigh not in path:
+                        new_used = used | {ek}
+                        stack.append((neigh, path + [neigh], new_used))
+
+    # Discretize arcs and try to include them as additional polygon candidates if they form closed shapes
+    # (basic: if an arc is almost full circle, treat as circle)
+    for e in sketch.entities:
+        if e["type"] == "arc" and not e.get("construction", False):
+            cid = e["center"]
+            if cid in point_map:
+                cx, cy = point_map[cid]
+                r = float(e["radius"])
+                sa = float(e["start_angle"])
+                ea = float(e["end_angle"])
+                # Normalize angles
+                da = (ea - sa) % 360.0
+                if da < 1e-3:
+                    da = 360.0
+                if abs(da - 360.0) < 5.0:  # nearly full circle
+                    profiles.append({
+                        "type": "circle",
+                        "center": (cx, cy),
+                        "radius": r,
+                    })
+                else:
+                    # Discretize into polyline points for potential use
+                    n = max(4, int(da / 15))  # ~15 deg steps
+                    pts = []
+                    for i in range(n + 1):
+                        ang = math.radians(sa + (da * i / n))
+                        pts.append((cx + r * math.cos(ang), cy + r * math.sin(ang)))
+                    # Store as open for now; full loop joining is future work
+                    # If start and end are close, close it
+                    if math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < 1e-4:
+                        profiles.append({"type": "polygon", "points": pts[:-1]})
+
+    return profiles
+
+
+def _polygon_area(points: list[tuple[float, float]]) -> float:
+    """Shoelace formula. Positive for counter-clockwise."""
+    n = len(points)
+    if n < 3:
+        return 0.0
+    area = 0.0
+    for i in range(n):
+        x1, y1 = points[i]
+        x2, y2 = points[(i + 1) % n]
+        area += x1 * y2 - x2 * y1
+    return abs(area) / 2.0

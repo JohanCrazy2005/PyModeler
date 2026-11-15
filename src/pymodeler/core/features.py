@@ -187,62 +187,85 @@ class ExtrudeFeature:
                 x_axis[0] * y_axis[1] - x_axis[1] * y_axis[0],
             ]
 
-        # Try to extract a simple rectangular profile from the sketch
-        points = [e for e in sketch.entities if e["type"] == "point"]
-        if len(points) >= 4:
-            # Collect 2D coords
-            coords = [(p["x"], p["y"]) for p in points]
-            xs = [c[0] for c in coords]
-            ys = [c[1] for c in coords]
-            min_x, max_x = min(xs), max(xs)
-            min_y, max_y = min(ys), max(ys)
-            width = max_x - min_x
-            height = max_y - min_y
-            if width > 1e-8 and height > 1e-8:
-                # Build a box aligned to the sketch plane
-                origin = sketch.plane.get("origin", [0.0, 0.0, 0.0])
-                x_axis = sketch.plane.get("x_axis", [1.0, 0.0, 0.0])
-                y_axis = sketch.plane.get("y_axis", [0.0, 1.0, 0.0])
-                # Normalize direction
-                import math
-                dlen = math.sqrt(sum(c * c for c in direction)) or 1.0
-                d = [c / dlen for c in direction]
-                half_dist = dist / 2.0 if self.symmetric else dist
+        from .sketch import extract_simple_profiles
+        import math
 
-                def to_3d(px: float, py: float, along: float = 0.0) -> list[float]:
-                    return [
-                        origin[0] + px * x_axis[0] + py * y_axis[0] + along * d[0],
-                        origin[1] + px * x_axis[1] + py * y_axis[1] + along * d[1],
-                        origin[2] + px * x_axis[2] + py * y_axis[2] + along * d[2],
-                    ]
+        profiles = extract_simple_profiles(sketch)
+        origin = sketch.plane.get("origin", [0.0, 0.0, 0.0])
+        x_axis = sketch.plane.get("x_axis", [1.0, 0.0, 0.0])
+        y_axis = sketch.plane.get("y_axis", [0.0, 1.0, 0.0])
+        dlen = math.sqrt(sum(c * c for c in direction)) or 1.0
+        d = [c / dlen for c in direction]
+        half_dist = dist / 2.0 if self.symmetric else dist
 
-                # Bottom face (z=0 relative) and top face
-                bl = to_3d(min_x, min_y, 0.0)
-                br = to_3d(max_x, min_y, 0.0)
-                tr = to_3d(max_x, max_y, 0.0)
-                tl = to_3d(min_x, max_y, 0.0)
-                bl2 = to_3d(min_x, min_y, half_dist)
-                br2 = to_3d(max_x, min_y, half_dist)
-                tr2 = to_3d(max_x, max_y, half_dist)
-                tl2 = to_3d(min_x, max_y, half_dist)
+        def to_3d(px: float, py: float, along: float = 0.0) -> list[float]:
+            return [
+                origin[0] + px * x_axis[0] + py * y_axis[0] + along * d[0],
+                origin[1] + px * x_axis[1] + py * y_axis[1] + along * d[1],
+                origin[2] + px * x_axis[2] + py * y_axis[2] + along * d[2],
+            ]
 
-                if self.symmetric:
-                    # Centered: also go negative
-                    bl = to_3d(min_x, min_y, -half_dist)
-                    br = to_3d(max_x, min_y, -half_dist)
-                    tr = to_3d(max_x, max_y, -half_dist)
-                    tl = to_3d(min_x, max_y, -half_dist)
+        # Prefer circle profiles (faceted cylinder)
+        for prof in profiles:
+            if prof["type"] == "circle":
+                cx, cy = prof["center"]
+                r = prof["radius"]
+                segs = 24
+                verts = []
+                # Bottom and top rings
+                for i in range(segs):
+                    ang = 2 * math.pi * i / segs
+                    px = cx + r * math.cos(ang)
+                    py = cy + r * math.sin(ang)
+                    verts.append(to_3d(px, py, 0.0 if not self.symmetric else -half_dist))
+                for i in range(segs):
+                    ang = 2 * math.pi * i / segs
+                    px = cx + r * math.cos(ang)
+                    py = cy + r * math.sin(ang)
+                    verts.append(to_3d(px, py, half_dist))
+                # Centers for caps
+                bot_c = len(verts)
+                verts.append(to_3d(cx, cy, 0.0 if not self.symmetric else -half_dist))
+                top_c = len(verts)
+                verts.append(to_3d(cx, cy, half_dist))
 
-                vertices = [bl, br, tr, tl, bl2, br2, tr2, tl2]
-                faces = [
-                    [0, 1, 2, 3],  # bottom
-                    [4, 5, 6, 7],  # top
-                    [0, 1, 5, 4],  # front
-                    [2, 3, 7, 6],  # back
-                    [0, 3, 7, 4],  # left
-                    [1, 2, 6, 5],  # right
-                ]
-                return Mesh(vertices=vertices, faces=faces, name=self.name or "Extrude")
+                faces = []
+                # Sides
+                for i in range(segs):
+                    ni = (i + 1) % segs
+                    faces.append([i, ni, segs + ni, segs + i])
+                # Bottom cap
+                for i in range(segs):
+                    ni = (i + 1) % segs
+                    faces.append([bot_c, ni, i])
+                # Top cap
+                for i in range(segs):
+                    ni = (i + 1) % segs
+                    faces.append([top_c, segs + i, segs + ni])
+                return Mesh(vertices=verts, faces=faces, name=self.name or "Extrude")
+
+        # Polygon profiles (closed loops of lines / discretized arcs)
+        for prof in profiles:
+            if prof["type"] == "polygon" and len(prof["points"]) >= 3:
+                pts2d = prof["points"]
+                n = len(pts2d)
+                verts = []
+                z0 = -half_dist if self.symmetric else 0.0
+                z1 = half_dist
+                for px, py in pts2d:
+                    verts.append(to_3d(px, py, z0))
+                for px, py in pts2d:
+                    verts.append(to_3d(px, py, z1))
+                faces = []
+                # Bottom (reversed for outward)
+                faces.append(list(reversed(range(n))))
+                # Top
+                faces.append(list(range(n, 2 * n)))
+                # Sides
+                for i in range(n):
+                    ni = (i + 1) % n
+                    faces.append([i, ni, n + ni, n + i])
+                return Mesh(vertices=verts, faces=faces, name=self.name or "Extrude")
 
         # Fallback: unit cube scaled so its height roughly matches distance
         from .mesh import create_cube
@@ -355,67 +378,54 @@ class RevolveFeature:
         alen = math.sqrt(sum(c * c for c in axis_dir)) or 1.0
         ad = [c / alen for c in axis_dir]
 
-        # Extract simple rectangular profile (same logic as Extrude)
-        points = [e for e in sketch.entities if e["type"] == "point"]
-        if len(points) >= 4:
-            coords = [(p["x"], p["y"]) for p in points]
-            xs = [c[0] for c in coords]
-            ys = [c[1] for c in coords]
-            min_x, max_x = min(xs), max(xs)
-            min_y, max_y = min(ys), max(ys)
-            if (max_x - min_x) > 1e-8 and (max_y - min_y) > 1e-8:
-                # Profile points in sketch plane (use min/max for a simple rectangle)
-                # For revolve we treat X as radial distance from axis, Y as axial height
-                # Simple approximation: revolve the outer rectangle around Y
-                r_inner = abs(min_x)
-                r_outer = abs(max_x)
-                h_bot = min_y
-                h_top = max_y
+        from .sketch import extract_simple_profiles
 
-                # Build ring of points for bottom and top
-                vertices = []
-                # Bottom outer / inner, top outer / inner, for each segment
-                for i in range(segs + 1):
-                    theta = (i / segs) * angle_rad
-                    if self.symmetric:
-                        theta -= angle_rad  # center it
-                    cos_t = math.cos(theta)
-                    sin_t = math.sin(theta)
-                    # Radial in XZ plane, axial along Y (simplified for default axis)
-                    # Offset from ax_origin
-                    for r, h in ((r_outer, h_bot), (r_inner, h_bot), (r_outer, h_top), (r_inner, h_top)):
-                        # Approximate: assume axis is Y, profile X is radial
-                        px = ax_origin[0] + r * cos_t
-                        py = ax_origin[1] + h
-                        pz = ax_origin[2] + r * sin_t
-                        vertices.append([px, py, pz])
+        profiles = extract_simple_profiles(sketch)
+        # Prefer polygon profiles for revolve (treat X as radial, Y as axial for default)
+        poly = next((pr for pr in profiles if pr["type"] == "polygon" and len(pr["points"]) >= 3), None)
+        if poly:
+            pts = poly["points"]
+            # Simple: use bounding radial and height for faceted solid
+            xs = [p[0] for p in pts]
+            ys = [p[1] for p in pts]
+            r_outer = max(abs(x) for x in xs) or 1.0
+            r_inner = min(abs(x) for x in xs)
+            h_bot = min(ys)
+            h_top = max(ys)
 
-                # Build faces (quads between consecutive segments)
-                faces = []
-                stride = 4  # 4 points per angular step
-                for i in range(segs):
-                    base = i * stride
-                    nxt = (i + 1) * stride
-                    # Outer wall
-                    faces.append([base + 0, nxt + 0, nxt + 2, base + 2])
-                    # Inner wall (if hollow)
-                    if r_inner > 1e-6:
-                        faces.append([base + 1, base + 3, nxt + 3, nxt + 1])
-                    # Bottom annulus
-                    faces.append([base + 0, base + 1, nxt + 1, nxt + 0])
-                    # Top annulus
-                    faces.append([base + 2, nxt + 2, nxt + 3, base + 3])
+            vertices = []
+            for i in range(segs + 1):
+                theta = (i / segs) * angle_rad
+                if self.symmetric:
+                    theta -= angle_rad
+                cos_t = math.cos(theta)
+                sin_t = math.sin(theta)
+                for r, h in ((r_outer, h_bot), (r_inner, h_bot), (r_outer, h_top), (r_inner, h_top)):
+                    px = ax_origin[0] + r * cos_t
+                    py = ax_origin[1] + h
+                    pz = ax_origin[2] + r * sin_t
+                    vertices.append([px, py, pz])
 
-                # Cap ends if not full 360
-                if angle_deg < 359.9:
-                    # Start cap
-                    faces.append([0, 1, 3, 2])
-                    # End cap
-                    last = segs * stride
-                    faces.append([last + 0, last + 2, last + 3, last + 1])
+            faces = []
+            stride = 4
+            for i in range(segs):
+                base = i * stride
+                nxt = (i + 1) * stride
+                faces.append([base + 0, nxt + 0, nxt + 2, base + 2])
+                if r_inner > 1e-6:
+                    faces.append([base + 1, base + 3, nxt + 3, nxt + 1])
+                faces.append([base + 0, base + 1, nxt + 1, nxt + 0])
+                faces.append([base + 2, nxt + 2, nxt + 3, base + 3])
 
-                return Mesh(vertices=vertices, faces=faces, name=self.name or "Revolve")
+            if angle_deg < 359.9:
+                faces.append([0, 1, 3, 2])
+                last = segs * stride
+                faces.append([last + 0, last + 2, last + 3, last + 1])
 
+            return Mesh(vertices=vertices, faces=faces, name=self.name or "Revolve")
+
+        # Circle profile -> simple torus-like or sphere approximation via revolve of circle is complex;
+        # fall through to cylinder for now
         # Fallback: simple cylinder
         from .mesh import create_cylinder
         try:

@@ -10,30 +10,31 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Sketch editor improvements are complete:
-- Editable table cells for point X/Y coordinates and circle/arc radius
-- Editable dimension values (numeric or parameter name)
-- Better selection: Add Line / Add Circle / Add Dimension prefer currently selected entities of the right type when available; otherwise fall back to first available
-- Research note already present in `docs/research/sketch-editor-ui.md`
+Profile extraction improvements are complete for simple cases:
+- `extract_simple_profiles` detects closed polygons from connected lines and circle entities
+- Near-full arcs are treated as circles; arcs can be discretized
+- Extrude uses polygon or circle profiles (faceted prism / cylinder) instead of only AABB
+- Revolve uses extracted polygon for better radial/axial profile
+- Research note: `docs/research/profile-extraction.md`
 
 Next concrete work:
 
-1. **Better profile support**
-   - Extrude and Revolve should handle simple polygons and circles better
-   - Arc support in profile extraction
-   - Research how Fusion 360 / Onshape extract closed profiles from sketches for features
-
-2. **Offset / symmetric improvements for Extrude**
+1. **Offset / symmetric improvements for Extrude**
    - Support start offset and symmetric extrude options in schema + feature + mesh generation
+   - Research Fusion 360 / Onshape offset and two-direction extrude behavior
+
+2. **Boolean operations (join/cut) on generated meshes**
+   - Basic mesh boolean helpers or stubs for feature operations beyond "new"
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After profile improvements, next increments:
-- Boolean operations (join/cut) on generated meshes
+After offset/symmetric, next increments:
 - Rollback marker and feature reordering in the timeline
 - Visual 2D canvas for sketching (mouse drawing, snapping)
+- Better hole/nested profile support
 
 ## Recently Completed
+- Better profile support: polygon + circle extraction, arc handling, improved Extrude/Revolve mesh generation
 - Sketch editor editable cells (point coordinates, dimension values) + selection-aware entity addition
 - Revolve feature (schema, parameter-driven angle, faceted solid of revolution, FeatureHistory integration)
 - Basic 2D sketch editor widgets (table-based) + research note
