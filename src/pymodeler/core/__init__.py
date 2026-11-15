@@ -30,6 +30,13 @@ from .parameters import (
     ParameterEvaluationError,
     validate_parameter_data,
 )
+from .features import (
+    ExtrudeFeature,
+    FeatureHistory,
+    FeatureValidationError,
+    validate_extrude_data,
+    validate_history_data,
+)
 
 __all__ = [
     "Mesh",
@@ -60,4 +67,9 @@ __all__ = [
     "ParameterValidationError",
     "ParameterEvaluationError",
     "validate_parameter_data",
+    "ExtrudeFeature",
+    "FeatureHistory",
+    "FeatureValidationError",
+    "validate_extrude_data",
+    "validate_history_data",
 ]
