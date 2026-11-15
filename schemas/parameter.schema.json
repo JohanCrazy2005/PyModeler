@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/parameter.schema.json",
+  "title": "ParameterStore",
+  "description": "Collection of named user parameters that can drive sketch dimensions and features.",
+  "type": "object",
+  "required": ["parameters"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional store identifier"
+    },
+    "name": {
+      "type": "string",
+      "default": "Parameters",
+      "description": "Human-readable name for the store"
+    },
+    "parameters": {
+      "type": "array",
+      "description": "List of named parameters",
+      "items": { "$ref": "#/$defs/parameter" }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "description": "Unique parameter name (identifier)"
+        },
+        "value": {
+          "type": "number",
+          "description": "Numeric value (used when no expression, or as fallback)"
+        },
+        "expression": {
+          "type": "string",
+          "description": "Optional expression string that may reference other parameter names"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Optional unit (mm, in, deg, etc.)"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional human comment"
+        }
+      }
+    }
+  }
+}

@@ -24,7 +24,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 
 ## Phase 1 – Parametric Core (Sketch + Features)
 - [x] Sketch schema + data model (entities, constraints, dimensions)
-- [ ] User Parameters / variables system
+- [x] User Parameters / variables system
 - [ ] Basic 2D sketch editor in UI
 - [ ] Extrude feature (from sketch to solid) with parameters
 - [ ] Feature history / timeline data model + simple UI
@@ -59,4 +59,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-15 (Sketch schema + core data model implemented, tested, exported)
+Last updated: 2026-11-15 (ParameterStore schema + implementation, tests, research note)

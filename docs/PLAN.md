@@ -44,8 +44,8 @@
 ## Current Focus
 1. Research on parametric modeling (Fusion/Onshape) and manufacturing features (Mozaik) is complete and documented.
 2. Sketch data model + JSON Schema is implemented and tested (entities, constraints, dimensions).
-3. Next: simple Parameter / variable system so dimensions can be driven by named parameters.
-4. Then Extrude feature and feature history.
+3. Parameter / variable system implemented and tested (named params, simple expressions).
+4. Next: Extrude feature and feature history data model.
 5. Keep all changes small, tested, and main-branch safe.
 
 ## Risk Management
