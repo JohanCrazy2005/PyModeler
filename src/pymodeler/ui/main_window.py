@@ -44,6 +44,8 @@ from pymodeler.core import (
     ParameterStore,
     Sketch,
     create_rectangle_sketch,
+    ExtrudeFeature,
+    RevolveFeature,
 )
 from pymodeler.render import ViewportWidget
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
@@ -125,6 +127,7 @@ class MainWindow(QMainWindow):
         self.feature_history = FeatureHistory()
         self.parameters = ParameterStore()
         self.current_sketch: Optional[Sketch] = None
+        self.sketches: dict[str, Sketch] = {}
 
         self.viewport = ViewportWidget()
         self.viewport.set_scene(self.scene)
@@ -140,6 +143,8 @@ class MainWindow(QMainWindow):
         self.property_panel.set_context(self.feature_history, self.parameters)
         self.feature_tree.feature_selected.connect(self.property_panel.show_feature)
         self.property_panel.properties_changed.connect(self.feature_tree.refresh)
+        self.property_panel.properties_changed.connect(self._recompute_and_update_scene)
+        self.feature_tree.rollback_changed.connect(self._recompute_and_update_scene)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
         left = QWidget()
@@ -174,6 +179,9 @@ class MainWindow(QMainWindow):
         rect_act = QAction("Add Rectangle Sketch", self)
         rect_act.triggered.connect(self._add_rectangle_sketch)
         sketch_menu.addAction(rect_act)
+        extrude_act = QAction("Extrude Current Sketch", self)
+        extrude_act.triggered.connect(self._extrude_current_sketch)
+        sketch_menu.addAction(extrude_act)
 
     def _new_sketch(self) -> None:
         self.current_sketch = Sketch(name="New Sketch")
@@ -220,6 +228,36 @@ class MainWindow(QMainWindow):
         for item in selected_items:
             self.scene.select(item.text(), clear=False)
         self.viewport.update()
+
+    def _extrude_current_sketch(self) -> None:
+        if self.current_sketch is None:
+            QMessageBox.information(self, "Extrude", "Create or select a sketch first.")
+            return
+        self.sketches[self.current_sketch.id] = self.current_sketch
+        feat = ExtrudeFeature(sketch_id=self.current_sketch.id, distance=5.0, name="Extrude")
+        self.feature_history.add_extrude(feat)
+        self.feature_tree.refresh()
+        self._recompute_and_update_scene()
+
+    def _recompute_and_update_scene(self) -> None:
+        """Regenerate meshes from active features and replace scene objects."""
+        meshes = self.feature_history.recompute_meshes(self.sketches, self.parameters)
+        # Clear existing objects (simple approach for now)
+        self.scene.objects.clear()
+        self.scene.selected.clear()
+        for fid, mesh in meshes.items():
+            # Find feature name
+            name = fid
+            for f in self.feature_history.features:
+                if f.get("id") == fid:
+                    name = f.get("name", fid)
+                    break
+            obj = SceneObject(name=name, mesh=mesh)
+            self.scene.objects.append(obj)
+        self._refresh_outliner()
+        self.viewport.set_scene(self.scene)
+        self.viewport.update()
+        self.viewport.frame_all()
 
 def run_app() -> int:
     import sys

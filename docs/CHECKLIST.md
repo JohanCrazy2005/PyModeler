@@ -12,7 +12,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Cross-platform dependency list
 - [x] Automated tests for core data + smoke test
 - [x] Continuous integration skeleton (GitHub Actions)
-- [ ] Ensure all core source modules are complete and tested on main
+- [x] Ensure all core source modules are complete and tested on main
 
 ## Research & Planning (Mandatory)
 - [x] Create `docs/research/` folder
@@ -65,4 +65,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (ezdxf approved for DXF I/O)
+Last updated: 2026-11-16 (feature recompute wired to viewport; features.py restored)

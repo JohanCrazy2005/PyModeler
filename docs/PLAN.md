@@ -58,6 +58,7 @@
 13. Feature tree UI now supports setting the rollback marker via context menu and visually indicates suppressed features.
 14. Visual 2D sketch canvas implemented (QGraphicsView) with mouse drawing of points/lines/circles, basic snapping, and live preview. Integrated into the Sketch Editor.
 15. **ezdxf is an approved dependency** for DXF import/export, 2D drawing output, and manufacturing-related DXF workflows. Use it whenever DXF support is needed.
+16. Feature recompute is wired into the MainWindow: property changes and rollback marker updates regenerate meshes and display them in the viewport.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.
