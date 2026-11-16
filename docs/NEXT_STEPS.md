@@ -10,30 +10,27 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Rollback marker and basic feature reordering are now in the data model:
-- Research note: `docs/research/timeline-rollback.md`
-- `FeatureHistory.rollback_marker` (optional integer) temporarily suppresses features after the marker
-- `set_rollback()`, `get_active_count()`, `reorder(from_index, to_index)`
-- `recompute_meshes` only processes features up to the marker
-- Schema updated; tests cover marker suppression and reordering
+Core FeatureHistory (including rollback marker) and Extrude/Revolve data models are restored and fully tested. Property panel and feature tree UI now expose Extrude start_offset / symmetric / operation and visually indicate suppressed features after the rollback marker.
 
 Next concrete work:
 
-1. **UI exposure of offset / symmetric / operation in the property panel**
-   - Let the user edit Extrude start_offset, symmetric, and operation from the feature tree
+1. **Allow setting the rollback marker from the feature tree UI**
+   - Context menu or button on the tree to set marker at a selected index (or "to end")
 
-2. **Visual indication of the rollback marker in the feature tree UI**
-   - Show which features are active vs. suppressed; allow setting the marker
+2. **Visual 2D canvas for sketching**
+   - Mouse drawing, basic snapping, preview of entities (research already exists)
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
 After timeline UI improvements, next increments:
-- Visual 2D canvas for sketching (mouse drawing, snapping)
 - Better hole/nested profile support
 - Multi-feature Part model
 - Dependency-aware reordering (parent/child checks)
 
 ## Recently Completed
+- Restored full FeatureHistory + Extrude/Revolve implementations (rollback_marker, set_rollback, reorder, recompute_meshes suppression, offset/symmetric/operation)
+- UI: Property panel now edits Extrude start_offset, symmetric, and operation
+- UI: Feature tree shows [suppressed] for features after rollback marker and grays them out
 - Rollback marker + basic feature reordering (data model, schema, recompute, tests)
 - Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration
 - Extrude start offset + symmetric refinements (schema, resolution, mesh generation)
