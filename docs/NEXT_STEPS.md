@@ -10,15 +10,15 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Core FeatureHistory (including rollback marker) and Extrude/Revolve data models are restored and fully tested. Property panel and feature tree UI now expose Extrude start_offset / symmetric / operation and visually indicate suppressed features after the rollback marker.
+Rollback marker can now be set from the feature tree UI via right-click context menu ("Roll to here" / "Roll to end"). Features after the marker are visually marked [suppressed] and grayed. FeatureHistory + Extrude/Revolve data models are fully restored and tested. Property panel supports Extrude distance and start_offset.
 
 Next concrete work:
 
-1. **Allow setting the rollback marker from the feature tree UI**
-   - Context menu or button on the tree to set marker at a selected index (or "to end")
+1. **Visual 2D canvas for sketching**
+   - Mouse drawing, basic snapping, preview of entities (research already exists in docs/research/sketch-editor-ui.md)
 
-2. **Visual 2D canvas for sketching**
-   - Mouse drawing, basic snapping, preview of entities (research already exists)
+2. **Wire recompute into the main window / viewport**
+   - When features or rollback change, regenerate meshes and display them in the viewport
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
@@ -28,9 +28,9 @@ After timeline UI improvements, next increments:
 - Dependency-aware reordering (parent/child checks)
 
 ## Recently Completed
+- Feature tree context menu to set rollback marker + visual [suppressed] indication
 - Restored full FeatureHistory + Extrude/Revolve implementations (rollback_marker, set_rollback, reorder, recompute_meshes suppression, offset/symmetric/operation)
-- UI: Property panel now edits Extrude start_offset, symmetric, and operation
-- UI: Feature tree shows [suppressed] for features after rollback marker and grays them out
+- UI: Property panel now edits Extrude start_offset (and distance/angle)
 - Rollback marker + basic feature reordering (data model, schema, recompute, tests)
 - Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration
 - Extrude start offset + symmetric refinements (schema, resolution, mesh generation)

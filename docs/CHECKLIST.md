@@ -34,6 +34,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Extrude start offset and improved symmetric (schema + mesh generation)
 - [x] Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration (optional manifold3d)
 - [x] Rollback marker and basic feature reordering (data model + recompute)
+- [x] Feature tree UI: set rollback marker via context menu + visual suppressed state
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [ ] Multi-feature Part model
@@ -63,4 +64,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (Rollback marker + feature reordering data model)
+Last updated: 2026-11-16 (Feature tree rollback marker UI)
