@@ -53,6 +53,7 @@
 9. Better profile extraction: simple closed polygons and circles for Extrude/Revolve (see docs/research/profile-extraction.md).
 10. Extrude start offset and symmetric refinements implemented and tested (see docs/research/extrude-offset-symmetric.md).
 11. Basic mesh Boolean operations (join/cut/intersect) implemented with optional manifold3d backend and FeatureHistory integration (see docs/research/boolean-operations.md).
+12. Rollback marker and basic feature reordering implemented in the data model (see docs/research/timeline-rollback.md). Features after the marker are temporarily suppressed during recompute.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/feature_history.schema.json",
   "title": "FeatureHistory",
-  "description": "Ordered timeline of parametric features that can be serialized and recomputed.",
+  "description": "Ordered timeline of parametric features that can be serialized and recomputed. Supports a rollback marker that temporarily suppresses features after a given index.",
   "type": "object",
   "required": ["features"],
   "additionalProperties": false,
@@ -17,11 +17,16 @@
     },
     "features": {
       "type": "array",
-      "description": "Ordered list of feature objects (extrude, etc.)",
+      "description": "Ordered list of feature objects (extrude, revolve, etc.)",
       "items": {
         "type": "object",
         "additionalProperties": true
       }
+    },
+    "rollback_marker": {
+      "type": ["integer", "null"],
+      "description": "Number of leading features that are active (0 .. len(features)). null or omitted means marker is at the end (all features active). Features after the marker are temporarily suppressed during recompute.",
+      "minimum": 0
     },
     "metadata": {
       "type": "object",

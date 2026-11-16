@@ -10,28 +10,31 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Basic mesh Boolean operations are complete:
-- Research note: `docs/research/boolean-operations.md`
-- `src/pymodeler/core/boolean.py` provides join/cut/intersect via trimesh + optional manifold3d
-- FeatureHistory.recompute_meshes applies the operation when a feature is not "new"
-- Fallback concatenation for join if no engine; clear errors otherwise
+Rollback marker and basic feature reordering are now in the data model:
+- Research note: `docs/research/timeline-rollback.md`
+- `FeatureHistory.rollback_marker` (optional integer) temporarily suppresses features after the marker
+- `set_rollback()`, `get_active_count()`, `reorder(from_index, to_index)`
+- `recompute_meshes` only processes features up to the marker
+- Schema updated; tests cover marker suppression and reordering
 
 Next concrete work:
 
-1. **Rollback marker and feature reordering in the timeline**
-   - Allow suppressing features after a marker and reordering (data model first)
-
-2. **UI exposure of offset / symmetric / operation in the property panel**
+1. **UI exposure of offset / symmetric / operation in the property panel**
    - Let the user edit Extrude start_offset, symmetric, and operation from the feature tree
+
+2. **Visual indication of the rollback marker in the feature tree UI**
+   - Show which features are active vs. suppressed; allow setting the marker
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After timeline improvements, next increments:
+After timeline UI improvements, next increments:
 - Visual 2D canvas for sketching (mouse drawing, snapping)
 - Better hole/nested profile support
 - Multi-feature Part model
+- Dependency-aware reordering (parent/child checks)
 
 ## Recently Completed
+- Rollback marker + basic feature reordering (data model, schema, recompute, tests)
 - Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration
 - Extrude start offset + symmetric refinements (schema, resolution, mesh generation)
 - Better profile support: polygon + circle extraction, arc handling, improved Extrude/Revolve mesh generation
