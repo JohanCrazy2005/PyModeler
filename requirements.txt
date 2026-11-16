@@ -16,3 +16,6 @@ pytest-qt>=4.2.0
 # Future
 # Pillow>=10.0.0
 # pygltflib>=1.16.0
+
+# Optional robust mesh Booleans (recommended)
+# manifold3d>=2.0.0

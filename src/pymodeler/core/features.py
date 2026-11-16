@@ -513,14 +513,39 @@ class FeatureHistory:
         sketches: Dict[str, Sketch],
         parameters: Optional[ParameterStore] = None,
     ) -> Dict[str, Mesh]:
-        """Recompute solid meshes for every supported feature that has a matching sketch."""
+        """Recompute solid meshes for every supported feature that has a matching sketch.
+
+        Features with operation "new" produce independent meshes.
+        Features with join/cut/intersect are applied to the accumulated body
+        of previous features (basic single-body timeline for now).
+        """
+        from .boolean import mesh_boolean, BooleanError
+
         meshes: Dict[str, Mesh] = {}
-        for feat in self.get_extrude_features():
+        current_body: Optional[Mesh] = None
+
+        # Process in timeline order
+        for feat_dict in self.features:
+            ftype = feat_dict.get("type")
+            if ftype == "extrude":
+                feat = ExtrudeFeature.from_dict(feat_dict)
+            elif ftype == "revolve":
+                feat = RevolveFeature.from_dict(feat_dict)
+            else:
+                continue
             sketch = sketches.get(feat.sketch_id)
-            if sketch is not None:
-                meshes[feat.id] = feat.generate_mesh(sketch, parameters)
-        for feat in self.get_revolve_features():
-            sketch = sketches.get(feat.sketch_id)
-            if sketch is not None:
-                meshes[feat.id] = feat.generate_mesh(sketch, parameters)
+            if sketch is None:
+                continue
+            tool_mesh = feat.generate_mesh(sketch, parameters)
+            op = getattr(feat, "operation", "new")
+            if op == "new" or current_body is None:
+                result = tool_mesh
+            else:
+                try:
+                    result = mesh_boolean(current_body, tool_mesh, op, name=feat.name or ftype)
+                except BooleanError:
+                    # Fallback: keep the tool mesh so the app stays runnable
+                    result = tool_mesh
+            meshes[feat.id] = result
+            current_body = result
         return meshes

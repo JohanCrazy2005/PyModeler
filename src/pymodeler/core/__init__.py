@@ -30,6 +30,7 @@ from .parameters import (
     ParameterEvaluationError,
     validate_parameter_data,
 )
+from .boolean import mesh_boolean, BooleanError
 from .features import (
     ExtrudeFeature,
     RevolveFeature,
@@ -76,4 +77,6 @@ __all__ = [
     "validate_extrude_data",
     "validate_revolve_data",
     "validate_history_data",
+    "mesh_boolean",
+    "BooleanError",
 ]

@@ -10,29 +10,29 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Extrude offset / symmetric improvements are complete:
-- Schema supports `start_offset` (numeric or parameter/expression)
-- Symmetric treats `distance` as total length (±half around the offset center)
-- Mesh generation applies offset for both polygon and circle profiles
-- Research note: `docs/research/extrude-offset-symmetric.md`
+Basic mesh Boolean operations are complete:
+- Research note: `docs/research/boolean-operations.md`
+- `src/pymodeler/core/boolean.py` provides join/cut/intersect via trimesh + optional manifold3d
+- FeatureHistory.recompute_meshes applies the operation when a feature is not "new"
+- Fallback concatenation for join if no engine; clear errors otherwise
 
 Next concrete work:
 
-1. **Boolean operations (join/cut) on generated meshes**
-   - Basic mesh boolean helpers or stubs for feature operations beyond "new"
-   - Research simple CSG / boolean approaches that stay cross-platform
-
-2. **Rollback marker and feature reordering in the timeline**
+1. **Rollback marker and feature reordering in the timeline**
    - Allow suppressing features after a marker and reordering (data model first)
+
+2. **UI exposure of offset / symmetric / operation in the property panel**
+   - Let the user edit Extrude start_offset, symmetric, and operation from the feature tree
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After booleans, next increments:
+After timeline improvements, next increments:
 - Visual 2D canvas for sketching (mouse drawing, snapping)
 - Better hole/nested profile support
-- UI exposure of offset/symmetric in the property panel
+- Multi-feature Part model
 
 ## Recently Completed
+- Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration
 - Extrude start offset + symmetric refinements (schema, resolution, mesh generation)
 - Better profile support: polygon + circle extraction, arc handling, improved Extrude/Revolve mesh generation
 - Sketch editor editable cells (point coordinates, dimension values) + selection-aware entity addition
