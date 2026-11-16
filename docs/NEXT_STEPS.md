@@ -35,8 +35,10 @@ After viewport wiring:
 - Multi-feature Part model
 - Dependency-aware reordering (parent/child checks)
 - Better hole/nested profile support
+- DXF export stubs using **ezdxf** (now an approved library)
 
 ## Recently Completed
+- Documented **ezdxf** as an approved dependency for DXF I/O and dimensioned/manufacturing drawing outputs (PLAN, GOAL, requirements.txt)
 - Visual 2D sketch canvas (QGraphicsView) with point/line/circle drawing and snapping
 - Feature tree context menu to set rollback marker + visual [suppressed] indication
 - Restored full FeatureHistory + Extrude/Revolve implementations (rollback_marker, set_rollback, reorder, recompute_meshes suppression, offset/symmetric/operation)
@@ -61,3 +63,4 @@ After viewport wiring:
 - Test before every push. Keep main runnable.
 - Put research outputs in `docs/research/` and any generated examples in `output/`.
 - Research documents for Fusion, Onshape, and Mozaik are in place; consult them before expanding Phase 1.
+- **ezdxf is approved and preferred** for any DXF read/write, 2D drawing export, and manufacturing-related DXF workflows. Use it from `src/pymodeler/io/` when implementing DXF support.

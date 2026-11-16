@@ -14,7 +14,7 @@
 - `src/pymodeler/core/` – pure parametric logic (no Qt)
 - `src/pymodeler/ui/` – PyQt6 (feature tree, viewport, property panels, sketch editor)
 - `src/pymodeler/render/` – viewport
-- `src/pymodeler/io/` – import/export + manufacturing outputs
+- `src/pymodeler/io/` – import/export + manufacturing outputs (DXF via ezdxf)
 - `src/pymodeler/cam/` or manufacturing helpers (later)
 - `docs/research/` – feature research notes from Fusion / Onshape / Mozaik
 
@@ -24,6 +24,7 @@
 - numpy, scipy
 - jsonschema
 - trimesh (mesh utilities)
+- **ezdxf** (DXF read/write for 2D drawings, sketches, and manufacturing exports — approved and preferred for DXF)
 - Consider CadQuery / OCP / pythonOCC later for robust B-Rep if needed
 - moderngl or PyOpenGL for viewport
 - pytest
@@ -38,7 +39,7 @@
 - **Phase 0-1 (Foundation)**: Project structure, basic scene, simple solids, PyQt6 shell, research documents. (mostly complete)
 - **Phase 2 (Sketch + Parametric Core)**: 2D sketch engine with constraints/dimensions, Extrude/Revolve, feature history.
 - **Phase 3 (Parts & Assemblies)**: Multi-feature parts, basic assemblies and mates.
-- **Phase 4 (Manufacturing Helpers)**: Cut lists, BOMs, simple nesting concepts, dimensioned outputs (Mozaik-inspired).
+- **Phase 4 (Manufacturing Helpers)**: Cut lists, BOMs, simple nesting concepts, dimensioned outputs (Mozaik-inspired). DXF export via ezdxf.
 - **Phase 5 (Advanced + CAM path)**: Sheet metal basics, configurations, early toolpath / G-code stubs, simulation data.
 
 ## Current Focus
@@ -56,6 +57,7 @@
 12. Rollback marker and basic feature reordering implemented in the data model (see docs/research/timeline-rollback.md). Features after the marker are temporarily suppressed during recompute.
 13. Feature tree UI now supports setting the rollback marker via context menu and visually indicates suppressed features.
 14. Visual 2D sketch canvas implemented (QGraphicsView) with mouse drawing of points/lines/circles, basic snapping, and live preview. Integrated into the Sketch Editor.
+15. **ezdxf is an approved dependency** for DXF import/export, 2D drawing output, and manufacturing-related DXF workflows. Use it whenever DXF support is needed.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

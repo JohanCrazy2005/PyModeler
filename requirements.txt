@@ -6,6 +6,9 @@ jsonschema>=4.20.0
 # Mesh utilities (cross-platform)
 trimesh>=4.0.0
 
+# DXF import/export and 2D drawing outputs (approved)
+ezdxf>=1.0.0
+
 # Viewport / rendering
 moderngl>=5.8.0
 

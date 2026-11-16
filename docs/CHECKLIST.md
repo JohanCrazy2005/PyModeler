@@ -42,7 +42,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Simple Assembly + mates / constraints
 - [ ] Cut list / part list generation (Mozaik-inspired)
 - [ ] Basic BOM
-- [ ] Dimensioned drawing / export stubs
+- [ ] Dimensioned drawing / export stubs (DXF via ezdxf)
 - [ ] Material / stock definitions
 - [ ] Configurations (independent inputs)
 
@@ -56,7 +56,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Sheet metal / panel basics
 - [ ] Simple nesting concepts
 - [ ] Early toolpath / G-code generation stubs
-- [ ] Import/Export improvements (STEP later if geometry kernel allows)
+- [ ] Import/Export improvements (DXF via ezdxf; STEP later if geometry kernel allows)
 - [ ] Joinery rules / automatic machining concepts
 
 ## Ongoing
@@ -65,4 +65,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (Visual 2D sketch canvas)
+Last updated: 2026-11-16 (ezdxf approved for DXF I/O)

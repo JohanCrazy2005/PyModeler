@@ -33,11 +33,11 @@ The end product should feel like a practical engineering / product-design / smal
 ## Core Requirements
 - **UI Framework**: PyQt6 for native-feeling, cross-platform GUI (Windows, macOS, Linux).
 - **Data Models**: All major modules use strict JSON Schemas for validation, serialization, and clean inter-module communication. Feature history, parameters, and constraints must be schema-driven.
-- **Libraries**: Prefer mature, well-maintained public Python packages that are cross-platform (numpy, scipy, trimesh, cadquery or similar where helpful, moderngl / PyOpenGL, pillow, jsonschema, etc.).
+- **Libraries**: Prefer mature, well-maintained public Python packages that are cross-platform (numpy, scipy, trimesh, **ezdxf** for DXF, cadquery or similar where helpful, moderngl / PyOpenGL, pillow, jsonschema, etc.).
 - **Architecture**: Modular, with clear separation of:
   - Core parametric data (Sketch, Feature, Part, Assembly, Parameters)
   - UI / Viewports / Feature tree
-  - I/O (STEP/IGES later, OBJ/glTF, DXF, cut-list exports)
+  - I/O (STEP/IGES later, OBJ/glTF, **DXF via ezdxf**, cut-list exports)
   - Manufacturing helpers (cut lists, nesting stubs, toolpath concepts)
 - **Quality**: Code must be tested before every significant push. Prefer clean, typed, documented code.
 
