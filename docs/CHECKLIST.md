@@ -35,6 +35,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Basic mesh Boolean helpers (join/cut/intersect) + FeatureHistory integration (optional manifold3d)
 - [x] Rollback marker and basic feature reordering (data model + recompute)
 - [x] Feature tree UI: set rollback marker via context menu + visual suppressed state
+- [x] Visual 2D canvas for sketching (mouse drawing, basic snapping, preview)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [ ] Multi-feature Part model
@@ -64,4 +65,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (Feature tree rollback marker UI)
+Last updated: 2026-11-16 (Visual 2D sketch canvas)

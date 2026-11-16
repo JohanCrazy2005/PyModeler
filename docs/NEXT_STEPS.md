@@ -10,24 +10,34 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Rollback marker can now be set from the feature tree UI via right-click context menu ("Roll to here" / "Roll to end"). Features after the marker are visually marked [suppressed] and grayed. FeatureHistory + Extrude/Revolve data models are fully restored and tested. Property panel supports Extrude distance and start_offset.
+Visual 2D sketch canvas is now available:
+- QGraphicsView-based canvas inside the Sketch Editor dialog
+- Mouse drawing for Point / Line / Circle modes
+- Basic point snapping
+- Live preview while dragging
+- Bidirectional sync with the Sketch data model and table views
 
 Next concrete work:
 
-1. **Visual 2D canvas for sketching**
-   - Mouse drawing, basic snapping, preview of entities (research already exists in docs/research/sketch-editor-ui.md)
-
-2. **Wire recompute into the main window / viewport**
+1. **Wire recompute into the main window / viewport**
    - When features or rollback change, regenerate meshes and display them in the viewport
+   - Connect FeatureHistory.recompute_meshes to scene objects
+
+2. **Improve canvas interaction**
+   - Better selection of entities on the canvas
+   - Drag existing points to update coordinates
+   - Arc tool, rectangle tool on canvas
+   - Constraint badges / visual feedback
 
 3. Keep foundation solid; all existing tests must continue to pass.
 
-After timeline UI improvements, next increments:
-- Better hole/nested profile support
+After viewport wiring:
 - Multi-feature Part model
 - Dependency-aware reordering (parent/child checks)
+- Better hole/nested profile support
 
 ## Recently Completed
+- Visual 2D sketch canvas (QGraphicsView) with point/line/circle drawing and snapping
 - Feature tree context menu to set rollback marker + visual [suppressed] indication
 - Restored full FeatureHistory + Extrude/Revolve implementations (rollback_marker, set_rollback, reorder, recompute_meshes suppression, offset/symmetric/operation)
 - UI: Property panel now edits Extrude start_offset (and distance/angle)
