@@ -55,6 +55,7 @@
 11. Basic mesh Boolean operations (join/cut/intersect) implemented with optional manifold3d backend and FeatureHistory integration (see docs/research/boolean-operations.md).
 12. Rollback marker and basic feature reordering implemented in the data model (see docs/research/timeline-rollback.md). Features after the marker are temporarily suppressed during recompute.
 13. Feature tree UI now supports setting the rollback marker via context menu and visually indicates suppressed features.
+14. Visual 2D sketch canvas implemented (QGraphicsView) with mouse drawing of points/lines/circles, basic snapping, and live preview. Integrated into the Sketch Editor.
 
 ## Risk Management
 - Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.

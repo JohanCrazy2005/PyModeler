@@ -36,3 +36,12 @@ Research complete. Proceeding to table-based SketchEditorWidget implementation.
 - Dimension values are editable (accepts numbers or parameter name strings).
 - Add Line / Circle / Dimension prefer selected entities of the appropriate type when the user has made a selection in the entities table; falls back to first available otherwise.
 - Still table-based (no canvas); full visual sketching remains a later increment.
+
+## Implementation Notes (2026-11-16)
+- Added visual 2D canvas (`SketchCanvasWidget`) using QGraphicsView / QGraphicsScene.
+- Supports Point, Line, and Circle drawing modes with mouse press/drag/release.
+- Basic point snapping (nearest existing point within SNAP_DISTANCE).
+- Live dashed preview while dragging for lines and circles.
+- Bidirectional sync: canvas changes update the Sketch model; table edits refresh the canvas.
+- Integrated as a splitter pane inside the existing SketchEditorWidget dialog.
+- Research on canvas interaction (Fusion/Onshape) already covered above; this is the first visual increment.
