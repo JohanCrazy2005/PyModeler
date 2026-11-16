@@ -38,6 +38,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Visual 2D canvas for sketching (mouse drawing, basic snapping, preview)
 - [x] Canvas selection of entities + drag points to update coordinates
 - [x] Rectangle and Arc tools on the visual canvas
+- [x] Constraint visual feedback / badges on canvas (colored markers + tooltips)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [ ] Multi-feature Part model
@@ -67,4 +68,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (canvas selection, point drag, rectangle & arc tools)
+Last updated: 2026-11-16 (constraint badges on sketch canvas)

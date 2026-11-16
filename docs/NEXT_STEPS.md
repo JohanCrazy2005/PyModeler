@@ -10,18 +10,18 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-Canvas interaction improvements completed:
-- Select mode with entity highlighting
-- Drag points in select mode to update coordinates (via Sketch.update_point)
-- Rectangle tool (click-drag creates constrained rectangle)
-- Arc tool (basic center + radius + end angle)
-- Toolbar buttons for all modes
+Constraint visual feedback completed:
+- Colored circular badges near constrained entities on the sketch canvas
+- Short type labels (HOR, VER, EQU, …)
+- Hover tooltips showing constraint type, entities, and ID
+- Research note in docs/research/constraint-visual-feedback.md
 
 Next concrete work:
 
-1. **Constraint visual feedback / badges**
-   - Small icons or colored markers near constrained entities on the canvas
-   - Hover tooltips showing constraint type
+1. **Fully constrained sketch validation (DOF analysis stub)**
+   - Simple degrees-of-freedom counting or status flags on entities
+   - Color entities blue (under) / black (fully) as in Fusion/Onshape
+   - Schema extension if needed for status
 
 2. **Multi-feature Part model**
    - Schema + data model for a Part that owns sketches + FeatureHistory
@@ -34,6 +34,7 @@ After canvas polish:
 - DXF export stubs using **ezdxf** (now an approved library)
 
 ## Recently Completed
+- Constraint visual feedback / badges on sketch canvas (markers + tooltips)
 - Improved canvas: select mode, point dragging, rectangle tool with basic constraints, arc tool stub
 - Added Sketch.update_point helper
 - Wired FeatureHistory.recompute_meshes into MainWindow so feature/rollback changes update the viewport
