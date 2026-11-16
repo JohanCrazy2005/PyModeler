@@ -1,7 +1,8 @@
-"""Basic 2D sketch editor widget (table-based stub).
+"""Basic 2D sketch editor widget (table-based stub + visual canvas).
 
 Allows creating and editing sketch entities and dimensions connected to the Sketch data model.
 Supports editable table cells for point coordinates and dimension values.
+Includes a visual QGraphicsView canvas for mouse drawing with basic snapping.
 """
 
 from __future__ import annotations
@@ -22,16 +23,19 @@ from PyQt6.QtWidgets import (
     QWidget,
     QComboBox,
     QMessageBox,
+    QSplitter,
 )
 
 from pymodeler.core import Sketch, create_rectangle_sketch
+from pymodeler.ui.sketch_canvas import SketchCanvasWidget
 
 
 class SketchEditorWidget(QWidget):
-    """Table-based editor for a Sketch: entities, constraints, dimensions.
+    """Table-based editor + visual canvas for a Sketch: entities, constraints, dimensions.
 
     Entities table is editable for point X/Y and circle radius.
     Dimensions table is editable for values.
+    Canvas supports mouse drawing of points/lines/circles with snapping.
     """
 
     sketch_changed = pyqtSignal()
@@ -44,6 +48,12 @@ class SketchEditorWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel("Sketch Editor"))
 
+        # Splitter: canvas on top/left, tables on bottom/right
+        splitter = QSplitter(Qt.Orientation.Vertical)
+        self.canvas = SketchCanvasWidget()
+        self.canvas.sketch_changed.connect(self._on_canvas_changed)
+        splitter.addWidget(self.canvas)
+
         self.tabs = QTabWidget()
         self.entities_table = self._make_entities_table()
         self.constraints_table = self._make_simple_table(["ID", "Type", "Entities"])
@@ -52,7 +62,10 @@ class SketchEditorWidget(QWidget):
         self.tabs.addTab(self.entities_table, "Entities")
         self.tabs.addTab(self.constraints_table, "Constraints")
         self.tabs.addTab(self.dimensions_table, "Dimensions")
-        layout.addWidget(self.tabs)
+        splitter.addWidget(self.tabs)
+        splitter.setStretchFactor(0, 2)
+        splitter.setStretchFactor(1, 1)
+        layout.addWidget(splitter)
 
         # Connect editable signals
         self.entities_table.itemChanged.connect(self._on_entities_item_changed)
@@ -103,6 +116,13 @@ class SketchEditorWidget(QWidget):
 
         self.setEnabled(False)
 
+    def _on_canvas_changed(self) -> None:
+        """Canvas modified the sketch; refresh tables and re-emit."""
+        if self._updating:
+            return
+        self.refresh()
+        self.sketch_changed.emit()
+
     def _make_entities_table(self) -> QTableWidget:
         # Columns: Type, ID, X/Param1, Y/Param2, Other, Construction, Fixed
         table = QTableWidget(0, 7)
@@ -123,6 +143,7 @@ class SketchEditorWidget(QWidget):
     def set_sketch(self, sketch: Optional[Sketch]) -> None:
         self.sketch = sketch
         self.setEnabled(sketch is not None)
+        self.canvas.set_sketch(sketch)
         self.refresh()
 
     def refresh(self) -> None:
@@ -131,6 +152,7 @@ class SketchEditorWidget(QWidget):
             self.constraints_table.setRowCount(0)
             self.dimensions_table.setRowCount(0)
             self.name_edit.clear()
+            self.canvas.refresh()
             return
 
         self._updating = True
@@ -210,6 +232,9 @@ class SketchEditorWidget(QWidget):
                 self.dimensions_table.setItem(row, 4, driven_item)
         finally:
             self._updating = False
+        # Always refresh canvas after tables
+        if not self._updating:
+            self.canvas.refresh()
 
     def _on_entities_item_changed(self, item: QTableWidgetItem) -> None:
         if self._updating or self.sketch is None:
@@ -236,6 +261,7 @@ class SketchEditorWidget(QWidget):
             else:
                 return
             self.sketch.validate()
+            self.canvas.refresh()
             self.sketch_changed.emit()
         except (ValueError, KeyError):
             # Revert by refreshing
