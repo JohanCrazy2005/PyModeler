@@ -1,0 +1,68 @@
+# Master Development Plan
+
+## Guiding Principles
+1. **Research First, Then Plan, Then Build**: Before any major new area, research how Fusion 360, Onshape, and Mozaik (and related tools) implement it. Document under `docs/research/`. Then write a concrete step-by-step plan. Only then code.
+2. **Parametric CAD First**: The core is a history-based parametric modeler (sketches → features → parts → assemblies), not freeform mesh sculpting.
+3. **JSON Schema First**: Every persistent structure (Sketch, Feature, Part, Assembly, Parameter, CutList…) has a formal JSON Schema.
+4. **Test Before Push**: Main branch must stay runnable and tested.
+5. **Incremental & Visible Progress**: Small, complete, tested features.
+6. **Cross-platform**: Windows, macOS, Linux via public Python libraries + PyQt6.
+7. **Design-to-Manufacture Mindset**: Even early features should keep manufacturing usefulness in mind (parameters, cut lists, clear part definitions).
+
+## Architecture (updated for CAD focus)
+- `schemas/` – Sketch, Feature, Part, Assembly, Parameter, Material, CutList, etc.
+- `src/pymodeler/core/` – pure parametric logic (no Qt)
+- `src/pymodeler/ui/` – PyQt6 (feature tree, viewport, property panels, sketch editor)
+- `src/pymodeler/render/` – viewport
+- `src/pymodeler/io/` – import/export + manufacturing outputs (DXF via ezdxf)
+- `src/pymodeler/cam/` or manufacturing helpers (later)
+- `docs/research/` – feature research notes from Fusion / Onshape / Mozaik
+
+## Technology Stack (Initial + CAD direction)
+- Python 3.10+
+- PyQt6
+- numpy, scipy
+- jsonschema
+- trimesh (mesh utilities)
+- **ezdxf** (DXF read/write for 2D drawings, sketches, and manufacturing exports — approved and preferred for DXF)
+- Consider CadQuery / OCP / pythonOCC later for robust B-Rep if needed
+- moderngl or PyOpenGL for viewport
+- pytest
+
+## Process for Every Major Phase
+1. Web research of Fusion 360 / Onshape / Mozaik behavior for that area.
+2. Write structured notes in `docs/research/`.
+3. Produce prioritized, step-by-step implementation plan.
+4. Implement + schema + tests + update living docs.
+
+## High-level Roadmap (CAD/CAM oriented)
+- **Phase 0-1 (Foundation)**: Project structure, basic scene, simple solids, PyQt6 shell, research documents. (mostly complete)
+- **Phase 2 (Sketch + Parametric Core)**: 2D sketch engine with constraints/dimensions, Extrude/Revolve, feature history.
+- **Phase 3 (Parts & Assemblies)**: Multi-feature parts, basic assemblies and mates.
+- **Phase 4 (Manufacturing Helpers)**: Cut lists, BOMs, simple nesting concepts, dimensioned outputs (Mozaik-inspired). DXF export via ezdxf.
+- **Phase 5 (Advanced + CAM path)**: Sheet metal basics, configurations, early toolpath / G-code stubs, simulation data.
+
+## Current Focus
+1. Research on parametric modeling (Fusion/Onshape) and manufacturing features (Mozaik) is complete and documented.
+2. Sketch data model + JSON Schema is implemented and tested (entities, constraints, dimensions).
+3. Parameter / variable system implemented and tested (named params, simple expressions).
+4. Extrude feature + FeatureHistory data model implemented and tested (parameter-driven distance, simple solid generation).
+5. Timeline/feature tree UI stub implemented (list + property panel).
+6. Basic table-based 2D sketch editor widget implemented and integrated (add entities, dimensions).
+7. Revolve feature implemented and tested (parameter-driven angle, simple solid of revolution).
+8. Sketch editor improved: editable point coordinates and dimension values in tables; selection-aware addition of lines, circles, and dimensions.
+9. Better profile extraction: simple closed polygons and circles for Extrude/Revolve (see docs/research/profile-extraction.md).
+10. Extrude start offset and symmetric refinements implemented and tested (see docs/research/extrude-offset-symmetric.md).
+11. Basic mesh Boolean operations (join/cut/intersect) implemented with optional manifold3d backend and FeatureHistory integration (see docs/research/boolean-operations.md).
+12. Rollback marker and basic feature reordering implemented in the data model (see docs/research/timeline-rollback.md). Features after the marker are temporarily suppressed during recompute.
+13. Feature tree UI now supports setting the rollback marker via context menu and visually indicates suppressed features.
+14. Visual 2D sketch canvas implemented (QGraphicsView) with mouse drawing of points/lines/circles, basic snapping, and live preview. Integrated into the Sketch Editor.
+15. **ezdxf is an approved dependency** for DXF import/export, 2D drawing output, and manufacturing-related DXF workflows. Use it whenever DXF support is needed.
+16. Feature recompute is wired into the MainWindow: property changes and rollback marker updates regenerate meshes and display them in the viewport.
+17. Visual canvas interaction improved: select mode with highlighting, point dragging, rectangle tool (with constraints), and basic arc tool.
+
+## Risk Management
+- Scope is still large. Stay focused on parametric CAD + practical manufacturing helpers.
+- Prefer proven libraries for geometry kernels when the pure-Python approach becomes limiting.
+- Main branch always runnable.
+- Constraint solving and robust B-Rep are non-trivial; start with simple validated sketches and mesh-based solids before investing in heavy kernels.
