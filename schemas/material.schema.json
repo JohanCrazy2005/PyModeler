@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/material.schema.json",
+  "title": "MaterialStore",
+  "description": "Collection of named materials / stock definitions for manufacturing-aware parts (thickness, type, cost, etc.).",
+  "type": "object",
+  "required": ["materials"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional store identifier"
+    },
+    "name": {
+      "type": "string",
+      "default": "Materials",
+      "description": "Human-readable name for the store"
+    },
+    "materials": {
+      "type": "array",
+      "description": "List of material / stock definitions",
+      "items": { "$ref": "#/$defs/material" }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "material": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique material / stock name"
+        },
+        "thickness": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Nominal thickness (for sheet stock)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Material category (e.g. plywood, MDF, solid_wood, aluminum, plastic)"
+        },
+        "unit": {
+          "type": "string",
+          "default": "mm",
+          "description": "Unit for thickness and other linear measures"
+        },
+        "density": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optional density (kg/m³ or similar)"
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optional unit cost"
+        },
+        "grain_direction": {
+          "type": "string",
+          "description": "Optional grain / texture direction note"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional human comment"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Extra manufacturing metadata (edge banding, finish, etc.)"
+        }
+      }
+    }
+  }
+}

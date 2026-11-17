@@ -41,6 +41,7 @@ from .features import (
     validate_history_data,
 )
 from .part import Part, PartValidationError, validate_part_data
+from .materials import MaterialStore, MaterialValidationError, validate_material_data
 
 __all__ = [
     "Mesh",
@@ -81,6 +82,9 @@ __all__ = [
     "Part",
     "PartValidationError",
     "validate_part_data",
+    "MaterialStore",
+    "MaterialValidationError",
+    "validate_material_data",
     "mesh_boolean",
     "BooleanError",
 ]
