@@ -23,10 +23,12 @@ Research notes for Phase 2 manufacturing helpers. Last updated: 2026-11-17.
 - Schema: `schemas/cutlist.schema.json`
 - Core: `src/pymodeler/core/cutlist.py`
   - `generate_cut_list(parts, material_store=None, quantities=None)` walks Parts, recomputes bodies, extracts AABB size (width/depth/height = dx/dy/dz), resolves material via MaterialStore.
-  - `CutList` wrapper + `cut_list_to_text()` for simple reporting.
+  - `group_cut_list()` groups items by material, thickness, or material+thickness (Mozaik-style). Thickness prefers material.thickness else min bounding-box dimension.
+  - `cut_list_to_csv()` and `cut_list_to_grouped_text()` helpers.
+  - `CutList` wrapper exposes `groups()`, `to_csv()`, `to_grouped_text()`, `to_text()`.
 - Quantity is a field on each item (not duplicated rows) so the document stays compact.
 - Empty parts are included with `has_geometry: false` (size omitted).
-- Next consumers: UI cut-list panel, grouping by material, nesting concepts, DXF export of profiles, BOM for assemblies.
+- Next consumers: UI cut-list panel (with grouping/CSV export button), nesting concepts, BOM for assemblies.
 
 ## References
 - Mozaik Cutlist documentation

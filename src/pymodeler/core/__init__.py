@@ -52,6 +52,9 @@ from .cutlist import (
     CutListValidationError,
     generate_cut_list,
     cut_list_to_text,
+    cut_list_to_grouped_text,
+    cut_list_to_csv,
+    group_cut_list,
     validate_cutlist_data,
 )
 from .assembly import (
@@ -110,6 +113,9 @@ __all__ = [
     "CutListValidationError",
     "generate_cut_list",
     "cut_list_to_text",
+    "cut_list_to_grouped_text",
+    "cut_list_to_csv",
+    "group_cut_list",
     "validate_cutlist_data",
     "Assembly",
     "Instance",

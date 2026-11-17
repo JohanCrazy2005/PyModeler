@@ -1,0 +1,4 @@
+group,quantity,name,material_name,width,depth,height,thickness,part_id
+Baltic Birch 18mm / 18.0 mm,2,Shelf,Baltic Birch 18mm,600.0,400.0,18.0,18.0,part_3e5c7399
+Baltic Birch 18mm / 18.0 mm,1,Side,Baltic Birch 18mm,700.0,400.0,18.0,18.0,part_2f21c8d7
+Acrylic 6mm / 6.0 mm,1,Back,Acrylic 6mm,700.0,300.0,6.0,6.0,part_6fe0942b

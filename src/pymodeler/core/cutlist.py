@@ -8,11 +8,15 @@ Validated against schemas/cutlist.schema.json.
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import uuid
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
+
 
 import numpy as np
 from jsonschema import Draft202012Validator
@@ -162,6 +166,136 @@ def generate_cut_list(
     return data
 
 
+def _item_thickness(item: dict) -> Optional[float]:
+    """Best-effort thickness: prefer explicit material thickness, else min size dimension."""
+    material = item.get("material")
+    if isinstance(material, dict) and material.get("thickness") is not None:
+        try:
+            return float(material["thickness"])
+        except (TypeError, ValueError):
+            pass
+    size = item.get("size") or {}
+    dims = [size.get("width"), size.get("depth"), size.get("height")]
+    dims = [float(d) for d in dims if d is not None]
+    if dims:
+        return min(dims)
+    return None
+
+
+def group_cut_list(cutlist: dict, by: str = "material_thickness") -> dict:
+    """Group cut-list items by material and/or thickness.
+
+    Parameters
+    ----------
+    cutlist : dict
+        A validated cut-list document.
+    by : str
+        "material" | "thickness" | "material_thickness" (default).
+
+    Returns
+    -------
+    dict
+        Mapping of group key → list of items belonging to that group.
+        Keys are human-readable strings (e.g. "Baltic Birch 18mm / 18.0 mm").
+    """
+    validate_cutlist_data(cutlist)
+    groups: Dict[str, List[dict]] = defaultdict(list)
+    for item in cutlist.get("items", []):
+        mat = item.get("material_name") or "(no material)"
+        thick = _item_thickness(item)
+        thick_str = f"{thick:.1f} mm" if thick is not None else "(no thickness)"
+        if by == "material":
+            key = mat
+        elif by == "thickness":
+            key = thick_str
+        else:  # material_thickness
+            key = f"{mat} / {thick_str}"
+        groups[key].append(item)
+    return dict(groups)
+
+
+def cut_list_to_csv(cutlist: dict, include_groups: bool = False) -> str:
+    """Export a cut list to CSV string (Mozaik-style helper).
+
+    Columns: quantity, name, material_name, width, depth, height, thickness, part_id
+    When include_groups=True a group column is added (material + thickness).
+    """
+    validate_cutlist_data(cutlist)
+    output = io.StringIO()
+    fieldnames = [
+        "quantity",
+        "name",
+        "material_name",
+        "width",
+        "depth",
+        "height",
+        "thickness",
+        "part_id",
+    ]
+    if include_groups:
+        fieldnames.insert(0, "group")
+    writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator="\n")
+    writer.writeheader()
+    groups = group_cut_list(cutlist) if include_groups else {}
+    # reverse lookup item → group
+    item_to_group = {}
+    if include_groups:
+        for gkey, gitems in groups.items():
+            for it in gitems:
+                item_to_group[id(it)] = gkey
+    for item in cutlist.get("items", []):
+        size = item.get("size") or {}
+        row = {
+            "quantity": item.get("quantity", 1),
+            "name": item.get("name", ""),
+            "material_name": item.get("material_name") or "",
+            "width": size.get("width", ""),
+            "depth": size.get("depth", ""),
+            "height": size.get("height", ""),
+            "thickness": _item_thickness(item) or "",
+            "part_id": item.get("part_id", ""),
+        }
+        if include_groups:
+            row["group"] = item_to_group.get(id(item), "")
+        writer.writerow(row)
+    return output.getvalue()
+
+
+def cut_list_to_grouped_text(cutlist: dict) -> str:
+    """Pretty-print cut list grouped by material/thickness."""
+    groups = group_cut_list(cutlist)
+    lines = [
+        f"Cut List: {cutlist.get('name', 'Cut List')} (grouped)",
+        f"Generated: {cutlist.get('generated_at', '')}",
+        "=" * 72,
+    ]
+    total_qty = 0
+    for gkey in sorted(groups.keys()):
+        items = groups[gkey]
+        lines.append(f"\n{gkey}")
+        lines.append("-" * 72)
+        lines.append(f"{'Qty':>4}  {'Name':<20}  {'Size (W x D x H)':<24}")
+        lines.append("-" * 72)
+        gqty = 0
+        for it in items:
+            qty = it.get("quantity", 1)
+            gqty += qty
+            name = (it.get("name") or "")[:20]
+            sz = it.get("size") or {}
+            if sz and sz.get("width") is not None:
+                size_str = f"{sz.get('width', 0):.1f} x {sz.get('depth', 0):.1f} x {sz.get('height', 0):.1f}"
+            else:
+                size_str = "(no geometry)"
+            lines.append(f"{qty:>4}  {name:<20}  {size_str:<24}")
+        lines.append(f"  Subtotal quantity: {gqty}")
+        total_qty += gqty
+    lines.append("=" * 72)
+    lines.append(f"Total unique parts: {len(cutlist.get('items', []))}")
+    lines.append(f"Total quantity: {total_qty}")
+    lines.append(f"Groups: {len(groups)}")
+    return "\n".join(lines)
+
+
 def cut_list_to_text(cutlist: dict) -> str:
     """Pretty-print a cut list as a simple text table (for logs / output/)."""
     lines = [
@@ -211,6 +345,15 @@ class CutList:
 
     def to_text(self) -> str:
         return cut_list_to_text(self.data)
+
+    def to_grouped_text(self) -> str:
+        return cut_list_to_grouped_text(self.data)
+
+    def to_csv(self, include_groups: bool = False) -> str:
+        return cut_list_to_csv(self.data, include_groups=include_groups)
+
+    def groups(self, by: str = "material_thickness") -> dict:
+        return group_cut_list(self.data, by=by)
 
     def __repr__(self) -> str:
         return f"<CutList name={self.data.get('name')!r} items={len(self.data.get('items', []))}>"

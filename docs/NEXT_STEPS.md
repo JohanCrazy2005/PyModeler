@@ -10,21 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Multi-part switching UI is complete.**
+**Cut-list enhancements complete.**
 
-- Parts list in left panel of MainWindow.
-- Menu: Part → New Part.
-- Selecting a part switches `current_part`, updates FeatureTree, PropertyPanel, and recomputes the viewport.
-- New parts are empty Part instances added to `self.parts`.
-- Cut list continues to operate on all parts.
+- `group_cut_list()` groups items by material, thickness, or material+thickness (Mozaik-style).
+- Thickness is taken from material.thickness when present, otherwise the minimum bounding-box dimension.
+- `cut_list_to_csv()` exports a clean CSV (optional group column).
+- `cut_list_to_grouped_text()` and `CutList` methods (`groups()`, `to_csv()`, `to_grouped_text()`).
+- Existing `generate_cut_list` / schema unchanged and fully backward-compatible.
+- Tests cover grouping, CSV, and class helpers.
 
 ### Next concrete tasks (Phase 2)
-1. Optional cut-list enhancements: group by material/thickness, CSV export helper.
-2. Assembly mates schema + basic rigid/fastened mate solver.
-3. Viewport polish / selection improvements.
-4. Basic BOM generation.
+1. Assembly mates schema + basic rigid/fastened mate solver.
+2. Viewport polish / selection improvements.
+3. Basic BOM generation.
+4. Optional: UI exposure of grouped cut-list / CSV export button.
 
 ## Recently Completed
+- Cut-list enhancements: grouping by material/thickness + CSV export helper
 - Multi-part switching UI (parts list + switch + feature tree update)
 - DXF export stub for 2D sketches and closed profiles (ezdxf)
 - Simple Assembly container (schema + core data model + tests + research note)

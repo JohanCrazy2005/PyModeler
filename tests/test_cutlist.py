@@ -14,7 +14,10 @@ from pymodeler.core.cutlist import (
     CutList,
     CutListValidationError,
     cut_list_to_text,
+    cut_list_to_csv,
+    cut_list_to_grouped_text,
     generate_cut_list,
+    group_cut_list,
     validate_cutlist_data,
 )
 
@@ -94,3 +97,35 @@ def test_cutlist_class_and_text():
 def test_invalid_cutlist_rejected():
     with pytest.raises(CutListValidationError):
         validate_cutlist_data({"name": "Bad"})  # missing items
+
+
+def test_grouping_and_csv():
+    p1 = _make_plate("Shelf", 600.0, 400.0, 18.0, material="Baltic Birch 18mm")
+    p2 = _make_plate("Side", 700.0, 400.0, 18.0, material="Baltic Birch 18mm")
+    p3 = _make_plate("Back", 700.0, 300.0, 6.0, material="Acrylic 6mm")
+    store = create_default_library()
+    cl = generate_cut_list([p1, p2, p3], material_store=store, quantities={p1.id: 2})
+    groups = group_cut_list(cl)
+    assert len(groups) == 2
+    birch_key = [k for k in groups if "Baltic" in k][0]
+    assert len(groups[birch_key]) == 2
+    acrylic_key = [k for k in groups if "Acrylic" in k][0]
+    assert len(groups[acrylic_key]) == 1
+
+    csv_text = cut_list_to_csv(cl, include_groups=True)
+    assert "quantity" in csv_text
+    assert "Shelf" in csv_text
+    assert "group" in csv_text.split("\n")[0]
+    assert "Baltic Birch" in csv_text
+
+    grouped_txt = cut_list_to_grouped_text(cl)
+    assert "grouped" in grouped_txt
+    assert "Baltic Birch" in grouped_txt
+    assert "Acrylic" in grouped_txt
+    assert "Subtotal" in grouped_txt
+
+    # Class methods
+    cl_obj = CutList.from_parts([p1, p2, p3], material_store=store)
+    assert len(cl_obj.groups()) == 2
+    assert "group" in cl_obj.to_csv(include_groups=True).split("\n")[0]
+    assert "grouped" in cl_obj.to_grouped_text()
