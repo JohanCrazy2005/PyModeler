@@ -46,6 +46,9 @@ from pymodeler.core import (
     create_rectangle_sketch,
     ExtrudeFeature,
     RevolveFeature,
+    Part,
+    generate_cut_list,
+    cut_list_to_text,
 )
 from pymodeler.render import ViewportWidget
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
@@ -124,23 +127,27 @@ class MainWindow(QMainWindow):
         self.resize(1200, 800)
         self.scene = Scene(name="Scene")
         self.history = CommandStack()
-        self.feature_history = FeatureHistory()
-        self.parameters = ParameterStore()
+        # Parametric Part as the primary working unit
+        self.current_part = Part(name="Part 1")
+        self.parts: list[Part] = [self.current_part]
         self.current_sketch: Optional[Sketch] = None
-        self.sketches: dict[str, Sketch] = {}
 
         self.viewport = ViewportWidget()
         self.viewport.set_scene(self.scene)
         self.viewport.selection_changed.connect(self._sync_outliner_from_scene)
-        self.viewport.transform_committed.connect(self._on_transform_committed)
+        # Transform commit is currently a no-op stub; full parametric transform later
+        if hasattr(self.viewport, "transform_committed"):
+            self.viewport.transform_committed.connect(self._on_transform_committed)
 
         self.outliner = QListWidget()
         self.outliner.itemSelectionChanged.connect(self._on_outliner_selection)
 
         self.feature_tree = FeatureTreeWidget()
-        self.feature_tree.set_history(self.feature_history)
+        self.feature_tree.set_history(self.current_part.feature_history)
         self.property_panel = PropertyPanel()
-        self.property_panel.set_context(self.feature_history, self.parameters)
+        self.property_panel.set_context(
+            self.current_part.feature_history, self.current_part.parameters
+        )
         self.feature_tree.feature_selected.connect(self.property_panel.show_feature)
         self.property_panel.properties_changed.connect(self.feature_tree.refresh)
         self.property_panel.properties_changed.connect(self._recompute_and_update_scene)
@@ -151,7 +158,7 @@ class MainWindow(QMainWindow):
         left_layout = QVBoxLayout(left)
         left_layout.addWidget(QLabel("Outliner"))
         left_layout.addWidget(self.outliner)
-        left_layout.addWidget(QLabel("Timeline / Features"))
+        left_layout.addWidget(QLabel(f"Timeline / Features — {self.current_part.name}"))
         left_layout.addWidget(self.feature_tree)
         left_layout.addWidget(self.property_panel)
         splitter.addWidget(left)
@@ -182,6 +189,24 @@ class MainWindow(QMainWindow):
         extrude_act = QAction("Extrude Current Sketch", self)
         extrude_act.triggered.connect(self._extrude_current_sketch)
         sketch_menu.addAction(extrude_act)
+
+        mfg_menu = menubar.addMenu("&Manufacturing")
+        cutlist_act = QAction("Show Cut List", self)
+        cutlist_act.triggered.connect(self._show_cut_list)
+        mfg_menu.addAction(cutlist_act)
+
+    def _on_transform_committed(self, *args) -> None:
+        """Stub for viewport transform commit. Parametric transforms come later."""
+        pass
+
+    def _show_cut_list(self) -> None:
+        """Generate and display a simple cut list for current parts."""
+        try:
+            cl = generate_cut_list(self.parts)
+            text = cut_list_to_text(cl)
+            QMessageBox.information(self, "Cut List", text or "No parts with geometry.")
+        except Exception as e:
+            QMessageBox.warning(self, "Cut List", f"Could not generate cut list:\n{e}")
 
     def _new_sketch(self) -> None:
         self.current_sketch = Sketch(name="New Sketch")
@@ -233,26 +258,19 @@ class MainWindow(QMainWindow):
         if self.current_sketch is None:
             QMessageBox.information(self, "Extrude", "Create or select a sketch first.")
             return
-        self.sketches[self.current_sketch.id] = self.current_sketch
+        self.current_part.add_sketch(self.current_sketch)
         feat = ExtrudeFeature(sketch_id=self.current_sketch.id, distance=5.0, name="Extrude")
-        self.feature_history.add_extrude(feat)
+        self.current_part.feature_history.add_extrude(feat)
         self.feature_tree.refresh()
         self._recompute_and_update_scene()
 
     def _recompute_and_update_scene(self) -> None:
-        """Regenerate meshes from active features and replace scene objects."""
-        meshes = self.feature_history.recompute_meshes(self.sketches, self.parameters)
-        # Clear existing objects (simple approach for now)
+        """Regenerate the Part body and place it in the scene."""
+        body = self.current_part.recompute()
         self.scene.objects.clear()
         self.scene.selected.clear()
-        for fid, mesh in meshes.items():
-            # Find feature name
-            name = fid
-            for f in self.feature_history.features:
-                if f.get("id") == fid:
-                    name = f.get("name", fid)
-                    break
-            obj = SceneObject(name=name, mesh=mesh)
+        if body is not None:
+            obj = SceneObject(name=self.current_part.name, mesh=body)
             self.scene.objects.append(obj)
         self._refresh_outliner()
         self.viewport.set_scene(self.scene)
