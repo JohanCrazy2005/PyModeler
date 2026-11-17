@@ -47,6 +47,13 @@ from .material import (
     validate_material_data,
     create_default_library,
 )
+from .cutlist import (
+    CutList,
+    CutListValidationError,
+    generate_cut_list,
+    cut_list_to_text,
+    validate_cutlist_data,
+)
 
 __all__ = [
     "Mesh",
@@ -93,4 +100,9 @@ __all__ = [
     "MaterialValidationError",
     "validate_material_data",
     "create_default_library",
+    "CutList",
+    "CutListValidationError",
+    "generate_cut_list",
+    "cut_list_to_text",
+    "validate_cutlist_data",
 ]
