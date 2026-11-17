@@ -10,20 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**DXF export stub is complete.**
+**Multi-part switching UI is complete.**
 
-- Module: `src/pymodeler/io/dxf.py` (`export_sketch_to_dxf`, `export_profiles_to_dxf`).
-- Uses **ezdxf** to write lines, circles, arcs, and closed profiles (LWPOLYLINE) from Sketch / `extract_simple_profiles`.
-- Tests: `tests/test_dxf.py` (all passing).
-- Research note: `docs/research/dxf-export.md`.
+- Parts list in left panel of MainWindow.
+- Menu: Part → New Part.
+- Selecting a part switches `current_part`, updates FeatureTree, PropertyPanel, and recomputes the viewport.
+- New parts are empty Part instances added to `self.parts`.
+- Cut list continues to operate on all parts.
 
 ### Next concrete tasks (Phase 2)
-1. **Multi-part switching UI** in MainWindow (list of parts, switch `current_part`, feature tree updates).
-2. Optional cut-list enhancements: group by material/thickness, CSV export helper.
-3. Later: Assembly mates schema + basic rigid/fastened mate solver.
-4. Viewport polish / selection improvements.
+1. Optional cut-list enhancements: group by material/thickness, CSV export helper.
+2. Assembly mates schema + basic rigid/fastened mate solver.
+3. Viewport polish / selection improvements.
+4. Basic BOM generation.
 
 ## Recently Completed
+- Multi-part switching UI (parts list + switch + feature tree update)
 - DXF export stub for 2D sketches and closed profiles (ezdxf)
 - Simple Assembly container (schema + core data model + tests + research note)
 - Light UI integration: MainWindow works with Part (FeatureTree, recompute body, cut-list display)

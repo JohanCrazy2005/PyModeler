@@ -142,6 +142,11 @@ class MainWindow(QMainWindow):
         self.outliner = QListWidget()
         self.outliner.itemSelectionChanged.connect(self._on_outliner_selection)
 
+        # Parts list for multi-part switching
+        self.part_list = QListWidget()
+        self.part_list.itemSelectionChanged.connect(self._on_part_selection)
+        self.part_label = QLabel(f"Timeline / Features — {self.current_part.name}")
+
         self.feature_tree = FeatureTreeWidget()
         self.feature_tree.set_history(self.current_part.feature_history)
         self.property_panel = PropertyPanel()
@@ -156,9 +161,11 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         left = QWidget()
         left_layout = QVBoxLayout(left)
+        left_layout.addWidget(QLabel("Parts"))
+        left_layout.addWidget(self.part_list)
         left_layout.addWidget(QLabel("Outliner"))
         left_layout.addWidget(self.outliner)
-        left_layout.addWidget(QLabel(f"Timeline / Features — {self.current_part.name}"))
+        left_layout.addWidget(self.part_label)
         left_layout.addWidget(self.feature_tree)
         left_layout.addWidget(self.property_panel)
         splitter.addWidget(left)
@@ -166,6 +173,7 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(1, 1)
         self.setCentralWidget(splitter)
         self._build_menus()
+        self._refresh_part_list()
         self._refresh_outliner()
 
     def _build_menus(self) -> None:
@@ -175,6 +183,11 @@ class MainWindow(QMainWindow):
         quit_act.setShortcut(QKeySequence.StandardKey.Quit)
         quit_act.triggered.connect(self.close)
         file_menu.addAction(quit_act)
+
+        part_menu = menubar.addMenu("&Part")
+        new_part_act = QAction("New Part", self)
+        new_part_act.triggered.connect(self._new_part)
+        part_menu.addAction(new_part_act)
 
         sketch_menu = menubar.addMenu("&Sketch")
         new_sketch_act = QAction("New Sketch", self)
@@ -198,6 +211,49 @@ class MainWindow(QMainWindow):
     def _on_transform_committed(self, *args) -> None:
         """Stub for viewport transform commit. Parametric transforms come later."""
         pass
+
+    def _refresh_part_list(self) -> None:
+        """Refresh the parts list and select the current part."""
+        self.part_list.blockSignals(True)
+        self.part_list.clear()
+        for part in self.parts:
+            self.part_list.addItem(part.name)
+        # Select current
+        for i, part in enumerate(self.parts):
+            if part is self.current_part:
+                self.part_list.item(i).setSelected(True)
+                break
+        self.part_list.blockSignals(False)
+        self.part_label.setText(f"Timeline / Features — {self.current_part.name}")
+
+    def _on_part_selection(self) -> None:
+        """Switch the current part when selection changes."""
+        selected = self.part_list.selectedItems()
+        if not selected:
+            return
+        name = selected[0].text()
+        for part in self.parts:
+            if part.name == name:
+                self._switch_to_part(part)
+                break
+
+    def _switch_to_part(self, part: Part) -> None:
+        """Switch working part, update feature tree, properties, and viewport."""
+        self.current_part = part
+        self.feature_tree.set_history(part.feature_history)
+        self.property_panel.set_context(part.feature_history, part.parameters)
+        self.part_label.setText(f"Timeline / Features — {part.name}")
+        # Clear current sketch on switch for safety (sketches belong to parts)
+        self.current_sketch = None
+        self._recompute_and_update_scene()
+
+    def _new_part(self) -> None:
+        """Create a new empty Part and switch to it."""
+        n = len(self.parts) + 1
+        new_part = Part(name=f"Part {n}")
+        self.parts.append(new_part)
+        self._refresh_part_list()
+        self._switch_to_part(new_part)
 
     def _show_cut_list(self) -> None:
         """Generate and display a simple cut list for current parts."""

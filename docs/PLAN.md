@@ -32,12 +32,13 @@
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list stub + light UI integration of Parts complete.
 - Phase 2: DXF export stub (ezdxf) complete.
-- Next: multi-part switching UI, then cut-list enhancements.
+- Phase 2: Multi-part switching UI complete.
+- Next: cut-list enhancements (grouping/CSV), then Assembly mates.
 
 ## Near-term Roadmap
-1. Multi-part switching UI in MainWindow.
-2. Optional cut-list enhancements (grouping by material/thickness, CSV export).
-3. Assembly mates / constraints (schema + basic solver).
-4. Viewport polish and selection.
+1. Optional cut-list enhancements (grouping by material/thickness, CSV export).
+2. Assembly mates / constraints (schema + basic solver).
+3. Viewport polish and selection.
+4. Basic BOM.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
