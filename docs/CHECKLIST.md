@@ -47,7 +47,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Assembly mates / constraints
 - [x] Cut list / part list generation (Mozaik-inspired) — stub implemented
 - [ ] Basic BOM
-- [ ] Dimensioned drawing / export stubs (DXF via ezdxf)
+- [x] Dimensioned drawing / export stubs (DXF via ezdxf)
 - [x] Material / stock definitions
 - [ ] Configurations (independent inputs)
 
@@ -70,4 +70,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (Simple Assembly data model)
+Last updated: 2026-11-17 (DXF export stub)

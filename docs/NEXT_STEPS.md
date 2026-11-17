@@ -10,21 +10,21 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Simple Assembly data model is complete.**
+**DXF export stub is complete.**
 
-- Schema: `schemas/assembly.schema.json` (instances with part_id + Transform).
-- Core: `src/pymodeler/core/assembly.py` (`Assembly` + `Instance` classes, validation, add/remove, serialization).
-- Research: `docs/research/assembly-model.md`.
-- Tests: `tests/test_assembly.py` (all passing).
-- Mates / constraint solving intentionally deferred.
+- Module: `src/pymodeler/io/dxf.py` (`export_sketch_to_dxf`, `export_profiles_to_dxf`).
+- Uses **ezdxf** to write lines, circles, arcs, and closed profiles (LWPOLYLINE) from Sketch / `extract_simple_profiles`.
+- Tests: `tests/test_dxf.py` (all passing).
+- Research note: `docs/research/dxf-export.md`.
 
 ### Next concrete tasks (Phase 2)
-1. **DXF export stub** for 2D profiles / sketches using **ezdxf** (add to `src/pymodeler/io/`). Export closed profiles or sketch entities to DXF.
-2. Multi-part switching UI (list of parts in MainWindow, switch `current_part`).
-3. Optional cut-list enhancements: group by material/thickness, CSV export helper.
-4. Later: Assembly mates schema + basic rigid/fastened mate solver.
+1. **Multi-part switching UI** in MainWindow (list of parts, switch `current_part`, feature tree updates).
+2. Optional cut-list enhancements: group by material/thickness, CSV export helper.
+3. Later: Assembly mates schema + basic rigid/fastened mate solver.
+4. Viewport polish / selection improvements.
 
 ## Recently Completed
+- DXF export stub for 2D sketches and closed profiles (ezdxf)
 - Simple Assembly container (schema + core data model + tests + research note)
 - Light UI integration: MainWindow works with Part (FeatureTree, recompute body, cut-list display)
 - Cut list / part list generation stub (schema + generator + tests)

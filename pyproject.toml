@@ -15,6 +15,7 @@ dependencies = [
     "numpy>=1.24.0",
     "jsonschema>=4.20.0",
     "trimesh>=4.0.0",
+    "ezdxf>=1.0.0",
     "moderngl>=5.8.0",
 ]
 
