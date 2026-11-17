@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/assembly.schema.json",
+  "title": "Assembly",
+  "description": "A simple Assembly container that holds instances of Parts (or future sub-assemblies) with transforms. Mates/constraints are deferred.",
+  "type": "object",
+  "required": ["instances"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "default": "Assembly"
+    },
+    "instances": {
+      "type": "array",
+      "description": "Ordered list of part instances placed in the assembly",
+      "items": {
+        "type": "object",
+        "required": ["part_id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "part_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Identifier of the referenced Part"
+          },
+          "transform": {
+            "type": "object",
+            "description": "Placement transform (location, rotation Euler XYZ radians, scale)",
+            "additionalProperties": false,
+            "properties": {
+              "location": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "scale": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          },
+          "grounded": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether this instance is fixed in place"
+          },
+          "visible": {
+            "type": "boolean",
+            "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

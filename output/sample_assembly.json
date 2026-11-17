@@ -1,0 +1,54 @@
+{
+  "id": "asm_e804ad00",
+  "name": "Sample Assembly",
+  "instances": [
+    {
+      "id": "inst_8b7658f7",
+      "name": "Grounded Part",
+      "part_id": "part_13d5cfbd",
+      "transform": {
+        "location": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "grounded": true,
+      "visible": true
+    },
+    {
+      "id": "inst_c96dc2f5",
+      "name": "Offset Part",
+      "part_id": "part_13d5cfbd",
+      "transform": {
+        "location": [
+          60,
+          0,
+          0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "grounded": false,
+      "visible": true
+    }
+  ]
+}

@@ -54,6 +54,12 @@ from .cutlist import (
     cut_list_to_text,
     validate_cutlist_data,
 )
+from .assembly import (
+    Assembly,
+    Instance,
+    AssemblyValidationError,
+    validate_assembly_data,
+)
 
 __all__ = [
     "Mesh",
@@ -105,4 +111,8 @@ __all__ = [
     "generate_cut_list",
     "cut_list_to_text",
     "validate_cutlist_data",
+    "Assembly",
+    "Instance",
+    "AssemblyValidationError",
+    "validate_assembly_data",
 ]

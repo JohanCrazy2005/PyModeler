@@ -31,12 +31,12 @@
 ## Current Status (2026-11-17)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list stub + light UI integration of Parts complete.
-- Next: Simple Assembly data model, then DXF export stub.
+- Next: DXF export stub (ezdxf), then multi-part switching UI.
 
 ## Near-term Roadmap
-1. Simple Assembly data model (list of Part instances + transforms; mates later).
-2. DXF export stub for 2D profiles / drawings using ezdxf.
-3. Multi-part switching UI and optional cut-list enhancements (grouping, CSV).
+1. DXF export stub for 2D profiles / drawings using ezdxf.
+2. Multi-part switching UI and optional cut-list enhancements (grouping, CSV).
+3. Assembly mates / constraints (schema + basic solver).
 4. Viewport polish and selection.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.

@@ -43,7 +43,8 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [x] Multi-feature Part model
 - [x] Light UI integration of Parts (MainWindow + FeatureTree + cut-list display)
-- [ ] Simple Assembly + mates / constraints
+- [x] Simple Assembly data model (instances + transforms; mates later)
+- [ ] Assembly mates / constraints
 - [x] Cut list / part list generation (Mozaik-inspired) — stub implemented
 - [ ] Basic BOM
 - [ ] Dimensioned drawing / export stubs (DXF via ezdxf)
@@ -69,4 +70,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (Light UI integration of Parts + cut-list display)
+Last updated: 2026-11-17 (Simple Assembly data model)
