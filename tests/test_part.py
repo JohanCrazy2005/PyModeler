@@ -85,3 +85,16 @@ def test_part_add_sketch():
 def test_invalid_part_schema():
     with pytest.raises(PartValidationError):
         Part.from_dict({"name": "Bad"})  # missing feature_history
+
+
+def test_part_ui_flow_simulation():
+    """Simulate the light UI integration flow: create part, add sketch, extrude, recompute body."""
+    part = Part(name="Part 1")
+    sketch = create_rectangle_sketch(name="Rectangle")
+    part.add_sketch(sketch)
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=5.0, name="Extrude")
+    part.feature_history.add_extrude(feat)
+    body = part.recompute()
+    assert body is not None
+    assert len(body.vertices) >= 8
+    assert part.feature_history.features[0]["name"] == "Extrude"
