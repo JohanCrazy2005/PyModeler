@@ -34,12 +34,13 @@
 - Phase 2: DXF export stub (ezdxf) complete.
 - Phase 2: Multi-part switching UI complete.
 - Phase 2: Cut-list enhancements (grouping by material/thickness + CSV export) complete.
-- Next: Assembly mates schema + basic solver.
+- Phase 2: Assembly rigid/fastened mates (schema + basic solver) complete.
+- Next: Viewport polish / selection improvements.
 
 ## Near-term Roadmap
-1. Assembly mates / constraints (schema + basic rigid/fastened mate solver).
-2. Viewport polish and selection.
-3. Basic BOM.
-4. Optional UI for grouped cut list / CSV export.
+1. Viewport polish and selection.
+2. Basic BOM.
+3. Optional UI for mates and grouped cut list / CSV export.
+4. Optional richer mate types (revolute/slider stubs).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.

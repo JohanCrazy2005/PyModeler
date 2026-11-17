@@ -60,6 +60,7 @@ from .cutlist import (
 from .assembly import (
     Assembly,
     Instance,
+    Mate,
     AssemblyValidationError,
     validate_assembly_data,
 )
@@ -119,6 +120,7 @@ __all__ = [
     "validate_cutlist_data",
     "Assembly",
     "Instance",
+    "Mate",
     "AssemblyValidationError",
     "validate_assembly_data",
 ]

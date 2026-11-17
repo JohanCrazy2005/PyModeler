@@ -45,7 +45,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Light UI integration of Parts (MainWindow + FeatureTree + cut-list display)
 - [x] Multi-part switching UI (parts list, switch current_part, feature tree updates)
 - [x] Simple Assembly data model (instances + transforms; mates later)
-- [ ] Assembly mates / constraints
+- [x] Assembly mates / constraints (rigid/fastened schema + basic solver)
 - [x] Cut list / part list generation (Mozaik-inspired) — stub implemented
 - [x] Cut-list enhancements: group by material/thickness + CSV export
 - [ ] Basic BOM
@@ -72,4 +72,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (cut-list grouping + CSV)
+Last updated: 2026-11-17 (assembly rigid/fastened mates)

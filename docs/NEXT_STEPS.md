@@ -10,22 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Cut-list enhancements complete.**
+**Assembly rigid/fastened mates complete.**
 
-- `group_cut_list()` groups items by material, thickness, or material+thickness (Mozaik-style).
-- Thickness is taken from material.thickness when present, otherwise the minimum bounding-box dimension.
-- `cut_list_to_csv()` exports a clean CSV (optional group column).
-- `cut_list_to_grouped_text()` and `CutList` methods (`groups()`, `to_csv()`, `to_grouped_text()`).
-- Existing `generate_cut_list` / schema unchanged and fully backward-compatible.
-- Tests cover grouping, CSV, and class helpers.
+- Schema extended with optional `mates` array (type rigid|fastened, instance ids, offset transform).
+- `Mate` class + `Assembly.add_mate` / `remove_mate` / `solve_mates`.
+- Basic solver: if one instance is grounded, moves the other by the stored location offset.
+- Fully backward-compatible; existing assemblies without mates still validate.
+- Tests cover schema, round-trip, and solve behavior.
+- Research note: `docs/research/assembly-mates.md`.
 
 ### Next concrete tasks (Phase 2)
-1. Assembly mates schema + basic rigid/fastened mate solver.
-2. Viewport polish / selection improvements.
-3. Basic BOM generation.
-4. Optional: UI exposure of grouped cut-list / CSV export button.
+1. Viewport polish / selection improvements.
+2. Basic BOM generation.
+3. Optional: UI exposure of mates + grouped cut-list / CSV export.
+4. Optional: richer mate solver (rotation composition, revolute/slider stubs).
 
 ## Recently Completed
+- Assembly mates: rigid/fastened schema + basic location-offset solver
 - Cut-list enhancements: grouping by material/thickness + CSV export helper
 - Multi-part switching UI (parts list + switch + feature tree update)
 - DXF export stub for 2D sketches and closed profiles (ezdxf)

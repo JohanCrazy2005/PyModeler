@@ -5,6 +5,7 @@ import pytest
 from pymodeler.core import (
     Assembly,
     Instance,
+    Mate,
     Part,
     Transform,
     create_rectangle_sketch,
@@ -84,3 +85,49 @@ def test_instance_defaults():
     assert inst.transform.scale == [1.0, 1.0, 1.0]
     assert inst.grounded is False
     assert inst.visible is True
+
+
+def test_rigid_mate_schema_and_roundtrip():
+    part_a = _make_simple_part("Base")
+    part_b = _make_simple_part("Top")
+    asm = Assembly(name="Mated")
+    ia = asm.add_instance(part_a, name="Base", grounded=True)
+    ib = asm.add_instance(part_b, name="Top")
+    offset = Transform(location=[0.0, 0.0, 5.0])
+    mate = asm.add_mate(ia, ib, type="rigid", offset=offset, name="Stack")
+    assert len(asm.mates) == 1
+    assert mate.type == "rigid"
+    assert mate.instance_a == ia.id
+    assert mate.instance_b == ib.id
+
+    data = asm.to_dict()
+    validate_assembly_data(data)
+    assert "mates" in data
+    assert data["mates"][0]["type"] == "rigid"
+
+    parts = {part_a.id: part_a, part_b.id: part_b}
+    restored = Assembly.from_dict(data, parts=parts)
+    assert len(restored.mates) == 1
+    assert restored.mates[0].offset.location == [0.0, 0.0, 5.0]
+
+
+def test_solve_rigid_mate():
+    part_a = _make_simple_part("Anchor")
+    part_b = _make_simple_part("Follower")
+    asm = Assembly()
+    ia = asm.add_instance(part_a, transform=Transform(location=[10.0, 0.0, 0.0]), grounded=True)
+    ib = asm.add_instance(part_b, transform=Transform(location=[0.0, 0.0, 0.0]))
+    asm.add_mate(ia, ib, type="fastened", offset=Transform(location=[0.0, 20.0, 0.0]))
+
+    # Before solve, B is at origin
+    assert ib.transform.location == [0.0, 0.0, 0.0]
+    asm.solve_mates()
+    # After solve, B should be at A + offset
+    assert ib.transform.location == [10.0, 20.0, 0.0]
+    # A unchanged
+    assert ia.transform.location == [10.0, 0.0, 0.0]
+
+
+def test_invalid_mate_type():
+    with pytest.raises(ValueError):
+        Mate(instance_a="a", instance_b="b", type="revolute")

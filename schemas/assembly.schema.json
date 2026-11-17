@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/assembly.schema.json",
   "title": "Assembly",
-  "description": "A simple Assembly container that holds instances of Parts (or future sub-assemblies) with transforms. Mates/constraints are deferred.",
+  "description": "A simple Assembly container that holds instances of Parts (or future sub-assemblies) with transforms and basic mates.",
   "type": "object",
   "required": ["instances"],
   "additionalProperties": false,
@@ -68,6 +68,69 @@
           "visible": {
             "type": "boolean",
             "default": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "mates": {
+      "type": "array",
+      "description": "List of mates that constrain relative placement of instances",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["instance_a", "instance_b", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["rigid", "fastened"],
+            "description": "Mate type. rigid and fastened both lock relative transform (0 DOF)."
+          },
+          "instance_a": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the first instance"
+          },
+          "instance_b": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the second instance"
+          },
+          "offset": {
+            "type": "object",
+            "description": "Desired relative transform of B with respect to A (location only for this increment)",
+            "additionalProperties": false,
+            "properties": {
+              "location": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "rotation": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "scale": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
           },
           "metadata": {
             "type": "object",

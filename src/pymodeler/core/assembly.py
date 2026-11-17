@@ -1,7 +1,7 @@
-"""Simple Assembly: container for Part instances with transforms.
+"""Simple Assembly: container for Part instances with transforms and basic mates.
 
 Validated against schemas/assembly.schema.json.
-Mates and constraint solving are intentionally deferred.
+Supports rigid / fastened mates with a simple location-offset solver.
 """
 
 from __future__ import annotations
@@ -93,6 +93,57 @@ class Instance:
         )
 
 
+class Mate:
+    """A rigid or fastened mate locking the relative transform of two instances."""
+
+    def __init__(
+        self,
+        instance_a: str,
+        instance_b: str,
+        type: str = "rigid",
+        offset: Optional[Transform] = None,
+        name: Optional[str] = None,
+        metadata: Optional[dict] = None,
+        id: Optional[str] = None,
+    ):
+        if type not in ("rigid", "fastened"):
+            raise ValueError(f"Unsupported mate type: {type}")
+        self.id = id or _new_id("mate")
+        self.name = name or f"{type.capitalize()} Mate"
+        self.type = type
+        self.instance_a = instance_a
+        self.instance_b = instance_b
+        self.offset = offset or Transform()
+        self.metadata = metadata or {}
+
+    def to_dict(self) -> dict:
+        data: dict[str, Any] = {
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
+            "instance_a": self.instance_a,
+            "instance_b": self.instance_b,
+        }
+        offset_dict = self.offset.to_dict()
+        if offset_dict != {"location": [0.0, 0.0, 0.0], "rotation": [0.0, 0.0, 0.0], "scale": [1.0, 1.0, 1.0]}:
+            data["offset"] = offset_dict
+        if self.metadata:
+            data["metadata"] = self.metadata
+        return data
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Mate":
+        return cls(
+            instance_a=data["instance_a"],
+            instance_b=data["instance_b"],
+            type=data.get("type", "rigid"),
+            offset=Transform.from_dict(data.get("offset")),
+            name=data.get("name"),
+            metadata=data.get("metadata"),
+            id=data.get("id"),
+        )
+
+
 class Assembly:
     """Collection of Part instances with placement transforms."""
 
@@ -100,12 +151,14 @@ class Assembly:
         self,
         name: str = "Assembly",
         instances: Optional[List[Instance]] = None,
+        mates: Optional[List[Mate]] = None,
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
     ):
         self.id = id or _new_id("asm")
         self.name = name
         self.instances: List[Instance] = instances or []
+        self.mates: List[Mate] = mates or []
         self.metadata = metadata or {}
         self.validate()
 
@@ -115,6 +168,8 @@ class Assembly:
             "name": self.name,
             "instances": [inst.to_dict() for inst in self.instances],
         }
+        if self.mates:
+            data["mates"] = [m.to_dict() for m in self.mates]
         if self.metadata:
             data["metadata"] = self.metadata
         return data
@@ -130,9 +185,11 @@ class Assembly:
         for idata in data.get("instances", []):
             part = parts.get(idata.get("part_id"))
             instances.append(Instance.from_dict(idata, part=part))
+        mates = [Mate.from_dict(m) for m in data.get("mates", [])]
         return cls(
             name=data.get("name", "Assembly"),
             instances=instances,
+            mates=mates,
             metadata=data.get("metadata"),
             id=data.get("id"),
         )
@@ -172,5 +229,63 @@ class Assembly:
                 return inst
         return None
 
+    def add_mate(
+        self,
+        instance_a: Instance | str,
+        instance_b: Instance | str,
+        type: str = "rigid",
+        offset: Optional[Transform] = None,
+        name: Optional[str] = None,
+    ) -> Mate:
+        """Add a rigid/fastened mate between two instances."""
+        id_a = instance_a.id if isinstance(instance_a, Instance) else instance_a
+        id_b = instance_b.id if isinstance(instance_b, Instance) else instance_b
+        if self.get_instance(id_a) is None or self.get_instance(id_b) is None:
+            raise ValueError("Both instances must exist in the assembly")
+        mate = Mate(instance_a=id_a, instance_b=id_b, type=type, offset=offset, name=name)
+        self.mates.append(mate)
+        self.validate()
+        return mate
+
+    def remove_mate(self, mate_id: str) -> bool:
+        before = len(self.mates)
+        self.mates = [m for m in self.mates if m.id != mate_id]
+        if len(self.mates) < before:
+            self.validate()
+            return True
+        return False
+
+    def solve_mates(self) -> None:
+        """Simple solver for rigid/fastened mates.
+
+        For each mate, if one instance is grounded, move the other so that
+        its location = grounded.location + offset.location.
+        Rotation and scale are left unchanged in this basic implementation.
+        Multiple mates are applied in list order; last write wins for conflicts.
+        """
+        by_id = {inst.id: inst for inst in self.instances}
+        for mate in self.mates:
+            if mate.type not in ("rigid", "fastened"):
+                continue
+            a = by_id.get(mate.instance_a)
+            b = by_id.get(mate.instance_b)
+            if a is None or b is None:
+                continue
+            ox, oy, oz = mate.offset.location
+            if a.grounded and not b.grounded:
+                b.transform.location = [
+                    a.transform.location[0] + ox,
+                    a.transform.location[1] + oy,
+                    a.transform.location[2] + oz,
+                ]
+            elif b.grounded and not a.grounded:
+                # Inverse: A should be B - offset
+                a.transform.location = [
+                    b.transform.location[0] - ox,
+                    b.transform.location[1] - oy,
+                    b.transform.location[2] - oz,
+                ]
+            # If neither or both grounded, leave transforms as-is (user responsibility)
+
     def __repr__(self) -> str:
-        return f"<Assembly id={self.id!r} name={self.name!r} instances={len(self.instances)}>"
+        return f"<Assembly id={self.id!r} name={self.name!r} instances={len(self.instances)} mates={len(self.mates)}>"
