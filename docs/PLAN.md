@@ -30,11 +30,11 @@
 
 ## Current Status (2026-11-17)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
-- Phase 2: **Part model** + **Material / stock definitions** implemented and tested.
+- Phase 2: Part model + Material/stock definitions implemented and tested.
 - Next: Cut-list stub, light UI wiring of Parts, then Assembly.
 
 ## Near-term Roadmap
-1. Cut-list generator (walk Parts → list of parts with dimensions + material lookup).
+1. Cut-list generator (walk Parts → list of parts with dimensions + material).
 2. MainWindow / FeatureTree integration so the user works with Parts instead of a free-floating FeatureHistory.
 3. Simple Assembly data model (list of Part instances + transforms; mates later).
 4. DXF export stub for 2D profiles / drawings using ezdxf.

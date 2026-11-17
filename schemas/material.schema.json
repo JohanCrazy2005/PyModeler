@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/material.schema.json",
   "title": "MaterialStore",
-  "description": "Collection of named materials / stock definitions for manufacturing-aware parts (thickness, type, cost, etc.).",
+  "description": "Library of materials and stock definitions for Parts (sheet, solid, linear). Supports manufacturing-relevant attributes used by cut lists and BOM.",
   "type": "object",
   "required": ["materials"],
   "additionalProperties": false,
@@ -15,7 +15,7 @@
     "name": {
       "type": "string",
       "default": "Materials",
-      "description": "Human-readable name for the store"
+      "description": "Human-readable name for the material library"
     },
     "materials": {
       "type": "array",
@@ -33,47 +33,73 @@
       "required": ["name"],
       "additionalProperties": false,
       "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Unique material / stock name"
+          "description": "Display name, e.g. 'Baltic Birch 18mm'"
         },
-        "thickness": {
-          "type": "number",
-          "minimum": 0,
-          "description": "Nominal thickness (for sheet stock)"
+        "category": {
+          "type": "string",
+          "enum": ["wood", "metal", "plastic", "composite", "other"],
+          "default": "other",
+          "description": "Broad material category"
         },
         "type": {
           "type": "string",
-          "description": "Material category (e.g. plywood, MDF, solid_wood, aluminum, plastic)"
+          "enum": ["sheet", "solid", "linear", "other"],
+          "default": "sheet",
+          "description": "Stock form: sheet (panel), solid (block), linear (extrusion/bar)"
+        },
+        "thickness": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Primary thickness in unit (mm by default); critical for panel stock"
+        },
+        "width": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Optional stock width"
+        },
+        "length": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Optional stock length"
+        },
+        "density": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Density in kg/m³ (optional, for mass estimates)"
+        },
+        "color": {
+          "type": ["string", "null"],
+          "description": "Optional hex color for visualization, e.g. '#c4a35a'"
+        },
+        "grain": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether grain direction is manufacturing-relevant"
         },
         "unit": {
           "type": "string",
           "default": "mm",
-          "description": "Unit for thickness and other linear measures"
+          "description": "Length unit for thickness/width/length"
         },
-        "density": {
-          "type": "number",
+        "cost_per_unit": {
+          "type": ["number", "null"],
           "minimum": 0,
-          "description": "Optional density (kg/m³ or similar)"
-        },
-        "cost": {
-          "type": "number",
-          "minimum": 0,
-          "description": "Optional unit cost"
-        },
-        "grain_direction": {
-          "type": "string",
-          "description": "Optional grain / texture direction note"
+          "description": "Optional cost per unit area/volume/length for later BOM"
         },
         "comment": {
           "type": "string",
-          "description": "Optional human comment"
+          "description": "Free-form note"
         },
         "metadata": {
           "type": "object",
-          "additionalProperties": true,
-          "description": "Extra manufacturing metadata (edge banding, finish, etc.)"
+          "additionalProperties": true
         }
       }
     }

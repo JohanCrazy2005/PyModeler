@@ -13,22 +13,22 @@ This file is updated by every automation run.
 **Material / stock definitions are complete.**
 
 - Schema: `schemas/material.schema.json`
-- Core: `src/pymodeler/core/materials.py` (`MaterialStore`)
-- Tests: `tests/test_materials.py`
+- Core: `src/pymodeler/core/material.py` (`MaterialStore`, validation, default library)
+- Tests: `tests/test_material.py`
 - Research: `docs/research/material-stock.md`
-
-Parts can now reference named materials (string or object) with thickness, type, cost, etc. for manufacturing use.
+- Part continues to accept material as string or object (no breaking change)
 
 ### Next concrete tasks (Phase 2)
-1. **Cut list / part list generation stub** that walks one or more Parts and emits quantity, size, material (lookup thickness/type from MaterialStore when possible).
-2. Light UI integration: MainWindow holds a Part (or list of Parts); FeatureTree already works with FeatureHistory. Optional property panel for material assignment.
+1. **Cut list / part list generation stub** that walks one or more Parts and emits quantity, size, material (use MaterialStore when material is an id/name).
+2. Light UI integration: MainWindow holds a Part (or list of Parts); FeatureTree already works with FeatureHistory; optional material property display.
 3. Begin simple Assembly container (references to Parts + basic transforms; mates later).
-4. Basic BOM generation from cut list.
+4. DXF export stub for 2D profiles using ezdxf (when dependency is added).
 
 ## Recently Completed
-- Material / stock definitions (schema + MaterialStore)
-- Part model (sketches + parameters + FeatureHistory → body mesh)
-- Research note: docs/research/material-stock.md and part-model.md
+- Material / stock definitions (schema + MaterialStore + default library)
+- Multi-feature Part model (sketches + parameters + FeatureHistory → body mesh)
+- Research note: docs/research/part-model.md, docs/research/material-stock.md
+- Restored working sketch.py from history (previous placeholder breakage)
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).

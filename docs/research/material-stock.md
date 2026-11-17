@@ -1,39 +1,35 @@
 # Material / Stock Definitions
 
-Research notes for Phase 2 manufacturing helpers. Sources: Mozaik material libraries, Fusion 360 material appearance / physical materials, Onshape material assignments, general cabinet/furniture CAD practices. Last updated: 2026-11-17.
+Research notes for Phase 2 manufacturing helpers. Last updated: 2026-11-17.
 
 ## Fusion 360 / Autodesk Fusion
-- Physical Materials and Appearance libraries.
-- Materials can be assigned to bodies or components.
-- Include density, thermal, etc. for simulation later.
-- Appearance is visual; physical is for mass/properties.
+- Physical Materials (density, strength, thermal) separate from Appearance (visual).
+- Materials assigned to bodies/components; used for mass properties and simulation.
+- Limited built-in stock/sheet size concept; more emphasis on physical properties.
 
 ## Onshape
-- Materials can be assigned at the part or body level.
-- Custom material libraries possible.
-- Used for mass properties and BOM.
+- Material libraries with density and appearance.
+- Assigned per Part; mass properties computed from volume × density.
+- Configurations can swap materials.
 
-## Mozaik / manufacturing-focused tools
-- Strong material / stock library is central.
-- Sheet materials: thickness, type (plywood, MDF, particleboard, solid), cost per sheet or unit, grain direction, edge banding options, finish.
-- Filtering cut lists by material.
-- Stock definitions drive cut sizes, nesting, and hardware compatibility.
-- Part library can override or add manufacturing metadata.
+## Mozaik (manufacturing focus)
+- Material / stock library is central: thickness, sheet size, grain, edge banding, CNC eligibility.
+- Cut lists filter and group by material.
+- Stock definitions drive nesting and material requirements.
+- Part library entries carry material, thickness, and manufacturing metadata.
 
 ## PyModeler design decisions (this increment)
-- Simple `MaterialStore` (schema-driven) holding named materials with:
-  - name (unique)
-  - thickness (for sheet stock)
-  - type (plywood, mdf, solid_wood, aluminum, …)
-  - unit
-  - optional density, cost, grain_direction, comment, metadata
-- Parts already accept an optional `material` (string name or object). Next steps can resolve the string against a store.
-- No UI yet — pure data + tests. Enables cut-list generation later.
-- Keep lightweight; expand when cut lists and BOM land.
+- `MaterialStore` – schema-validated library of material definitions.
+- Each material supports:
+  - name, category (wood/metal/plastic/composite/other)
+  - type (sheet / solid / linear / other)
+  - thickness, width, length (stock dimensions)
+  - density, color, grain flag, unit, optional cost
+- Part already accepts `material` as string (name/id) or object; no breaking change.
+- Starter library via `create_default_library()` for common panel materials.
+- Next consumers: cut-list generator (walk Parts → quantity, size, material) and light UI property panel.
 
-## Next after this
-- Cut-list stub that walks Parts and looks up material thickness / type.
-- Optional UI property panel to assign material from store.
-- BOM generation.
-
-Last updated: 2026-11-17
+## References
+- Mozaik Cutlist / Part Library docs
+- Fusion Physical Materials
+- Onshape material assignment
