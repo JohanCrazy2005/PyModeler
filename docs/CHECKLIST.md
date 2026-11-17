@@ -48,7 +48,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Assembly mates / constraints (rigid/fastened schema + basic solver)
 - [x] Cut list / part list generation (Mozaik-inspired) — stub implemented
 - [x] Cut-list enhancements: group by material/thickness + CSV export
-- [ ] Basic BOM
+- [x] Basic BOM
 - [x] Dimensioned drawing / export stubs (DXF via ezdxf)
 - [x] Material / stock definitions
 - [ ] Configurations (independent inputs)
@@ -72,4 +72,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (assembly rigid/fastened mates)
+Last updated: 2026-11-17 (basic BOM generation)

@@ -10,22 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Assembly rigid/fastened mates complete.**
+**Basic BOM generation complete.**
 
-- Schema extended with optional `mates` array (type rigid|fastened, instance ids, offset transform).
-- `Mate` class + `Assembly.add_mate` / `remove_mate` / `solve_mates`.
-- Basic solver: if one instance is grounded, moves the other by the stored location offset.
-- Fully backward-compatible; existing assemblies without mates still validate.
-- Tests cover schema, round-trip, and solve behavior.
-- Research note: `docs/research/assembly-mates.md`.
+- Schema: `schemas/bom.schema.json`.
+- Core: `src/pymodeler/core/bom.py` — `generate_bom` from Parts (with quantities) or from Assembly (instance counts by part_id).
+- Aggregates unique part_ids, sums quantities, resolves materials via MaterialStore, includes optional AABB size.
+- Helpers: `bom_to_text()`, `bom_to_csv()`. `BOM` wrapper with `from_parts` / `from_assembly`.
+- Tests cover schema, parts path, assembly path, material resolution, CSV/text, and unresolved part_ids.
+- Research note: `docs/research/bom.md`.
 
-### Next concrete tasks (Phase 2)
-1. Viewport polish / selection improvements.
-2. Basic BOM generation.
-3. Optional: UI exposure of mates + grouped cut-list / CSV export.
-4. Optional: richer mate solver (rotation composition, revolute/slider stubs).
+### Next concrete tasks (Phase 2 / 3)
+1. Viewport polish / selection improvements (Phase 3).
+2. Optional: UI exposure of mates, BOM, and grouped cut-list / CSV export.
+3. Optional: richer mate solver (rotation composition, revolute/slider stubs).
+4. Configurations (independent inputs).
 
 ## Recently Completed
+- Basic BOM generation: schema + aggregation from Parts or Assembly instances
 - Assembly mates: rigid/fastened schema + basic location-offset solver
 - Cut-list enhancements: grouping by material/thickness + CSV export helper
 - Multi-part switching UI (parts list + switch + feature tree update)
