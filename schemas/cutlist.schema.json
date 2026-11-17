@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/cutlist.schema.json",
+  "title": "CutList",
+  "description": "A cut list / part list generated from one or more Parts. Mozaik-inspired manufacturing helper. Reports quantity, resolved material, and bounding-box size of the recomputed body.",
+  "type": "object",
+  "required": ["items"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "default": "Cut List"
+    },
+    "items": {
+      "type": "array",
+      "description": "One entry per part instance (quantity applied as a field, not duplicated rows)",
+      "items": {
+        "type": "object",
+        "required": ["part_id", "name", "quantity"],
+        "additionalProperties": true,
+        "properties": {
+          "part_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "material": {
+            "description": "Raw material value from the Part (string, object, or null)",
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object", "additionalProperties": true },
+              { "type": "null" }
+            ]
+          },
+          "material_name": {
+            "type": ["string", "null"],
+            "description": "Resolved display name (from MaterialStore when possible)"
+          },
+          "material_id": {
+            "type": ["string", "null"]
+          },
+          "size": {
+            "type": "object",
+            "description": "Axis-aligned bounding box size of the recomputed body (dx, dy, dz). Ordered as width/depth/height for reporting.",
+            "properties": {
+              "width": { "type": "number" },
+              "depth": { "type": "number" },
+              "height": { "type": "number" },
+              "dx": { "type": "number" },
+              "dy": { "type": "number" },
+              "dz": { "type": "number" },
+              "unit": { "type": "string", "default": "mm" }
+            },
+            "additionalProperties": true
+          },
+          "bounding_box": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "max": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          },
+          "has_geometry": {
+            "type": "boolean"
+          },
+          "comment": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
