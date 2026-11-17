@@ -41,7 +41,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Constraint visual feedback / badges on canvas (colored markers + tooltips)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
-- [ ] Multi-feature Part model
+- [x] Multi-feature Part model
 - [ ] Simple Assembly + mates / constraints
 - [ ] Cut list / part list generation (Mozaik-inspired)
 - [ ] Basic BOM
@@ -68,4 +68,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-16 (DOF analysis stub for fully constrained sketches)
+Last updated: 2026-11-17 (Part model with sketches, parameters, FeatureHistory, and recompute)

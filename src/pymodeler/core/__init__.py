@@ -40,6 +40,7 @@ from .features import (
     validate_revolve_data,
     validate_history_data,
 )
+from .part import Part, PartValidationError, validate_part_data
 
 __all__ = [
     "Mesh",
@@ -77,6 +78,9 @@ __all__ = [
     "validate_extrude_data",
     "validate_revolve_data",
     "validate_history_data",
+    "Part",
+    "PartValidationError",
+    "validate_part_data",
     "mesh_boolean",
     "BooleanError",
 ]

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/part.schema.json",
+  "title": "Part",
+  "description": "A parametric Part: collection of sketches, user parameters, and an ordered FeatureHistory that recompute into a solid body (currently represented as a Mesh).",
+  "type": "object",
+  "required": ["feature_history"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "default": "Part"
+    },
+    "sketches": {
+      "type": "object",
+      "description": "Map of sketch_id → Sketch object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "description": "ParameterStore document",
+      "additionalProperties": true
+    },
+    "feature_history": {
+      "type": "object",
+      "description": "FeatureHistory document",
+      "additionalProperties": true
+    },
+    "material": {
+      "description": "Material or stock identifier (string or object)",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object", "additionalProperties": true },
+        { "type": "null" }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
