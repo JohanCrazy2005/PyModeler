@@ -57,6 +57,14 @@ from .cutlist import (
     group_cut_list,
     validate_cutlist_data,
 )
+from .bom import (
+    BOM,
+    BOMValidationError,
+    generate_bom,
+    bom_to_text,
+    bom_to_csv,
+    validate_bom_data,
+)
 from .assembly import (
     Assembly,
     Instance,
@@ -118,6 +126,12 @@ __all__ = [
     "cut_list_to_csv",
     "group_cut_list",
     "validate_cutlist_data",
+    "BOM",
+    "BOMValidationError",
+    "generate_bom",
+    "bom_to_text",
+    "bom_to_csv",
+    "validate_bom_data",
     "Assembly",
     "Instance",
     "Mate",
