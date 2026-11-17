@@ -10,26 +10,25 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Cut-list / part-list generation stub is complete.**
+**Light UI integration of Parts is complete.**
 
-- Schema: `schemas/cutlist.schema.json`
-- Core: `src/pymodeler/core/cutlist.py` (`generate_cut_list`, `CutList`, text formatter)
-- Tests: `tests/test_cutlist.py`
-- Research: `docs/research/cutlist.md`
-- Walks Parts → quantity, AABB size, resolved material (via MaterialStore)
+- MainWindow now holds `self.current_part` (and `self.parts` list).
+- FeatureTree and PropertyPanel are wired to the current Part’s FeatureHistory and ParameterStore.
+- Extrude of the current sketch adds the sketch + ExtrudeFeature to the Part and recomputes the body mesh into the scene.
+- Manufacturing menu → “Show Cut List” generates and displays a text cut list for the current parts.
 
 ### Next concrete tasks (Phase 2)
-1. **Light UI integration**: MainWindow holds one or more Parts; FeatureTree works with a Part’s FeatureHistory; optional material / cut-list property display or simple panel.
-2. Begin simple Assembly container (references to Parts + basic transforms; mates later).
-3. DXF export stub for 2D profiles using ezdxf (when dependency is added).
-4. Optional: group cut-list items by material / thickness; CSV export helper.
+1. Begin simple Assembly container (references to Parts + basic transforms; mates later). Schema + core data model first.
+2. DXF export stub for 2D profiles using ezdxf (add dependency when ready).
+3. Optional: group cut-list items by material / thickness; CSV export helper.
+4. Multi-part switching UI (list of parts, switch current_part).
 
 ## Recently Completed
+- Light UI integration: MainWindow works with Part (FeatureTree, recompute body, cut-list display)
 - Cut list / part list generation stub (schema + generator + tests)
 - Material / stock definitions (schema + MaterialStore + default library)
 - Multi-feature Part model (sketches + parameters + FeatureHistory → body mesh)
 - Research note: docs/research/part-model.md, docs/research/material-stock.md, docs/research/cutlist.md
-- Restored working sketch.py from history (previous placeholder breakage)
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).
