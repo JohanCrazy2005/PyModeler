@@ -43,7 +43,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [x] Multi-feature Part model
 - [ ] Simple Assembly + mates / constraints
-- [ ] Cut list / part list generation (Mozaik-inspired)
+- [x] Cut list / part list generation (Mozaik-inspired) — stub implemented
 - [ ] Basic BOM
 - [ ] Dimensioned drawing / export stubs (DXF via ezdxf)
 - [x] Material / stock definitions
@@ -68,4 +68,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (Material/stock definitions + MaterialStore)
+Last updated: 2026-11-17 (Cut-list stub + schema + tests)

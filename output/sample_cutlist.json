@@ -1,0 +1,37 @@
+{
+  "id": "cutlist_2e6a4ae5",
+  "name": "Sample Cut List",
+  "items": [
+    {
+      "part_id": "part_35ee81a3",
+      "name": "Shelf",
+      "quantity": 1,
+      "material": "Baltic Birch 18mm",
+      "material_name": "Baltic Birch 18mm",
+      "material_id": "mat_8b5180e1",
+      "has_geometry": true,
+      "size": {
+        "width": 600.0,
+        "depth": 400.0,
+        "height": 18.0,
+        "dx": 600.0,
+        "dy": 400.0,
+        "dz": 18.0,
+        "unit": "mm"
+      },
+      "bounding_box": {
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          600.0,
+          400.0,
+          18.0
+        ]
+      }
+    }
+  ],
+  "generated_at": "2026-11-17T15:54:28Z"
+}

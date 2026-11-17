@@ -10,24 +10,25 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Material / stock definitions are complete.**
+**Cut-list / part-list generation stub is complete.**
 
-- Schema: `schemas/material.schema.json`
-- Core: `src/pymodeler/core/material.py` (`MaterialStore`, validation, default library)
-- Tests: `tests/test_material.py`
-- Research: `docs/research/material-stock.md`
-- Part continues to accept material as string or object (no breaking change)
+- Schema: `schemas/cutlist.schema.json`
+- Core: `src/pymodeler/core/cutlist.py` (`generate_cut_list`, `CutList`, text formatter)
+- Tests: `tests/test_cutlist.py`
+- Research: `docs/research/cutlist.md`
+- Walks Parts → quantity, AABB size, resolved material (via MaterialStore)
 
 ### Next concrete tasks (Phase 2)
-1. **Cut list / part list generation stub** that walks one or more Parts and emits quantity, size, material (use MaterialStore when material is an id/name).
-2. Light UI integration: MainWindow holds a Part (or list of Parts); FeatureTree already works with FeatureHistory; optional material property display.
-3. Begin simple Assembly container (references to Parts + basic transforms; mates later).
-4. DXF export stub for 2D profiles using ezdxf (when dependency is added).
+1. **Light UI integration**: MainWindow holds one or more Parts; FeatureTree works with a Part’s FeatureHistory; optional material / cut-list property display or simple panel.
+2. Begin simple Assembly container (references to Parts + basic transforms; mates later).
+3. DXF export stub for 2D profiles using ezdxf (when dependency is added).
+4. Optional: group cut-list items by material / thickness; CSV export helper.
 
 ## Recently Completed
+- Cut list / part list generation stub (schema + generator + tests)
 - Material / stock definitions (schema + MaterialStore + default library)
 - Multi-feature Part model (sketches + parameters + FeatureHistory → body mesh)
-- Research note: docs/research/part-model.md, docs/research/material-stock.md
+- Research note: docs/research/part-model.md, docs/research/material-stock.md, docs/research/cutlist.md
 - Restored working sketch.py from history (previous placeholder breakage)
 
 ## Notes for Automation
