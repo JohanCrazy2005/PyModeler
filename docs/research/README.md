@@ -9,6 +9,7 @@ This folder holds structured research on features of parametric CAD and design-t
 - `onshape-part-studio.md` – Part Studios, feature history, configurations approach.
 - `mozaik-manufacturing.md` – Cut lists, nesting, joinery, manufacturing outputs.
 - `feature-inventory.md` – Prioritized inventory of capabilities aligned with the CAD/CAM goal.
+- `dxf-export.md` – DXF export stub using ezdxf for sketches and closed profiles.
 - Legacy notes (from earlier Blender-focused research): `blender-core-features.md`, `extrude-operator.md`, `inset-operator.md`, `viewport-essentials.md`.
 
-Last updated: 2026-11-15 (Fusion / Onshape / Mozaik research completed)
+Last updated: 2026-11-17 (DXF export research note added)
