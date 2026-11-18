@@ -10,22 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Basic BOM generation complete.**
+**Viewport polish complete (Phase 3 increment).**
 
-- Schema: `schemas/bom.schema.json`.
-- Core: `src/pymodeler/core/bom.py` — `generate_bom` from Parts (with quantities) or from Assembly (instance counts by part_id).
-- Aggregates unique part_ids, sums quantities, resolves materials via MaterialStore, includes optional AABB size.
-- Helpers: `bom_to_text()`, `bom_to_csv()`. `BOM` wrapper with `from_parts` / `from_assembly`.
-- Tests cover schema, parts path, assembly path, material resolution, CSV/text, and unresolved part_ids.
-- Research note: `docs/research/bom.md`.
+- RGB world axes (separate colored draws).
+- Shading mode cycle: solid / wireframe / solid_wire (edges overlay).
+- Standard views (front/right/top/etc.) + orthographic toggle.
+- Keyboard shortcuts: F/. frame selected, A/Home frame all, 1/3/7 standard views, 5 ortho, G/R/S gizmo modes.
+- Selection improvement: empty click clears selection.
+- Tests updated and covering the new camera/shading APIs.
 
-### Next concrete tasks (Phase 2 / 3)
-1. Viewport polish / selection improvements (Phase 3).
-2. Optional: UI exposure of mates, BOM, and grouped cut-list / CSV export.
-3. Optional: richer mate solver (rotation composition, revolute/slider stubs).
-4. Configurations (independent inputs).
+### Next concrete tasks (Phase 3 / Phase 2 remainder)
+1. Optional UI exposure of mates, BOM, and grouped cut-list / CSV export.
+2. Optional richer mate solver (rotation composition, revolute/slider stubs).
+3. Configurations (independent inputs).
+4. Further viewport: selection outline, better gizmo arrowheads, multi-select.
 
 ## Recently Completed
+- Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav, selection clear-on-miss
 - Basic BOM generation: schema + aggregation from Parts or Assembly instances
 - Assembly mates: rigid/fastened schema + basic location-offset solver
 - Cut-list enhancements: grouping by material/thickness + CSV export helper
