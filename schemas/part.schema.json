@@ -32,6 +32,11 @@
       "description": "FeatureHistory document",
       "additionalProperties": true
     },
+    "configurations": {
+      "type": "object",
+      "description": "Optional ConfigurationSet document",
+      "additionalProperties": true
+    },
     "material": {
       "description": "Material or stock identifier (string or object)",
       "oneOf": [

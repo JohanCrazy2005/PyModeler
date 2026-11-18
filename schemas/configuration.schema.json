@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/configuration.schema.json",
+  "title": "ConfigurationSet",
+  "description": "Independent configuration inputs (Onshape-style) that drive parameter values and feature suppressions on a Part. Avoids a single combinatorial table.",
+  "type": "object",
+  "required": ["inputs"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "default": "Configurations"
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Independent configuration inputs",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/list_input" },
+          { "$ref": "#/$defs/numeric_input" },
+          { "$ref": "#/$defs/boolean_input" }
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "list_input": {
+      "type": "object",
+      "required": ["name", "type", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "const": "list" },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "parameter_overrides": {
+                "type": "object",
+                "additionalProperties": { "type": "number" }
+              },
+              "suppressed_features": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "numeric_input": {
+      "type": "object",
+      "required": ["name", "type", "target_parameter"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "const": "numeric" },
+        "target_parameter": { "type": "string", "minLength": 1 },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "default": { "type": "number" }
+      }
+    },
+    "boolean_input": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "const": "boolean" },
+        "target_parameter": { "type": "string" },
+        "target_feature": { "type": "string" },
+        "true_value": { "type": "number" },
+        "false_value": { "type": "number" },
+        "suppress_when_false": { "type": "boolean", "default": true }
+      }
+    }
+  }
+}
