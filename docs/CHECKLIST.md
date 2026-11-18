@@ -54,8 +54,8 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Configurations (independent inputs)
 
 ## Phase 3 – Viewport, Interaction & Polish
-- [ ] Real OpenGL / moderngl viewport improvements
-- [ ] Camera controls, selection, feature highlighting
+- [x] Real OpenGL / moderngl viewport improvements (orbit, pan, zoom, grid, RGB axes, shading modes, standard views, ortho)
+- [~] Camera controls, selection, feature highlighting (selection clear-on-miss + keyboard frame/views done; outline later)
 - [ ] Transform tools that respect parametric intent where possible
 
 ## Phase 4 – Advanced CAD + Path to CAM
@@ -72,4 +72,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-17 (basic BOM generation)
+Last updated: 2026-11-18 (viewport polish: RGB axes, shading modes, standard views, selection clear)
