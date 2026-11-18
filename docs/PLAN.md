@@ -28,20 +28,16 @@
 - moderngl / PyOpenGL for viewport
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
-## Current Status (2026-11-17)
+## Current Status (2026-11-18)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
-- Phase 2: Part model + Material/stock + Cut-list stub + light UI integration of Parts complete.
-- Phase 2: DXF export stub (ezdxf) complete.
-- Phase 2: Multi-part switching UI complete.
-- Phase 2: Cut-list enhancements (grouping by material/thickness + CSV export) complete.
-- Phase 2: Assembly rigid/fastened mates (schema + basic solver) complete.
-- Phase 2: Basic BOM generation (schema + aggregation from Parts/Assemblies) complete.
-- Next: Viewport polish / selection improvements.
+- Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI complete.
+- Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss) complete.
+- Next: Optional UI for mates/BOM/cut-list export, richer mates, or Configurations.
 
 ## Near-term Roadmap
-1. Viewport polish and selection.
-2. Optional UI for mates, BOM, and grouped cut list / CSV export.
-3. Optional richer mate types (revolute/slider stubs).
-4. Configurations (independent inputs).
+1. Optional UI exposure of mates, BOM, and grouped cut list / CSV export.
+2. Optional richer mate types (revolute/slider stubs).
+3. Configurations (independent inputs).
+4. Further viewport polish (selection outline, gizmo improvements).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
