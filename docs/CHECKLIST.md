@@ -60,7 +60,8 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Real OpenGL / moderngl viewport improvements (orbit, pan, zoom, grid, RGB axes, shading modes, standard views, ortho)
 - [x] Camera controls, selection, feature highlighting (selection clear-on-miss + keyboard frame/views + full transform framing/picking + paint path)
 - [x] Full object transform (scale + rotation + location) applied to world vertices for framing, picking, and (when GL restored) drawing
-- [ ] Transform tools that respect parametric intent where possible
+- [x] Selection outline / edge highlight overlay in the viewport
+- [~] Transform tools that respect parametric intent where possible (basic gizmo axes now drawn; richer visuals next)
 
 ## Phase 4 – Advanced CAD + Path to CAM
 - [ ] Fillet / Chamfer / Shell / Hole features
@@ -76,4 +77,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-18 (Full OpenGL paint path restored; meshes drawn with transforms)
+Last updated: 2026-11-18 (Selection outline + basic gizmo axes drawn in viewport)

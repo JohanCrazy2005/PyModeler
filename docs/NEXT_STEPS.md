@@ -10,22 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Full OpenGL paint path restored in ViewportWidget.**
+**Selection outline (edge highlight) + basic gizmo axes drawn in viewport.**
 
-- initializeGL / paintGL / resizeGL now create moderngl context, shaders, grid, axes, and draw transformed meshes
-- Meshes are drawn with full Transform (scale → rot → translate) via transform_points + model matrix
-- Framing, click-select AABB, and gizmo axes all use full transforms
-- Selection highlighting (brighter color)
-- Headless-safe: pure math gizmo helpers and graceful fallback when no GL
+- Unique edges of selected meshes are drawn in bright yellow as an overlay (using unlit shader)
+- Basic RGB local axes (gizmo) are drawn for the primary selected object so hit-testing is visible
+- Pure `extract_unique_edges` helper is unit-tested (cube → 12 edges)
+- Drawing methods are headless-safe (early return when no GL context)
 - Main branch remains runnable
 
 ### Next concrete tasks (Phase 3 / remaining)
-1. Selection outline / edge highlight overlay in the viewport.
-2. Better gizmo visual (arrowheads, rotation rings) drawn in paintGL.
-3. Optional richer mate solver (rotation composition, revolute/slider stubs).
-4. Full profile extraction and solid mesh generation for Extrude / Revolve (currently approximate / stub for revolve).
+1. Better gizmo visual: arrowheads on translate axes, rotation rings for rotate mode, drawn in paintGL.
+2. Optional richer mate solver (rotation composition, revolute/slider stubs).
+3. Full profile extraction and solid mesh generation for Extrude / Revolve (currently approximate / stub for revolve).
+4. Transform tools that respect parametric intent where possible (Phase 3 remaining checklist item).
 
 ## Recently Completed
+- Selection outline / edge highlight overlay for selected objects + basic gizmo axes drawing
 - Restored complete OpenGL paint path so transformed meshes are drawn
 - Apply full transform (rotation + scale) in viewport mesh drawing / framing / picking
 - UI panel for selecting and applying configuration values

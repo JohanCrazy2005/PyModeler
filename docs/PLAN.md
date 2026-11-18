@@ -31,14 +31,14 @@
 ## Current Status (2026-11-18)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
-- Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss) complete.
-- Next: Selection outline, better gizmo visuals, richer mate solver, real solid feature mesh generation.
+- Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and basic gizmo axes drawing added.
+- Next: Richer gizmo visuals (arrowheads, rings), richer mate solver, real solid feature mesh generation.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
 2. (done) UI for selecting configuration values.
 3. Optional richer mate types (revolute/slider stubs) and rotation composition.
-4. Further viewport polish (selection outline, gizmo improvements).
+4. (done) Selection outline + basic gizmo axes. Further viewport polish (arrowheads, rotation rings).
 5. (done) Full transform (rotation + scale) in viewport drawing + paint path.
 6. Replace approximate/stub with real profile-based Extrude/Revolve mesh generation.
 
