@@ -30,14 +30,13 @@
 
 ## Current Status (2026-11-18)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
-- Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI complete.
+- Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss) complete.
-- Next: Optional UI for mates/BOM/cut-list export, richer mates, or Configurations.
+- Next: Richer mate solver, Configurations, or further viewport polish.
 
 ## Near-term Roadmap
-1. Optional UI exposure of mates, BOM, and grouped cut list / CSV export.
-2. Optional richer mate types (revolute/slider stubs).
-3. Configurations (independent inputs).
-4. Further viewport polish (selection outline, gizmo improvements).
+1. Optional richer mate types (revolute/slider stubs) and rotation composition.
+2. Configurations (independent inputs).
+3. Further viewport polish (selection outline, gizmo improvements, assembly instance visualization).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
