@@ -72,6 +72,11 @@ from .assembly import (
     AssemblyValidationError,
     validate_assembly_data,
 )
+from .configurations import (
+    ConfigurationSet,
+    ConfigurationValidationError,
+    validate_configuration_data,
+)
 
 __all__ = [
     "Mesh",
@@ -137,4 +142,7 @@ __all__ = [
     "Mate",
     "AssemblyValidationError",
     "validate_assembly_data",
+    "ConfigurationSet",
+    "ConfigurationValidationError",
+    "validate_configuration_data",
 ]

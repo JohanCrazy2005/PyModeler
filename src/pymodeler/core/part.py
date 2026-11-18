@@ -18,6 +18,7 @@ from .features import FeatureHistory, FeatureValidationError
 from .mesh import Mesh
 from .parameters import ParameterStore
 from .sketch import Sketch
+from .configurations import ConfigurationSet
 
 _SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas"
 _PART_SCHEMA_PATH = _SCHEMA_DIR / "part.schema.json"
@@ -52,6 +53,7 @@ class Part:
         sketches: Optional[Dict[str, Sketch]] = None,
         parameters: Optional[ParameterStore] = None,
         feature_history: Optional[FeatureHistory] = None,
+        configurations: Optional[ConfigurationSet] = None,
         material: Optional[Any] = None,
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
@@ -61,6 +63,7 @@ class Part:
         self.sketches: Dict[str, Sketch] = sketches or {}
         self.parameters = parameters or ParameterStore(name=f"{name} Parameters")
         self.feature_history = feature_history or FeatureHistory(name=f"{name} History")
+        self.configurations = configurations
         self.material = material
         self.metadata = metadata or {}
         self._body: Optional[Mesh] = None
@@ -74,6 +77,8 @@ class Part:
             "parameters": self.parameters.to_dict(),
             "feature_history": self.feature_history.to_dict(),
         }
+        if self.configurations is not None:
+            data["configurations"] = self.configurations.to_dict()
         if self.material is not None:
             data["material"] = self.material
         if self.metadata:
@@ -91,11 +96,15 @@ class Part:
             sketches[sid] = Sketch.from_dict(sdata)
         parameters = ParameterStore.from_dict(data.get("parameters", {}))
         history = FeatureHistory.from_dict(data.get("feature_history", {}))
+        configurations = None
+        if "configurations" in data and data["configurations"]:
+            configurations = ConfigurationSet.from_dict(data["configurations"])
         return cls(
             name=data.get("name", "Part"),
             sketches=sketches,
             parameters=parameters,
             feature_history=history,
+            configurations=configurations,
             material=data.get("material"),
             metadata=data.get("metadata"),
             id=data.get("id"),
