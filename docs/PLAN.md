@@ -30,14 +30,16 @@
 
 ## Current Status (2026-11-18)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
-- Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** complete.
+- Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss) complete.
-- Next: Richer mate solver, further viewport polish (outline/gizmos), configuration UI.
+- Next: Richer mate solver, further viewport polish (outline/gizmos), full transform application, real solid feature mesh generation.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
-2. Optional richer mate types (revolute/slider stubs) and rotation composition.
-3. Further viewport polish (selection outline, gizmo improvements).
-4. UI for selecting configuration values.
+2. (done) UI for selecting configuration values.
+3. Optional richer mate types (revolute/slider stubs) and rotation composition.
+4. Further viewport polish (selection outline, gizmo improvements).
+5. Full transform (rotation + scale) in viewport drawing.
+6. Replace stub cube with real profile-based Extrude/Revolve mesh generation.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
