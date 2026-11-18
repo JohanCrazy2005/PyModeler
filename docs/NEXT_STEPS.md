@@ -10,23 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Configurations (independent inputs) complete.**
+**Assembly instance visualization in viewport complete.**
 
-- Schema `schemas/configuration.schema.json`
-- Core `ConfigurationSet` in `src/pymodeler/core/configurations.py` (list / numeric / boolean inputs)
-- `apply()` updates ParameterStore values and marks features suppressed
-- FeatureHistory.recompute_meshes respects the `suppressed` flag
-- Optional `configurations` field on Part (round-trip)
-- Tests in `tests/test_configurations.py`
-- Research note `docs/research/configurations.md`
+- MainWindow._show_assembly_in_viewport populates the scene with SceneObjects for each visible instance
+- Applies the instance Transform (location / rotation / scale stored on SceneObject)
+- Unique names, metadata with instance_id / part_id
+- Automatically called after creating an assembly and after solving mates
+- Manual menu action "Show Assembly in Viewport"
+- Outliner and frame-all updated
 
 ### Next concrete tasks (Phase 3 / remaining)
-1. Visualize assembly instances in the viewport (transforms).
-2. Optional richer mate solver (rotation composition, revolute/slider stubs).
-3. Further viewport: selection outline, better gizmo arrowheads, multi-select.
-4. UI panel for selecting configuration values (list / numeric / boolean).
+1. Optional richer mate solver (rotation composition, revolute/slider stubs).
+2. Further viewport: selection outline, better gizmo arrowheads, multi-select.
+3. UI panel for selecting configuration values (list / numeric / boolean).
+4. Apply full transform (rotation + scale) in viewport mesh drawing if not already done.
 
 ## Recently Completed
+- Assembly instance visualization in the viewport (transforms applied to SceneObjects)
 - Configurations (independent inputs) schema + core + apply + tests
 - UI exposure of mates, BOM, grouped cut-list, and CSV exports
 - Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav, selection clear-on-miss
