@@ -10,22 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Assembly instance visualization in viewport complete.**
+**Configuration selection UI complete.**
 
-- MainWindow._show_assembly_in_viewport populates the scene with SceneObjects for each visible instance
-- Applies the instance Transform (location / rotation / scale stored on SceneObject)
-- Unique names, metadata with instance_id / part_id
-- Automatically called after creating an assembly and after solving mates
-- Manual menu action "Show Assembly in Viewport"
-- Outliner and frame-all updated
+- Part menu → "Apply Configurations..." opens a dialog
+- Dynamically builds widgets for list (QComboBox), numeric (QDoubleSpinBox), boolean (QCheckBox)
+- Collects selections and calls ConfigurationSet.apply
+- Triggers part recompute + feature tree refresh
+- Restored minimal working FeatureHistory / ExtrudeFeature so main branch remains importable and tests pass
 
 ### Next concrete tasks (Phase 3 / remaining)
 1. Optional richer mate solver (rotation composition, revolute/slider stubs).
 2. Further viewport: selection outline, better gizmo arrowheads, multi-select.
-3. UI panel for selecting configuration values (list / numeric / boolean).
-4. Apply full transform (rotation + scale) in viewport mesh drawing if not already done.
+3. Apply full transform (rotation + scale) in viewport mesh drawing.
+4. Full profile extraction and solid mesh generation for Extrude / Revolve (currently stub cube).
 
 ## Recently Completed
+- UI panel for selecting and applying configuration values
+- Restored core FeatureHistory data model (was placeholder)
 - Assembly instance visualization in the viewport (transforms applied to SceneObjects)
 - Configurations (independent inputs) schema + core + apply + tests
 - UI exposure of mates, BOM, grouped cut-list, and CSV exports
