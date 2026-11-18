@@ -10,20 +10,24 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**UI exposure of manufacturing outputs and basic assembly mates complete.**
+**Configurations (independent inputs) complete.**
 
-- Manufacturing menu: Show Cut List, Show Grouped Cut List, Export Cut List CSV (with groups), Show BOM, Export BOM CSV.
-- Assembly menu: New Assembly from Parts (instances, first grounded), Add Rigid Mate dialog (offset location), Solve Mates (basic location solver), Show Assembly Summary.
-- current_assembly stored on MainWindow; BOM prefers assembly when present.
-- Tests cover assembly creation + mate solve from UI context.
+- Schema `schemas/configuration.schema.json`
+- Core `ConfigurationSet` in `src/pymodeler/core/configurations.py` (list / numeric / boolean inputs)
+- `apply()` updates ParameterStore values and marks features suppressed
+- FeatureHistory.recompute_meshes respects the `suppressed` flag
+- Optional `configurations` field on Part (round-trip)
+- Tests in `tests/test_configurations.py`
+- Research note `docs/research/configurations.md`
 
-### Next concrete tasks (Phase 3 / Phase 2 remainder)
-1. Optional richer mate solver (rotation composition, revolute/slider stubs).
-2. Configurations (independent inputs).
+### Next concrete tasks (Phase 3 / remaining)
+1. Visualize assembly instances in the viewport (transforms).
+2. Optional richer mate solver (rotation composition, revolute/slider stubs).
 3. Further viewport: selection outline, better gizmo arrowheads, multi-select.
-4. Visualize assembly instances in the viewport (transforms).
+4. UI panel for selecting configuration values (list / numeric / boolean).
 
 ## Recently Completed
+- Configurations (independent inputs) schema + core + apply + tests
 - UI exposure of mates, BOM, grouped cut-list, and CSV exports
 - Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav, selection clear-on-miss
 - Basic BOM generation: schema + aggregation from Parts or Assembly instances
