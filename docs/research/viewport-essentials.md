@@ -1,6 +1,6 @@
 # Viewport Essentials Research Note
 
-**Date**: 2026-11-14  
+**Date**: 2026-11-14 (updated 2026-11-18)  
 **Sources**: Blender Manual (Navigation), community guides, Maya Help (Tumble/Track/Dolly)
 
 ## Core Navigation (Must-have for Phase 2 first viewport)
@@ -23,24 +23,19 @@
 - **Frame**: F (selected), A (all).
 - Similar grid and axis conventions.
 
-## Minimal Implementation Target for First Viewport Widget
-1. PyQt6 widget hosting moderngl or PyOpenGL context.
-2. Draw infinite grid (or large finite) on the ground plane.
-3. Draw RGB axes at origin.
-4. Draw all (or selected) scene meshes as simple wireframe or flat-shaded triangles.
-5. Basic orbit camera:
-   - Mouse left-drag or middle-drag → orbit (azimuth/elevation).
-   - Shift + drag → pan.
-   - Wheel → zoom (dolly).
-6. Update on scene changes (object added, transform).
-7. No selection yet (next step after basic drawing works).
+## Implemented (2026-11-18 polish)
+- moderngl QOpenGLWidget with orbit/pan/zoom.
+- Ground grid + properly colored RGB world axes.
+- Flat-shaded meshes, wireframe, solid+edges modes.
+- Standard views (front/right/top/etc.) and orthographic toggle.
+- Keyboard: F/. frame selected, A/Home frame all, 1/3/7 views, 5 ortho, G/R/S gizmo.
+- Click-to-select via AABB raycast; empty click clears selection.
+- Transform gizmos (translate/rotate/scale) with local axes.
 
 ## Later Viewport Features (deferred)
-- Selection (raycast / GPU picking).
-- Transform gizmos.
-- Shading modes (wire, solid, material preview).
-- Overlays (normals, edges, face dots).
+- Selection outline / feature highlighting.
+- Better gizmo arrowheads / rotation rings.
 - Multiple viewports / quad view.
 - Camera view vs user view.
 
-This note grounds the Phase 2 first increment. Implementation should start with a simple moderngl QOpenGLWidget subclass that renders the grid + meshes from the Scene.
+This note grounds the Phase 3 viewport polish. Further interaction improvements can build on the current camera and selection foundation.
