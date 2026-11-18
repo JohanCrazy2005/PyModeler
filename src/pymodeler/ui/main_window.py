@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
+    QFileDialog,
     QFormLayout,
     QHBoxLayout,
     QLabel,
@@ -49,6 +50,15 @@ from pymodeler.core import (
     Part,
     generate_cut_list,
     cut_list_to_text,
+    cut_list_to_grouped_text,
+    cut_list_to_csv,
+    generate_bom,
+    bom_to_text,
+    bom_to_csv,
+    Assembly,
+    Instance,
+    Mate,
+    Transform,
 )
 from pymodeler.render import ViewportWidget
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
@@ -131,6 +141,7 @@ class MainWindow(QMainWindow):
         self.current_part = Part(name="Part 1")
         self.parts: list[Part] = [self.current_part]
         self.current_sketch: Optional[Sketch] = None
+        self.current_assembly: Optional[Assembly] = None
 
         self.viewport = ViewportWidget()
         self.viewport.set_scene(self.scene)
@@ -207,6 +218,33 @@ class MainWindow(QMainWindow):
         cutlist_act = QAction("Show Cut List", self)
         cutlist_act.triggered.connect(self._show_cut_list)
         mfg_menu.addAction(cutlist_act)
+        grouped_act = QAction("Show Grouped Cut List", self)
+        grouped_act.triggered.connect(self._show_grouped_cut_list)
+        mfg_menu.addAction(grouped_act)
+        export_cl_act = QAction("Export Cut List CSV...", self)
+        export_cl_act.triggered.connect(self._export_cutlist_csv)
+        mfg_menu.addAction(export_cl_act)
+        mfg_menu.addSeparator()
+        bom_act = QAction("Show BOM", self)
+        bom_act.triggered.connect(self._show_bom)
+        mfg_menu.addAction(bom_act)
+        export_bom_act = QAction("Export BOM CSV...", self)
+        export_bom_act.triggered.connect(self._export_bom_csv)
+        mfg_menu.addAction(export_bom_act)
+
+        asm_menu = menubar.addMenu("&Assembly")
+        new_asm_act = QAction("New Assembly from Parts", self)
+        new_asm_act.triggered.connect(self._new_assembly_from_parts)
+        asm_menu.addAction(new_asm_act)
+        add_mate_act = QAction("Add Rigid Mate...", self)
+        add_mate_act.triggered.connect(self._add_rigid_mate)
+        asm_menu.addAction(add_mate_act)
+        solve_act = QAction("Solve Mates", self)
+        solve_act.triggered.connect(self._solve_mates)
+        asm_menu.addAction(solve_act)
+        show_asm_act = QAction("Show Assembly Summary", self)
+        show_asm_act.triggered.connect(self._show_assembly_summary)
+        asm_menu.addAction(show_asm_act)
 
     def _on_transform_committed(self, *args) -> None:
         """Stub for viewport transform commit. Parametric transforms come later."""
@@ -263,6 +301,159 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Cut List", text or "No parts with geometry.")
         except Exception as e:
             QMessageBox.warning(self, "Cut List", f"Could not generate cut list:\n{e}")
+
+    def _show_grouped_cut_list(self) -> None:
+        """Generate and display a cut list grouped by material/thickness."""
+        try:
+            cl = generate_cut_list(self.parts)
+            text = cut_list_to_grouped_text(cl)
+            QMessageBox.information(self, "Grouped Cut List", text or "No parts with geometry.")
+        except Exception as e:
+            QMessageBox.warning(self, "Grouped Cut List", f"Could not generate grouped cut list:\n{e}")
+
+    def _export_cutlist_csv(self) -> None:
+        """Export the current cut list (with groups) to a CSV file."""
+        try:
+            cl = generate_cut_list(self.parts)
+            csv_text = cut_list_to_csv(cl, include_groups=True)
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Export Cut List CSV", "cutlist.csv", "CSV Files (*.csv);;All Files (*)"
+            )
+            if path:
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(csv_text)
+                QMessageBox.information(self, "Export", f"Cut list saved to:\n{path}")
+        except Exception as e:
+            QMessageBox.warning(self, "Export Cut List", f"Could not export cut list:\n{e}")
+
+    def _show_bom(self) -> None:
+        """Generate and display a BOM for current parts (or assembly if present)."""
+        try:
+            if self.current_assembly is not None:
+                bom = generate_bom(assembly=self.current_assembly, parts_map={p.id: p for p in self.parts})
+            else:
+                bom = generate_bom(parts=self.parts)
+            text = bom_to_text(bom)
+            QMessageBox.information(self, "BOM", text or "No items.")
+        except Exception as e:
+            QMessageBox.warning(self, "BOM", f"Could not generate BOM:\n{e}")
+
+    def _export_bom_csv(self) -> None:
+        """Export the current BOM to a CSV file."""
+        try:
+            if self.current_assembly is not None:
+                bom = generate_bom(assembly=self.current_assembly, parts_map={p.id: p for p in self.parts})
+            else:
+                bom = generate_bom(parts=self.parts)
+            csv_text = bom_to_csv(bom)
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Export BOM CSV", "bom.csv", "CSV Files (*.csv);;All Files (*)"
+            )
+            if path:
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(csv_text)
+                QMessageBox.information(self, "Export", f"BOM saved to:\n{path}")
+        except Exception as e:
+            QMessageBox.warning(self, "Export BOM", f"Could not export BOM:\n{e}")
+
+    def _new_assembly_from_parts(self) -> None:
+        """Create a new Assembly and add all current Parts as instances (first grounded)."""
+        if not self.parts:
+            QMessageBox.information(self, "Assembly", "No parts available.")
+            return
+        self.current_assembly = Assembly(name="Assembly 1")
+        for i, part in enumerate(self.parts):
+            grounded = (i == 0)
+            self.current_assembly.add_instance(part, grounded=grounded)
+        QMessageBox.information(
+            self,
+            "Assembly",
+            f"Created assembly '{self.current_assembly.name}' with {len(self.current_assembly.instances)} instances.\n"
+            "First instance is grounded. Use 'Add Rigid Mate...' then 'Solve Mates'.",
+        )
+
+    def _add_rigid_mate(self) -> None:
+        """Dialog to add a rigid/fastened mate between two instances."""
+        if self.current_assembly is None or len(self.current_assembly.instances) < 2:
+            QMessageBox.information(self, "Add Mate", "Create an assembly with at least two instances first.")
+            return
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Add Rigid Mate")
+        dialog.setModal(True)
+        layout = QVBoxLayout(dialog)
+        form = QFormLayout()
+        inst_names = [f"{inst.name} ({inst.id[-4:]})" for inst in self.current_assembly.instances]
+        combo_a = QComboBox()
+        combo_a.addItems(inst_names)
+        combo_b = QComboBox()
+        combo_b.addItems(inst_names)
+        if len(inst_names) > 1:
+            combo_b.setCurrentIndex(1)
+        form.addRow("Instance A:", combo_a)
+        form.addRow("Instance B:", combo_b)
+        ox = QDoubleSpinBox()
+        ox.setRange(-1000, 1000)
+        ox.setValue(0.0)
+        oy = QDoubleSpinBox()
+        oy.setRange(-1000, 1000)
+        oy.setValue(0.0)
+        oz = QDoubleSpinBox()
+        oz.setRange(-1000, 1000)
+        oz.setValue(0.0)
+        form.addRow("Offset X:", ox)
+        form.addRow("Offset Y:", oy)
+        form.addRow("Offset Z:", oz)
+        layout.addLayout(form)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        idx_a = combo_a.currentIndex()
+        idx_b = combo_b.currentIndex()
+        if idx_a == idx_b:
+            QMessageBox.warning(self, "Add Mate", "Select two different instances.")
+            return
+        inst_a = self.current_assembly.instances[idx_a]
+        inst_b = self.current_assembly.instances[idx_b]
+        offset = Transform(location=[ox.value(), oy.value(), oz.value()])
+        try:
+            self.current_assembly.add_mate(inst_a, inst_b, type="rigid", offset=offset)
+            QMessageBox.information(self, "Add Mate", f"Added rigid mate between {inst_a.name} and {inst_b.name}.")
+        except Exception as e:
+            QMessageBox.warning(self, "Add Mate", f"Could not add mate:\n{e}")
+
+    def _solve_mates(self) -> None:
+        """Run the basic rigid mate solver and report results."""
+        if self.current_assembly is None:
+            QMessageBox.information(self, "Solve Mates", "No assembly present.")
+            return
+        try:
+            self.current_assembly.solve_mates()
+            # Summarize locations
+            lines = ["Mates solved (location offsets applied). Current instance locations:"]
+            for inst in self.current_assembly.instances:
+                loc = inst.transform.location
+                lines.append(f"  {inst.name}: ({loc[0]:.2f}, {loc[1]:.2f}, {loc[2]:.2f}) {'[grounded]' if inst.grounded else ''}")
+            QMessageBox.information(self, "Solve Mates", "\n".join(lines))
+        except Exception as e:
+            QMessageBox.warning(self, "Solve Mates", f"Solver failed:\n{e}")
+
+    def _show_assembly_summary(self) -> None:
+        """Display a text summary of the current assembly instances and mates."""
+        if self.current_assembly is None:
+            QMessageBox.information(self, "Assembly", "No assembly present. Use 'New Assembly from Parts'.")
+            return
+        lines = [f"Assembly: {self.current_assembly.name} (id={self.current_assembly.id})"]
+        lines.append(f"Instances ({len(self.current_assembly.instances)}):")
+        for inst in self.current_assembly.instances:
+            loc = inst.transform.location
+            lines.append(f"  - {inst.name} (part={inst.part_id}) loc=({loc[0]:.1f},{loc[1]:.1f},{loc[2]:.1f}) {'grounded' if inst.grounded else ''}")
+        lines.append(f"Mates ({len(self.current_assembly.mates)}):")
+        for mate in self.current_assembly.mates:
+            lines.append(f"  - {mate.name} ({mate.type}): {mate.instance_a} → {mate.instance_b}")
+        QMessageBox.information(self, "Assembly Summary", "\n".join(lines))
 
     def _new_sketch(self) -> None:
         self.current_sketch = Sketch(name="New Sketch")
