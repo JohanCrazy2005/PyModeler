@@ -54,6 +54,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] UI exposure of mates, BOM, and grouped cut-list / CSV export
 - [x] Configurations (independent inputs)
 - [x] Visualize assembly instances in viewport (transforms)
+- [x] UI panel for selecting configuration values (list / numeric / boolean)
 
 ## Phase 3 – Viewport, Interaction & Polish
 - [x] Real OpenGL / moderngl viewport improvements (orbit, pan, zoom, grid, RGB axes, shading modes, standard views, ortho)
@@ -74,4 +75,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-18 (Assembly instances visualized in viewport)
+Last updated: 2026-11-18 (Configuration selection UI + FeatureHistory restored)
