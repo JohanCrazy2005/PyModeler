@@ -33,7 +33,10 @@ def validate_scene_data(data: dict) -> None:
 
 
 class Transform:
-    """Location, rotation (Euler XYZ radians), scale."""
+    """Location, rotation (Euler XYZ radians), scale.
+
+    Composition order for world matrix: Scale -> Rotate (XYZ) -> Translate.
+    """
 
     def __init__(
         self,
@@ -61,6 +64,59 @@ class Transform:
             rotation=data.get("rotation"),
             scale=data.get("scale"),
         )
+
+    def matrix(self) -> "np.ndarray":
+        """Return 4x4 world matrix (Scale * RotXYZ * Translate).
+
+        Column-major friendly. Requires numpy (always present for viewport).
+        """
+        import numpy as np
+
+        sx, sy, sz = (float(v) for v in self.scale)
+        rx, ry, rz = (float(v) for v in self.rotation)  # radians
+        tx, ty, tz = (float(v) for v in self.location)
+
+        cx, sx_ = np.cos(rx), np.sin(rx)
+        cy, sy_ = np.cos(ry), np.sin(ry)
+        cz, sz_ = np.cos(rz), np.sin(rz)
+
+        # R = Rz * Ry * Rx
+        R = np.array(
+            [
+                [cz * cy, cz * sy_ * sx_ - sz_ * cx, cz * sy_ * cx + sz_ * sx_],
+                [sz_ * cy, sz_ * sy_ * sx_ + cz * cx, sz_ * sy_ * cx - cz * sx_],
+                [-sy_, cy * sx_, cy * cx],
+            ],
+            dtype=np.float32,
+        )
+
+        S = np.diag([sx, sy, sz]).astype(np.float32)
+        RS = R @ S
+
+        mat = np.eye(4, dtype=np.float32)
+        mat[:3, :3] = RS
+        mat[0, 3] = tx
+        mat[1, 3] = ty
+        mat[2, 3] = tz
+        return mat
+
+    def transform_points(self, points: "np.ndarray") -> "np.ndarray":
+        """Apply full transform (scale, rotation, translation) to (N,3) points.
+
+        Returns a new (N,3) float32 array of world-space positions.
+        """
+        import numpy as np
+
+        pts = np.asarray(points, dtype=np.float32)
+        if pts.size == 0:
+            return pts.reshape(0, 3)
+        if pts.ndim == 1:
+            pts = pts.reshape(1, 3)
+        mat = self.matrix()
+        ones = np.ones((pts.shape[0], 1), dtype=np.float32)
+        homo = np.hstack([pts, ones])
+        world = (mat @ homo.T).T
+        return world[:, :3].copy()
 
 
 class SceneObject:
