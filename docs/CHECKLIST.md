@@ -51,6 +51,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Basic BOM
 - [x] Dimensioned drawing / export stubs (DXF via ezdxf)
 - [x] Material / stock definitions
+- [x] UI exposure of mates, BOM, and grouped cut-list / CSV export
 - [ ] Configurations (independent inputs)
 
 ## Phase 3 – Viewport, Interaction & Polish
@@ -72,4 +73,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-18 (viewport polish: RGB axes, shading modes, standard views, selection clear)
+Last updated: 2026-11-18 (UI exposure of mates/BOM/grouped cut-list + CSV exports)
