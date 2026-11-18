@@ -10,22 +10,21 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Viewport polish complete (Phase 3 increment).**
+**UI exposure of manufacturing outputs and basic assembly mates complete.**
 
-- RGB world axes (separate colored draws).
-- Shading mode cycle: solid / wireframe / solid_wire (edges overlay).
-- Standard views (front/right/top/etc.) + orthographic toggle.
-- Keyboard shortcuts: F/. frame selected, A/Home frame all, 1/3/7 standard views, 5 ortho, G/R/S gizmo modes.
-- Selection improvement: empty click clears selection.
-- Tests updated and covering the new camera/shading APIs.
+- Manufacturing menu: Show Cut List, Show Grouped Cut List, Export Cut List CSV (with groups), Show BOM, Export BOM CSV.
+- Assembly menu: New Assembly from Parts (instances, first grounded), Add Rigid Mate dialog (offset location), Solve Mates (basic location solver), Show Assembly Summary.
+- current_assembly stored on MainWindow; BOM prefers assembly when present.
+- Tests cover assembly creation + mate solve from UI context.
 
 ### Next concrete tasks (Phase 3 / Phase 2 remainder)
-1. Optional UI exposure of mates, BOM, and grouped cut-list / CSV export.
-2. Optional richer mate solver (rotation composition, revolute/slider stubs).
-3. Configurations (independent inputs).
-4. Further viewport: selection outline, better gizmo arrowheads, multi-select.
+1. Optional richer mate solver (rotation composition, revolute/slider stubs).
+2. Configurations (independent inputs).
+3. Further viewport: selection outline, better gizmo arrowheads, multi-select.
+4. Visualize assembly instances in the viewport (transforms).
 
 ## Recently Completed
+- UI exposure of mates, BOM, grouped cut-list, and CSV exports
 - Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav, selection clear-on-miss
 - Basic BOM generation: schema + aggregation from Parts or Assembly instances
 - Assembly mates: rigid/fastened schema + basic location-offset solver
