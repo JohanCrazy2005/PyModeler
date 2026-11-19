@@ -39,6 +39,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Canvas selection of entities + drag points to update coordinates
 - [x] Rectangle and Arc tools on the visual canvas
 - [x] Constraint visual feedback / badges on canvas (colored markers + tooltips)
+- [x] Real solid-of-revolution mesh for Revolve (profile points, partial angles, Y-axis)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [x] Multi-feature Part model
@@ -61,7 +62,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Camera controls, selection, feature highlighting (selection clear-on-miss + keyboard frame/views + full transform framing/picking + paint path)
 - [x] Full object transform (scale + rotation + location) applied to world vertices for framing, picking, and (when GL restored) drawing
 - [x] Selection outline / edge highlight overlay in the viewport
-- [~] Transform tools that respect parametric intent where possible (gizmo now has arrowheads + rotation rings; further parametric intent next)
+- [~] Transform tools that respect parametric intent where possible (gizmo visuals done; next: drive parameters/sketch on drag)
 
 ## Phase 4 – Advanced CAD + Path to CAM
 - [ ] Fillet / Chamfer / Shell / Hole features
@@ -77,4 +78,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-18 (Richer gizmo visuals: arrowheads + rotation rings)
+Last updated: 2026-11-18 (Real revolve solid from profile points)
