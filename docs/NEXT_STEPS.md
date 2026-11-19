@@ -10,47 +10,38 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Further gizmo polish and richer parametric intent (scale/rotate + constraints).**
+**Scale/rotate parametric intent + richer mate solver.**
 
-- Translation gizmo now updates driving sketch plane origin + free points and recomputes the part (identity transform after).
-- Next: better hit-testing on arrowheads/rings, visual feedback while dragging, and scale/rotate that can update simple driving parameters or dimensions.
-- Keep headless-safe pure helpers.
-- Main branch remains runnable (features.py restored).
+- Gizmo hit-testing now prefers arrowheads (translate) and rings (rotate); active axis highlights yellow while dragging.
+- MainWindow restored and applies translation intent to sketches on commit.
+- Next: scale that can drive a simple dimension or sketch size; rotate that updates sketch plane; optional revolute/slider mate stubs.
 
 ### Next concrete tasks (Phase 3 / remaining)
-1. Optional richer mate solver (rotation composition, revolute/slider stubs).
-2. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
-3. Gizmo polish: better hit-testing, drag feedback, scale/rotate parametric intent.
+1. Scale/rotate parametric intent (update driving dimension or plane).
+2. Optional richer mate solver (rotation composition, revolute/slider stubs).
+3. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
 4. Constraint-aware sketch updates when applying transform intent.
 
 ## Recently Completed
-- Parametric-intent translation: gizmo translate on current part offsets sketches and recomputes body
-- Restored complete FeatureHistory / Extrude / Revolve implementation (was placeholder on main)
-- Real solid-of-revolution mesh generation for RevolveFeature (profile points revolved around Y-axis, partial angle end-caps, circle bounding-box fallback)
-- Richer gizmo visuals: arrowheads on translate axes, rotation rings for rotate mode, scale markers
-- Selection outline / edge highlight overlay for selected objects + basic gizmo axes drawing
-- Restored complete OpenGL paint path so transformed meshes are drawn
-- Apply full transform (rotation + scale) in viewport mesh drawing / framing / picking
+- Gizmo polish: pure tip/ring/marker hit-testing + drag visual feedback (brighter active axis)
+- Restored complete MainWindow (was empty on main) with parametric translation wiring
+- Parametric-intent translation: gizmo translate on current part offsets sketches and recomputes the part
+- Restored complete FeatureHistory / Extrude / Revolve implementation
+- Real solid-of-revolution mesh generation for RevolveFeature
+- Richer gizmo visuals: arrowheads, rotation rings, scale markers
+- Selection outline / edge highlight overlay
+- Full transform (rotation + scale) in viewport mesh drawing / framing / picking
 - UI panel for selecting and applying configuration values
-- Restored core FeatureHistory data model (was placeholder)
-- Assembly instance visualization in the viewport (transforms applied to SceneObjects)
-- Configurations (independent inputs) schema + core + apply + tests
+- Assembly instance visualization in the viewport
+- Configurations (independent inputs)
 - UI exposure of mates, BOM, grouped cut-list, and CSV exports
-- Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav, selection clear-on-miss
-- Basic BOM generation: schema + aggregation from Parts or Assembly instances
-- Assembly mates: rigid/fastened schema + basic location-offset solver
-- Cut-list enhancements: grouping by material/thickness + CSV export helper
-- Multi-part switching UI (parts list + switch + feature tree update)
-- DXF export stub for 2D sketches and closed profiles (ezdxf)
-- Simple Assembly container (schema + core data model + tests + research note)
-- Light UI integration: MainWindow works with Part (FeatureTree, recompute body, cut-list display)
-- Cut list / part list generation stub (schema + generator + tests)
-- Material / stock definitions (schema + MaterialStore + default library)
-- Multi-feature Part model (sketches + parameters + FeatureHistory → body mesh)
+- Viewport polish: RGB axes, shading modes, standard views, ortho toggle, keyboard nav
+- Basic BOM, Assembly mates, Cut-list enhancements, Multi-part switching UI
+- DXF export stub, Simple Assembly, Material/stock, Multi-feature Part model
 
 ## Notes for Automation
 - The end goal is a tool that feels like Fusion 360 / Onshape for parametric design and has practical manufacturing helpers like Mozaik (cut lists, nesting concepts, etc.).
 - Always prefer parametric, history-based, dimension-driven modeling over pure mesh editing.
-- **ezdxf is approved and preferred** for any DXF read/write, 2D drawing export, and manufacturing-related DXF workflows. Use it from `src/pymodeler/io/` when implementing DXF support.
+- **ezdxf is approved and preferred** for any DXF read/write, 2D drawing export, and manufacturing-related DXF workflows.
 - Keep main branch runnable and tested. Small complete increments.
 - Headless CI / sandbox lacks libEGL; keep pure-math and non-GL tests for viewport transform logic.
