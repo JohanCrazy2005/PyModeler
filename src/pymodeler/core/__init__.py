@@ -34,10 +34,12 @@ from .boolean import mesh_boolean, BooleanError
 from .features import (
     ExtrudeFeature,
     RevolveFeature,
+    HoleFeature,
     FeatureHistory,
     FeatureValidationError,
     validate_extrude_data,
     validate_revolve_data,
+    validate_hole_data,
     validate_history_data,
 )
 from .part import Part, PartValidationError, validate_part_data
@@ -113,10 +115,12 @@ __all__ = [
     "validate_parameter_data",
     "ExtrudeFeature",
     "RevolveFeature",
+    "HoleFeature",
     "FeatureHistory",
     "FeatureValidationError",
     "validate_extrude_data",
     "validate_revolve_data",
+    "validate_hole_data",
     "validate_history_data",
     "Part",
     "PartValidationError",
