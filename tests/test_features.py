@@ -6,9 +6,11 @@ from pymodeler.core.features import (
     ExtrudeFeature,
     FeatureHistory,
     FeatureValidationError,
+    HoleFeature,
     RevolveFeature,
     validate_extrude_data,
     validate_history_data,
+    validate_hole_data,
     validate_revolve_data,
 )
 from pymodeler.core.parameters import ParameterStore
@@ -226,3 +228,63 @@ def test_profile_extraction_arc_near_circle():
     sketch.add_arc(c, radius=2.0, start_angle=0, end_angle=359)
     profs = extract_simple_profiles(sketch)
     assert any(p["type"] == "circle" for p in profs)
+
+
+def test_hole_numeric():
+    feat = HoleFeature(diameter=6.0, depth=10.0, name="M6Hole")
+    assert feat.type == "hole"
+    assert feat.resolved_diameter() == 6.0
+    assert feat.resolved_depth() == 10.0
+    mesh = feat.generate_mesh()
+    assert len(mesh.vertices) > 20
+    assert len(mesh.faces) > 10
+    feat.validate()
+
+
+def test_hole_parameter():
+    store = ParameterStore()
+    store.add("Dia", value=8.0)
+    store.add("Dep", value=15.0)
+    feat = HoleFeature(diameter="Dia", depth="Dep")
+    assert feat.resolved_diameter(store) == 8.0
+    assert feat.resolved_depth(store) == 15.0
+    mesh = feat.generate_mesh(store)
+    assert len(mesh.vertices) > 0
+
+
+def test_hole_schema_roundtrip():
+    feat = HoleFeature(diameter="D", depth=5.0, center=[1.0, 2.0], segments=16)
+    data = feat.to_dict()
+    validate_hole_data(data)
+    restored = HoleFeature.from_dict(data)
+    assert restored.diameter == "D"
+    assert restored.depth == 5.0
+    assert restored.center == [1.0, 2.0]
+    assert restored.segments == 16
+
+
+def test_hole_invalid_schema():
+    with pytest.raises(FeatureValidationError):
+        HoleFeature.from_dict({"type": "hole", "diameter": 1.0})  # missing depth
+
+
+def test_hole_positive_required():
+    feat = HoleFeature(diameter=0.0, depth=1.0)
+    with pytest.raises(FeatureValidationError):
+        feat.generate_mesh()
+    feat2 = HoleFeature(diameter=1.0, depth=-1.0)
+    with pytest.raises(FeatureValidationError):
+        feat2.generate_mesh()
+
+
+def test_hole_in_history():
+    hist = FeatureHistory(name="WithHole")
+    feat = HoleFeature(diameter=4.0, depth=8.0)
+    hist.add_hole(feat)
+    assert len(hist.features) == 1
+    hist.validate()
+    restored = FeatureHistory.from_dict(hist.to_dict())
+    assert len(restored.get_hole_features()) == 1
+    meshes = hist.recompute_meshes({})
+    assert feat.id in meshes
+    assert len(meshes[feat.id].vertices) > 0
