@@ -10,18 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Further profile improvements + start Phase 4 feature stubs.**
+**Phase 4 Hole feature polish + Fillet stub, plus remaining profile improvements.**
 
-- Mate solver now uses full matrix composition for rigid/fastened (correct rotation composition) and accepts revolute/slider as stubs that apply the fixed offset.
-- Next: improve closed-profile extraction (proper arc joining into loops, holes) and begin a simple Fillet or Hole feature.
+- HoleFeature stub is complete: JSON Schema, parametric diameter/depth, center placement, cylindrical tool mesh generation, FeatureHistory integration, tests.
+- Research note: docs/research/hole-feature.md.
+- Also fixed Extrude symmetric + start_offset so the mesh correctly centers on the offset (tests now pass).
 
-### Next concrete tasks (Phase 3 remaining / Phase 4 start)
-1. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
-2. Constraint-aware sketch updates when applying transform intent (respect fixed/constrained points better).
-3. Begin Phase 4: simple Fillet or Hole feature stub (schema + basic mesh generation).
-4. Optional: richer DOF handling for revolute/slider (axis + limits stubs).
+### Next concrete tasks (Phase 4 start)
+1. Integrate Hole tool mesh into actual Boolean cut against the current part solid (use existing mesh_boolean).
+2. Support counterbore / countersink stubs on HoleFeature.
+3. Begin simple Fillet feature stub (schema + edge selection + basic mesh approximation or note as deferred).
+4. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
+5. Constraint-aware sketch updates when applying transform intent.
 
 ## Recently Completed
+- Hole feature stub (schema + cylinder tool mesh + history + tests)
+- Fixed Extrude symmetric mesh generation with start_offset
 - Richer mate solver: matrix-based transform composition for rigid/fastened + revolute/slider stubs
 - Scale + rotate parametric intent (points/radii/dimensions + plane axes) on gizmo commit
 - Gizmo polish: pure tip/ring/marker hit-testing + drag visual feedback (brighter active axis)
