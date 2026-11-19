@@ -1,7 +1,8 @@
 """Simple Assembly: container for Part instances with transforms and basic mates.
 
 Validated against schemas/assembly.schema.json.
-Supports rigid / fastened mates with a simple location-offset solver.
+Supports rigid / fastened mates with location + rotation offset solver.
+Revolute / slider types accepted as stubs (currently apply fixed offset).
 """
 
 from __future__ import annotations
@@ -94,7 +95,10 @@ class Instance:
 
 
 class Mate:
-    """A rigid or fastened mate locking the relative transform of two instances."""
+    """A mate locking or constraining the relative transform of two instances.
+
+    Types: rigid/fastened (0 DOF), revolute/slider (stubs).
+    """
 
     def __init__(
         self,
@@ -106,7 +110,7 @@ class Mate:
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
     ):
-        if type not in ("rigid", "fastened"):
+        if type not in ("rigid", "fastened", "revolute", "slider"):
             raise ValueError(f"Unsupported mate type: {type}")
         self.id = id or _new_id("mate")
         self.name = name or f"{type.capitalize()} Mate"
@@ -256,27 +260,34 @@ class Assembly:
         return False
 
     def solve_mates(self) -> None:
-        """Simple solver for rigid/fastened mates.
+        """Solver for mates.
 
-        For each mate, if one instance is grounded, move the other so that
-        its location = grounded.location + offset.location.
-        Rotation and scale are left unchanged in this basic implementation.
-        Multiple mates are applied in list order; last write wins for conflicts.
+        Rigid/fastened: set free instance location and rotation to grounded + offset
+        (component-wise Euler addition as basic composition; full matrix composition later).
+        Revolute/slider: currently apply the same fixed offset (stubs; DOF freeing later).
+        Multiple mates applied in list order; last write wins for conflicts.
+        If neither or both grounded, leave transforms as-is.
         """
         by_id = {inst.id: inst for inst in self.instances}
         for mate in self.mates:
-            if mate.type not in ("rigid", "fastened"):
+            if mate.type not in ("rigid", "fastened", "revolute", "slider"):
                 continue
             a = by_id.get(mate.instance_a)
             b = by_id.get(mate.instance_b)
             if a is None or b is None:
                 continue
             ox, oy, oz = mate.offset.location
+            orx, ory, orz = mate.offset.rotation
             if a.grounded and not b.grounded:
                 b.transform.location = [
                     a.transform.location[0] + ox,
                     a.transform.location[1] + oy,
                     a.transform.location[2] + oz,
+                ]
+                b.transform.rotation = [
+                    a.transform.rotation[0] + orx,
+                    a.transform.rotation[1] + ory,
+                    a.transform.rotation[2] + orz,
                 ]
             elif b.grounded and not a.grounded:
                 # Inverse: A should be B - offset
@@ -284,6 +295,11 @@ class Assembly:
                     b.transform.location[0] - ox,
                     b.transform.location[1] - oy,
                     b.transform.location[2] - oz,
+                ]
+                a.transform.rotation = [
+                    b.transform.rotation[0] - orx,
+                    b.transform.rotation[1] - ory,
+                    b.transform.rotation[2] - orz,
                 ]
             # If neither or both grounded, leave transforms as-is (user responsibility)
 

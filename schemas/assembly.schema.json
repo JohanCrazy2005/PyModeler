@@ -94,8 +94,8 @@
           },
           "type": {
             "type": "string",
-            "enum": ["rigid", "fastened"],
-            "description": "Mate type. rigid and fastened both lock relative transform (0 DOF)."
+            "enum": ["rigid", "fastened", "revolute", "slider"],
+            "description": "Mate type. rigid/fastened lock relative transform (0 DOF). revolute/slider are stubs that currently apply fixed offset (full DOF handling later)."
           },
           "instance_a": {
             "type": "string",
@@ -109,7 +109,7 @@
           },
           "offset": {
             "type": "object",
-            "description": "Desired relative transform of B with respect to A (location only for this increment)",
+            "description": "Desired relative transform of B with respect to A (location + rotation for rigid/fastened; stubs for others)",
             "additionalProperties": false,
             "properties": {
               "location": {
