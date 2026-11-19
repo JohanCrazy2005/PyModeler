@@ -55,14 +55,14 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] UI exposure of mates, BOM, and grouped cut-list / CSV export
 - [x] Configurations (independent inputs)
 - [x] Visualize assembly instances in viewport (transforms)
-- [x] UI panel for selecting configuration values (list / numeric / boolean)
+- [x] UI panel for selecting and applying configuration values (list / numeric / boolean)
 
 ## Phase 3 – Viewport, Interaction & Polish
 - [x] Real OpenGL / moderngl viewport improvements (orbit, pan, zoom, grid, RGB axes, shading modes, standard views, ortho)
 - [x] Camera controls, selection, feature highlighting (selection clear-on-miss + keyboard frame/views + full transform framing/picking + paint path)
 - [x] Full object transform (scale + rotation + location) applied to world vertices for framing, picking, and (when GL restored) drawing
 - [x] Selection outline / edge highlight overlay in the viewport
-- [x] Transform tools that respect parametric intent where possible (gizmo visuals + translation drives sketch points/plane origin + recompute)
+- [x] Transform tools that respect parametric intent where possible (gizmo visuals + translate/scale/rotate drive sketches/planes + recompute)
 - [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-19 (Gizmo hit-testing polish + MainWindow restore)
+Last updated: 2026-11-19 (Scale + rotate parametric intent on gizmo commit)
