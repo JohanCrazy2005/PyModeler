@@ -29,10 +29,10 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-18)
-- Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve, FeatureHistory, canvas tools, DOF stub, Booleans).
+- Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added.
-- Next: Richer mate solver, real solid feature mesh generation, parametric-intent transforms.
+- Next: parametric-intent transforms, richer mate solver, further profile improvements.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
@@ -40,6 +40,7 @@
 3. Optional richer mate types (revolute/slider stubs) and rotation composition.
 4. (done) Selection outline + richer gizmo visuals (arrowheads, rotation rings).
 5. (done) Full transform (rotation + scale) in viewport drawing + paint path.
-6. Replace approximate/stub with real profile-based Extrude/Revolve mesh generation.
+6. (done) Real profile-based Extrude and Revolve mesh generation (solid of revolution from points).
+7. Transform tools that update driving parameters or sketch entities when possible.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
