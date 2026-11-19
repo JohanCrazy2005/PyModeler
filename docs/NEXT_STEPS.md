@@ -10,22 +10,21 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Richer gizmo visuals (arrowheads + rotation rings) drawn in viewport.**
+**Transform tools that respect parametric intent where possible.**
 
-- Translate mode: RGB axes with arrowhead cones (lines + triangle fans)
-- Rotate mode: circular rings in the plane perpendicular to each local axis
-- Scale mode: simple end markers
-- Pure helpers `generate_ring_points` and `generate_arrow_base_points` are unit-tested (no Qt/GL required)
-- Drawing methods remain headless-safe (early return when no GL context)
+- Gizmo visuals (arrowheads + rotation rings) are in place
+- Next: when a transform is applied via gizmo, update driving parameters or sketch entities when possible instead of only the mesh transform
+- Keep headless-safe pure helpers for any new math
 - Main branch remains runnable
 
 ### Next concrete tasks (Phase 3 / remaining)
 1. Optional richer mate solver (rotation composition, revolute/slider stubs).
-2. Full profile extraction and solid mesh generation for Extrude / Revolve (currently approximate / stub for revolve).
-3. Transform tools that respect parametric intent where possible (Phase 3 remaining checklist item — gizmo visuals now improved).
+2. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
+3. Transform tools that respect parametric intent (update parameters / sketch points on gizmo drag).
 4. Further gizmo polish (better hit-testing on rings/arrows, visual feedback while dragging).
 
 ## Recently Completed
+- Real solid-of-revolution mesh generation for RevolveFeature (profile points revolved around Y-axis, partial angle end-caps, circle bounding-box fallback)
 - Richer gizmo visuals: arrowheads on translate axes, rotation rings for rotate mode, scale markers
 - Selection outline / edge highlight overlay for selected objects + basic gizmo axes drawing
 - Restored complete OpenGL paint path so transformed meshes are drawn
