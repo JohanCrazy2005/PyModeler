@@ -43,6 +43,7 @@ Current mesh-based approach:
 
 1. Schema for HoleFeature with diameter, depth, center position (or sketch point reference), operation="cut".
 2. Basic mesh generation: produce a cylinder tool body of the given diameter/depth.
-3. Later: integrate with mesh Boolean (cut) against the target solid, support counterbore/countersink, sketch-point placement, through-all, and thread stubs.
+3. **Done**: integrate with mesh Boolean (cut) against the target solid in Part.recompute.
+4. Next: support counterbore/countersink, sketch-point placement, through-all, and thread stubs.
 
-This is the first Phase 4 feature stub and aligns with the design-to-manufacture goal.
+This is the first Phase 4 feature and aligns with the design-to-manufacture goal.

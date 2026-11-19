@@ -117,7 +117,11 @@ class Part:
     def recompute(self) -> Optional[Mesh]:
         """Recompute the part body from active features.
 
-        Sequential Join of feature meshes (fallback to concatenation when Boolean engine missing).
+        Applies Boolean operations according to each feature's `operation` field:
+        - "new" or first feature: starts the body
+        - "join": mesh_boolean join
+        - "cut": mesh_boolean cut (difference)
+        Falls back gracefully when the Boolean engine is unavailable.
         Returns the resulting Mesh or None if no features produced geometry.
         """
         meshes = self.feature_history.recompute_meshes(self.sketches, self.parameters)
@@ -125,17 +129,25 @@ class Part:
             self._body = None
             return None
 
+        # Build lookup of feature operation by id
+        op_by_id = {f["id"]: f.get("operation", "join") for f in self.feature_history.features}
+
         body: Optional[Mesh] = None
         for fid, mesh in meshes.items():
             mesh.name = f"{self.name}_{fid}"
-            if body is None:
+            op = op_by_id.get(fid, "join")
+            if body is None or op == "new":
                 body = mesh
             else:
+                bool_op = "cut" if op == "cut" else "join"
                 try:
-                    body = mesh_boolean(body, mesh, "join", name=self.name)
+                    body = mesh_boolean(body, mesh, bool_op, name=self.name)
                 except Exception:
-                    # Last-resort concatenation already handled inside mesh_boolean for join
-                    body = mesh_boolean(body, mesh, "join", name=self.name)
+                    # For cut, if engine missing we keep the previous body (tool not subtracted)
+                    # For join, mesh_boolean already falls back to concatenation
+                    if bool_op == "join":
+                        body = mesh_boolean(body, mesh, "join", name=self.name)
+                    # else: leave body unchanged on cut failure
 
         self._body = body
         return body

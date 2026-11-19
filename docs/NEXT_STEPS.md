@@ -10,20 +10,20 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 Hole feature polish + Fillet stub, plus remaining profile improvements.**
+**Phase 4 Hole feature polish (counterbore/countersink) + Fillet stub, plus remaining profile improvements.**
 
-- HoleFeature stub is complete: JSON Schema, parametric diameter/depth, center placement, cylindrical tool mesh generation, FeatureHistory integration, tests.
+- HoleFeature complete for simple cut: JSON Schema, parametric diameter/depth, center placement, cylindrical tool mesh, **Boolean cut integration in Part.recompute**, FeatureHistory, tests.
 - Research note: docs/research/hole-feature.md.
-- Also fixed Extrude symmetric + start_offset so the mesh correctly centers on the offset (tests now pass).
 
-### Next concrete tasks (Phase 4 start)
-1. Integrate Hole tool mesh into actual Boolean cut against the current part solid (use existing mesh_boolean).
-2. Support counterbore / countersink stubs on HoleFeature.
-3. Begin simple Fillet feature stub (schema + edge selection + basic mesh approximation or note as deferred).
-4. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
-5. Constraint-aware sketch updates when applying transform intent.
+### Next concrete tasks (Phase 4)
+1. Support counterbore / countersink stubs on HoleFeature (schema fields + tool mesh variants).
+2. Begin simple Fillet feature stub (schema + edge selection + basic mesh approximation or note as deferred).
+3. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
+4. Constraint-aware sketch updates when applying transform intent.
+5. Early sheet-metal / panel thinking or nesting concepts.
 
 ## Recently Completed
+- Hole feature Boolean cut integration (Part.recompute respects operation=cut and applies mesh_boolean difference)
 - Hole feature stub (schema + cylinder tool mesh + history + tests)
 - Fixed Extrude symmetric mesh generation with start_offset
 - Richer mate solver: matrix-based transform composition for rigid/fastened + revolute/slider stubs

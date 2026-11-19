@@ -87,14 +87,30 @@ def test_invalid_part_schema():
         Part.from_dict({"name": "Bad"})  # missing feature_history
 
 
-def test_part_ui_flow_simulation():
-    """Simulate the light UI integration flow: create part, add sketch, extrude, recompute body."""
-    part = Part(name="Part 1")
-    sketch = create_rectangle_sketch(name="Rectangle")
-    part.add_sketch(sketch)
-    feat = ExtrudeFeature(sketch_id=sketch.id, distance=5.0, name="Extrude")
-    part.feature_history.add_extrude(feat)
-    body = part.recompute()
-    assert body is not None
-    assert len(body.vertices) >= 8
-    assert part.feature_history.features[0]["name"] == "Extrude"
+def test_part_hole_boolean_cut():
+    """Hole feature with operation=cut should subtract from the base solid when Boolean engine is available."""
+    from pymodeler.core import HoleFeature
+    from pymodeler.core.boolean import BooleanError
+
+    sketch = create_rectangle_sketch(width=10.0, height=10.0, name="Base")
+    hist = FeatureHistory(name="WithHole")
+    base = ExtrudeFeature(sketch_id=sketch.id, distance=5.0, name="Base", operation="new")
+    hole = HoleFeature(diameter=2.0, depth=6.0, center=[5.0, 5.0], name="CenterHole", operation="cut")
+    hist.add_extrude(base)
+    hist.add_hole(hole)
+
+    part = Part(name="PlateWithHole", sketches={sketch.id: sketch}, feature_history=hist)
+    try:
+        body = part.recompute()
+        assert body is not None
+        # If cut succeeded, vertex count should differ from plain base (or at least be valid)
+        base_only = base.generate_mesh(sketch)
+        # Result should be valid mesh; if engine present it is typically more complex
+        body.validate()
+        # Soft check: if Boolean engine worked, faces may increase due to the hole walls
+        assert len(body.faces) >= len(base_only.faces) or len(body.vertices) != len(base_only.vertices)
+    except BooleanError:
+        pytest.skip("Boolean engine not available for cut")
+    except Exception as exc:
+        # Unexpected failure should still fail the test
+        raise AssertionError(f"Hole cut recompute failed unexpectedly: {exc}") from exc

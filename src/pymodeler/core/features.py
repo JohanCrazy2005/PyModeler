@@ -321,7 +321,8 @@ class HoleFeature:
     """Parametric simple Hole feature.
 
     Generates a cylindrical tool mesh (the cutter) of the given diameter and depth.
-    Actual Boolean cut against a target solid is left for a later increment.
+    When the feature's operation is "cut" (default), Part.recompute applies a Boolean
+    difference of this tool against the current solid body.
     """
 
     def __init__(

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/hole.schema.json",
   "title": "HoleFeature",
-  "description": "Parametric Hole feature: creates a cylindrical cut (simple hole) at a given position. Intended for manufacturing (fasteners, joinery). Mesh generation currently produces the tool cylinder.",
+  "description": "Parametric Hole feature: creates a cylindrical cut (simple hole) at a given position. Intended for manufacturing (fasteners, joinery). Tool mesh is generated and Boolean-cut against the part body when operation=cut.",
   "type": "object",
   "required": ["id", "type", "diameter", "depth"],
   "additionalProperties": false,
@@ -61,7 +61,7 @@
       "type": "string",
       "enum": ["cut", "new"],
       "default": "cut",
-      "description": "Boolean operation intent. Currently generates tool mesh only."
+      "description": "Boolean operation intent. 'cut' subtracts the tool cylinder from the current part body."
     },
     "metadata": {
       "type": "object",
