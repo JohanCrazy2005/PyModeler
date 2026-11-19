@@ -31,8 +31,8 @@
 ## Current Status (2026-11-19)
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
-- Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation on gizmo commit is complete (sketch offset + recompute).
-- Next: gizmo polish, scale/rotate intent, richer mate solver, further profile improvements.
+- Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation on gizmo commit is complete (sketch offset + recompute). Gizmo hit-testing prefers tips/rings with drag highlight.
+- Next: scale/rotate parametric intent, richer mate solver, further profile improvements.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
@@ -42,5 +42,6 @@
 5. (done) Full transform (rotation + scale) in viewport drawing + paint path.
 6. (done) Real profile-based Extrude and Revolve mesh generation (solid of revolution from points).
 7. (done for translation) Transform tools that update driving parameters or sketch entities when possible.
+8. (done) Gizmo hit-testing polish + drag visual feedback.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.

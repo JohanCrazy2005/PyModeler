@@ -63,6 +63,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Full object transform (scale + rotation + location) applied to world vertices for framing, picking, and (when GL restored) drawing
 - [x] Selection outline / edge highlight overlay in the viewport
 - [x] Transform tools that respect parametric intent where possible (gizmo visuals + translation drives sketch points/plane origin + recompute)
+- [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
 - [ ] Fillet / Chamfer / Shell / Hole features
@@ -78,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-19 (Parametric-intent translation on gizmo commit)
+Last updated: 2026-11-19 (Gizmo hit-testing polish + MainWindow restore)
