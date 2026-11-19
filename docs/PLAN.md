@@ -32,7 +32,8 @@
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation, scale, and rotate on gizmo commit are complete (sketch offset/scale/dimensions + plane axes + recompute). Gizmo hit-testing prefers tips/rings with drag highlight.
-- Next: further profile improvements, then Phase 4 feature stubs (Fillet/Hole).
+- Phase 4 started: **HoleFeature stub** (schema, parametric diameter/depth, center, cylindrical tool mesh, FeatureHistory integration, tests). Research documented in docs/research/hole-feature.md. Extrude symmetric mesh generation also corrected.
+- Next: Boolean cut integration for Hole, counterbore/countersink, Fillet stub, profile loop improvements.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
@@ -43,5 +44,9 @@
 6. (done) Real profile-based Extrude and Revolve mesh generation (solid of revolution from points).
 7. (done for translate/scale/rotate) Transform tools that update driving parameters or sketch entities when possible.
 8. (done) Gizmo hit-testing polish + drag visual feedback.
+9. (done) Hole feature stub (schema + tool mesh).
+10. Integrate Hole into Boolean cut against part solid.
+11. Fillet / Chamfer stubs.
+12. Profile extraction improvements (arcs into loops, holes).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
