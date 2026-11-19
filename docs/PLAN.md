@@ -32,8 +32,8 @@
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation, scale, and rotate on gizmo commit are complete (sketch offset/scale/dimensions + plane axes + recompute). Gizmo hit-testing prefers tips/rings with drag highlight.
-- Phase 4 started: **HoleFeature** (schema, parametric diameter/depth, center, cylindrical tool mesh, FeatureHistory integration, **Boolean cut against part body**). Research documented in docs/research/hole-feature.md. Extrude symmetric mesh generation also corrected.
-- Next: Boolean cut integration for Hole, counterbore/countersink, Fillet stub, profile loop improvements.
+- Phase 4 started: **HoleFeature** (schema, parametric diameter/depth, center, cylindrical tool mesh, FeatureHistory integration, **Boolean cut against part body**). Research documented in docs/research/hole-feature.md. Extrude symmetric mesh generation also corrected. **FilletFeature stub** (schema, parametric radius, edge list, placeholder mesh, FeatureHistory). Research in docs/research/fillet-feature.md.
+- Next: Chamfer stub, profile loop improvements, through-all Hole, basic mesh bevel for Fillet.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
@@ -46,7 +46,9 @@
 8. (done) Gizmo hit-testing polish + drag visual feedback.
 9. (done) Hole feature stub (schema + tool mesh).
 10. (done) Integrate Hole into Boolean cut against part solid.
-11. Fillet / Chamfer stubs.
-12. Profile extraction improvements (arcs into loops, holes).
+11. (done) Fillet feature stub (schema + placeholder).
+12. Chamfer stub.
+13. Profile extraction improvements (arcs into loops, holes).
+14. Basic mesh bevel approximation for Fillet.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.

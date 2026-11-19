@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/fillet.schema.json",
+  "title": "FilletFeature",
+  "description": "Parametric Fillet feature: rounds selected edges with a given radius. Stub implementation stores intent; full mesh fillet (rolling-ball) is deferred. Intended for manufacturing (stress relief, tool access).",
+  "type": "object",
+  "required": ["id", "type", "radius"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique feature identifier"
+    },
+    "type": {
+      "type": "string",
+      "const": "fillet",
+      "description": "Feature type discriminator"
+    },
+    "name": {
+      "type": "string",
+      "default": "Fillet",
+      "description": "Human-readable feature name"
+    },
+    "radius": {
+      "description": "Fillet radius: numeric value or parameter name / expression string. Positive.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "edges": {
+      "type": "array",
+      "items": { "type": ["string", "integer"] },
+      "description": "Optional list of edge identifiers or mesh edge indices to fillet. Empty or omitted means all edges (or deferred selection).",
+      "default": []
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["modify", "new"],
+      "default": "modify",
+      "description": "Intent: modify the current solid by filleting edges. Full Boolean-style application deferred."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

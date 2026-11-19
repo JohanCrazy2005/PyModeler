@@ -24,6 +24,7 @@ _SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas"
 _EXTRUDE_SCHEMA_PATH = _SCHEMA_DIR / "extrude.schema.json"
 _REVOLVE_SCHEMA_PATH = _SCHEMA_DIR / "revolve.schema.json"
 _HOLE_SCHEMA_PATH = _SCHEMA_DIR / "hole.schema.json"
+_FILLET_SCHEMA_PATH = _SCHEMA_DIR / "fillet.schema.json"
 _HISTORY_SCHEMA_PATH = _SCHEMA_DIR / "feature_history.schema.json"
 
 with open(_EXTRUDE_SCHEMA_PATH, encoding="utf-8") as f:
@@ -32,12 +33,15 @@ with open(_REVOLVE_SCHEMA_PATH, encoding="utf-8") as f:
     REVOLVE_SCHEMA = json.load(f)
 with open(_HOLE_SCHEMA_PATH, encoding="utf-8") as f:
     HOLE_SCHEMA = json.load(f)
+with open(_FILLET_SCHEMA_PATH, encoding="utf-8") as f:
+    FILLET_SCHEMA = json.load(f)
 with open(_HISTORY_SCHEMA_PATH, encoding="utf-8") as f:
     HISTORY_SCHEMA = json.load(f)
 
 _EXTRUDE_VALIDATOR = Draft202012Validator(EXTRUDE_SCHEMA)
 _REVOLVE_VALIDATOR = Draft202012Validator(REVOLVE_SCHEMA)
 _HOLE_VALIDATOR = Draft202012Validator(HOLE_SCHEMA)
+_FILLET_VALIDATOR = Draft202012Validator(FILLET_SCHEMA)
 _HISTORY_VALIDATOR = Draft202012Validator(HISTORY_SCHEMA)
 
 
@@ -64,6 +68,13 @@ def validate_hole_data(data: dict) -> None:
     if errors:
         messages = [f"{list(e.path)}: {e.message}" for e in errors]
         raise FeatureValidationError("Hole schema validation failed:\n" + "\n".join(messages))
+
+
+def validate_fillet_data(data: dict) -> None:
+    errors = sorted(_FILLET_VALIDATOR.iter_errors(data), key=lambda e: e.path)
+    if errors:
+        messages = [f"{list(e.path)}: {e.message}" for e in errors]
+        raise FeatureValidationError("Fillet schema validation failed:\n" + "\n".join(messages))
 
 
 def validate_history_data(data: dict) -> None:
@@ -428,6 +439,76 @@ class HoleFeature:
         return mesh
 
 
+class FilletFeature:
+    """Parametric Fillet feature stub.
+
+    Stores radius and optional edge selection. Full rolling-ball mesh fillet is deferred.
+    generate_mesh returns a small placeholder sphere whose radius matches the fillet radius
+    so the feature is visible in the timeline / recompute path.
+    """
+
+    def __init__(
+        self,
+        radius: float | str = 1.0,
+        name: str = "Fillet",
+        edges: Optional[list] = None,
+        operation: str = "modify",
+        metadata: Optional[dict] = None,
+        id: Optional[str] = None,
+    ):
+        self.id = id or _new_id("fillet")
+        self.type = "fillet"
+        self.name = name
+        self.radius = radius
+        self.edges = edges or []
+        self.operation = operation
+        self.metadata = metadata or {}
+        self.validate()
+
+    def to_dict(self) -> dict:
+        data: dict[str, Any] = {
+            "id": self.id,
+            "type": self.type,
+            "name": self.name,
+            "radius": self.radius,
+            "edges": self.edges,
+            "operation": self.operation,
+        }
+        if self.metadata:
+            data["metadata"] = self.metadata
+        return data
+
+    def validate(self) -> None:
+        validate_fillet_data(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "FilletFeature":
+        validate_fillet_data(data)
+        return cls(
+            radius=data["radius"],
+            name=data.get("name", "Fillet"),
+            edges=data.get("edges"),
+            operation=data.get("operation", "modify"),
+            metadata=data.get("metadata"),
+            id=data.get("id"),
+        )
+
+    def resolved_radius(self, parameters: Optional[ParameterStore] = None) -> float:
+        return _resolve_value(self.radius, parameters, 1.0)
+
+    def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Return a small placeholder sphere of the fillet radius.
+
+        Real edge filleting on the part body is deferred (requires robust mesh bevel or B-rep).
+        """
+        r = self.resolved_radius(parameters)
+        if r <= 0:
+            raise FeatureValidationError("Fillet radius must be positive")
+        from .mesh import create_sphere
+        mesh = create_sphere(radius=r, name=self.id)
+        return mesh
+
+
 class FeatureHistory:
     """Ordered timeline of features with rollback support."""
 
@@ -484,6 +565,10 @@ class FeatureHistory:
         self.features.append(feat.to_dict())
         self.validate()
 
+    def add_fillet(self, feat: "FilletFeature") -> None:
+        self.features.append(feat.to_dict())
+        self.validate()
+
     def get_extrude_features(self) -> List[ExtrudeFeature]:
         return [ExtrudeFeature.from_dict(f) for f in self.features if f.get("type") == "extrude"]
 
@@ -492,6 +577,9 @@ class FeatureHistory:
 
     def get_hole_features(self) -> List["HoleFeature"]:
         return [HoleFeature.from_dict(f) for f in self.features if f.get("type") == "hole"]
+
+    def get_fillet_features(self) -> List["FilletFeature"]:
+        return [FilletFeature.from_dict(f) for f in self.features if f.get("type") == "fillet"]
 
     def recompute_meshes(
         self, sketches: Dict[str, Sketch], parameters: Optional[ParameterStore] = None
@@ -521,6 +609,9 @@ class FeatureHistory:
                     result[fid] = feat.generate_mesh(sketch, params)
                 elif fdict.get("type") == "hole":
                     feat = HoleFeature.from_dict(fdict)
+                    result[fid] = feat.generate_mesh(params)
+                elif fdict.get("type") == "fillet":
+                    feat = FilletFeature.from_dict(fdict)
                     result[fid] = feat.generate_mesh(params)
             except Exception:
                 from .mesh import create_cube

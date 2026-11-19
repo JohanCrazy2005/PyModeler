@@ -10,19 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 Hole feature polish complete for counterbore/countersink stubs; next is Fillet stub + profile improvements.**
+**Phase 4 Fillet feature stub complete; next is Chamfer stub or profile improvements.**
 
-- HoleFeature now supports simple, counterbore, and countersink variants: JSON Schema fields, parametric diameters/depths/angles, tool mesh variants (cylinder / stepped / conical), Boolean cut integration, FeatureHistory, tests.
-- Research note: docs/research/hole-feature.md.
+- FilletFeature stub: JSON Schema (radius, edges list, operation=modify), parametric radius, placeholder sphere mesh, FeatureHistory integration, tests.
+- Research note: docs/research/fillet-feature.md.
+- Full rolling-ball / mesh bevel fillet deferred (mesh-based limitation).
 
 ### Next concrete tasks (Phase 4)
-1. Begin simple Fillet feature stub (schema + edge selection + basic mesh approximation or note as deferred).
+1. Begin simple Chamfer feature stub (schema + distance + edge selection + basic mesh approximation or note as deferred).
 2. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
 3. Constraint-aware sketch updates when applying transform intent.
 4. Early sheet-metal / panel thinking or nesting concepts.
 5. Through-all / to-face extents for Hole.
+6. Basic mesh bevel approximation for Fillet on selected edges.
 
 ## Recently Completed
+- Fillet feature stub (schema + radius/edges + placeholder mesh + history + tests)
 - Hole feature counterbore/countersink stubs (schema + tool mesh variants)
 - Hole feature Boolean cut integration (Part.recompute respects operation=cut and applies mesh_boolean difference)
 - Hole feature stub (schema + cylinder tool mesh + history + tests)

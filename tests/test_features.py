@@ -6,9 +6,11 @@ from pymodeler.core.features import (
     ExtrudeFeature,
     FeatureHistory,
     FeatureValidationError,
+    FilletFeature,
     HoleFeature,
     RevolveFeature,
     validate_extrude_data,
+    validate_fillet_data,
     validate_history_data,
     validate_hole_data,
     validate_revolve_data,
@@ -288,3 +290,59 @@ def test_hole_in_history():
     meshes = hist.recompute_meshes({})
     assert feat.id in meshes
     assert len(meshes[feat.id].vertices) > 0
+
+
+def test_fillet_numeric():
+    feat = FilletFeature(radius=2.5, name="EdgeRound")
+    assert feat.type == "fillet"
+    assert feat.resolved_radius() == 2.5
+    mesh = feat.generate_mesh()
+    assert len(mesh.vertices) > 0
+    feat.validate()
+
+
+def test_fillet_parameter():
+    store = ParameterStore()
+    store.add("R", value=1.5)
+    feat = FilletFeature(radius="R")
+    assert feat.resolved_radius(store) == 1.5
+    mesh = feat.generate_mesh(store)
+    assert len(mesh.vertices) > 0
+
+
+def test_fillet_schema_roundtrip():
+    feat = FilletFeature(radius="FilletR", edges=[0, 1, "edge_top"], name="TopFillet")
+    data = feat.to_dict()
+    validate_fillet_data(data)
+    restored = FilletFeature.from_dict(data)
+    assert restored.radius == "FilletR"
+    assert restored.edges == [0, 1, "edge_top"]
+    assert restored.name == "TopFillet"
+
+
+def test_fillet_invalid_schema():
+    with pytest.raises(FeatureValidationError):
+        FilletFeature.from_dict({"type": "fillet"})  # missing radius
+
+
+def test_fillet_positive_required():
+    feat = FilletFeature(radius=0.0)
+    with pytest.raises(FeatureValidationError):
+        feat.generate_mesh()
+    feat2 = FilletFeature(radius=-1.0)
+    with pytest.raises(FeatureValidationError):
+        feat2.generate_mesh()
+
+
+def test_fillet_in_history():
+    hist = FeatureHistory(name="WithFillet")
+    feat = FilletFeature(radius=1.0)
+    hist.add_fillet(feat)
+    assert len(hist.features) == 1
+    hist.validate()
+    restored = FeatureHistory.from_dict(hist.to_dict())
+    assert len(restored.get_fillet_features()) == 1
+    meshes = hist.recompute_meshes({})
+    assert feat.id in meshes
+    assert len(meshes[feat.id].vertices) > 0
+
