@@ -1,8 +1,8 @@
 """Simple Assembly: container for Part instances with transforms and basic mates.
 
 Validated against schemas/assembly.schema.json.
-Supports rigid / fastened mates with location + rotation offset solver.
-Revolute / slider types accepted as stubs (currently apply fixed offset).
+Supports rigid / fastened mates with proper matrix-based location + rotation composition.
+Revolute / slider types accepted as stubs (currently apply the fixed offset; DOF freeing later).
 """
 
 from __future__ import annotations
@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 
 import jsonschema
 from jsonschema import Draft202012Validator
+import numpy as np
 
 from .part import Part
 from .scene import Transform
@@ -42,6 +43,28 @@ def validate_assembly_data(data: dict) -> None:
 
 def _new_id(prefix: str = "asm") -> str:
     return f"{prefix}_{uuid.uuid4().hex[:8]}"
+
+
+def _matrix_to_transform(mat: np.ndarray) -> Transform:
+    """Extract location and XYZ Euler rotation from a 4x4 matrix (scale assumed ~1)."""
+    loc = mat[:3, 3].tolist()
+    R = mat[:3, :3]
+    # Normalize columns in case of residual scale
+    for i in range(3):
+        n = np.linalg.norm(R[:, i])
+        if n > 1e-8:
+            R[:, i] /= n
+    sy = -R[2, 0]
+    cy = float(np.sqrt(max(0.0, 1.0 - sy * sy)))
+    if cy > 1e-6:
+        rx = float(np.arctan2(R[2, 1], R[2, 2]))
+        ry = float(np.arctan2(sy, cy))
+        rz = float(np.arctan2(R[1, 0], R[0, 0]))
+    else:
+        rx = float(np.arctan2(-R[1, 2], R[1, 1]))
+        ry = float(np.arctan2(sy, cy))
+        rz = 0.0
+    return Transform(location=loc, rotation=[rx, ry, rz])
 
 
 class Instance:
@@ -262,8 +285,9 @@ class Assembly:
     def solve_mates(self) -> None:
         """Solver for mates.
 
-        Rigid/fastened: set free instance location and rotation to grounded + offset
-        (component-wise Euler addition as basic composition; full matrix composition later).
+        Rigid/fastened: compose world transform of free instance as
+        world_free = world_grounded * offset (or inverse) using full 4x4 matrices,
+        then extract location + XYZ Euler. This correctly handles rotation composition.
         Revolute/slider: currently apply the same fixed offset (stubs; DOF freeing later).
         Multiple mates applied in list order; last write wins for conflicts.
         If neither or both grounded, leave transforms as-is.
@@ -276,31 +300,24 @@ class Assembly:
             b = by_id.get(mate.instance_b)
             if a is None or b is None:
                 continue
-            ox, oy, oz = mate.offset.location
-            orx, ory, orz = mate.offset.rotation
+            mat_offset = mate.offset.matrix()
             if a.grounded and not b.grounded:
-                b.transform.location = [
-                    a.transform.location[0] + ox,
-                    a.transform.location[1] + oy,
-                    a.transform.location[2] + oz,
-                ]
-                b.transform.rotation = [
-                    a.transform.rotation[0] + orx,
-                    a.transform.rotation[1] + ory,
-                    a.transform.rotation[2] + orz,
-                ]
+                mat_a = a.transform.matrix()
+                mat_b = mat_a @ mat_offset
+                new_t = _matrix_to_transform(mat_b)
+                b.transform.location = new_t.location
+                b.transform.rotation = new_t.rotation
             elif b.grounded and not a.grounded:
-                # Inverse: A should be B - offset
-                a.transform.location = [
-                    b.transform.location[0] - ox,
-                    b.transform.location[1] - oy,
-                    b.transform.location[2] - oz,
-                ]
-                a.transform.rotation = [
-                    b.transform.rotation[0] - orx,
-                    b.transform.rotation[1] - ory,
-                    b.transform.rotation[2] - orz,
-                ]
+                mat_b = b.transform.matrix()
+                # inverse: world_A = world_B * inv(offset)
+                try:
+                    mat_offset_inv = np.linalg.inv(mat_offset)
+                except np.linalg.LinAlgError:
+                    continue
+                mat_a = mat_b @ mat_offset_inv
+                new_t = _matrix_to_transform(mat_a)
+                a.transform.location = new_t.location
+                a.transform.rotation = new_t.rotation
             # If neither or both grounded, leave transforms as-is (user responsibility)
 
     def __repr__(self) -> str:

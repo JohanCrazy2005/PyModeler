@@ -1,6 +1,7 @@
 """Tests for the simple Assembly data model."""
 
 import pytest
+import numpy as np
 
 from pymodeler.core import (
     Assembly,
@@ -128,6 +129,48 @@ def test_solve_rigid_mate():
     assert ia.transform.location == [10.0, 0.0, 0.0]
 
 
+def test_solve_rigid_mate_with_rotation():
+    """Matrix composition correctly applies rotation offset even when grounded has rotation."""
+    part_a = _make_simple_part("Anchor")
+    part_b = _make_simple_part("Follower")
+    asm = Assembly()
+    # Grounded A rotated 90 deg around Z
+    ia = asm.add_instance(
+        part_a,
+        transform=Transform(location=[0.0, 0.0, 0.0], rotation=[0.0, 0.0, np.pi / 2]),
+        grounded=True,
+    )
+    ib = asm.add_instance(part_b)
+    # Offset: +1 in X of A's local frame (which is world +Y after 90° Z rot)
+    asm.add_mate(ia, ib, type="rigid", offset=Transform(location=[1.0, 0.0, 0.0]))
+
+    asm.solve_mates()
+    # Expected world location of B ≈ [0, 1, 0]
+    loc = ib.transform.location
+    assert abs(loc[0]) < 1e-5
+    assert abs(loc[1] - 1.0) < 1e-5
+    assert abs(loc[2]) < 1e-5
+    # Rotation should match A's rotation (offset has none)
+    rot = ib.transform.rotation
+    assert abs(rot[2] - np.pi / 2) < 1e-5
+
+
+def test_revolute_slider_stubs_accepted():
+    """Revolute and slider are accepted as stubs (apply fixed offset for now)."""
+    part_a = _make_simple_part("A")
+    part_b = _make_simple_part("B")
+    asm = Assembly()
+    ia = asm.add_instance(part_a, grounded=True)
+    ib = asm.add_instance(part_b)
+    m1 = asm.add_mate(ia, ib, type="revolute", offset=Transform(location=[5.0, 0.0, 0.0]))
+    assert m1.type == "revolute"
+    asm.solve_mates()
+    assert ib.transform.location == [5.0, 0.0, 0.0]
+
+    m2 = asm.add_mate(ia, ib, type="slider")
+    assert m2.type == "slider"
+
+
 def test_invalid_mate_type():
     with pytest.raises(ValueError):
-        Mate(instance_a="a", instance_b="b", type="revolute")
+        Mate(instance_a="a", instance_b="b", type="ball")

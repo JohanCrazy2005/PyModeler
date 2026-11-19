@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-19 (Scale + rotate parametric intent on gizmo commit)
+Last updated: 2026-11-19 (Richer mate solver: matrix composition + revolute/slider stubs)

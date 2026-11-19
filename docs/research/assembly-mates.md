@@ -31,3 +31,9 @@ Research for PyModeler basic Assembly mates (rigid / fastened). Sources: Autodes
 4. Update living docs and research note (this file).
 
 Future increments: revolute/slider, full transform composition, UI exposure, motion simulation.
+
+## Update 2026-11-19 – Richer solver
+- Rigid/fastened now use full 4x4 matrix composition (world_B = world_A @ offset) with Euler extraction.
+- Revolute and slider types are accepted as stubs (apply fixed offset; full DOF later).
+- Tests cover rotation composition and stub acceptance.
+
