@@ -10,19 +10,20 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Scale/rotate parametric intent + richer mate solver.**
+**Richer mate solver + profile improvements.**
 
-- Gizmo hit-testing now prefers arrowheads (translate) and rings (rotate); active axis highlights yellow while dragging.
-- MainWindow restored and applies translation intent to sketches on commit.
-- Next: scale that can drive a simple dimension or sketch size; rotate that updates sketch plane; optional revolute/slider mate stubs.
+- Scale/rotate parametric intent is now applied on gizmo commit (scale drives points/radii/dimensions; rotate updates sketch plane axes).
+- Translation, scale, and rotate all reset the free transform after recompute.
+- Next: optional revolute/slider mate stubs and rotation composition; better closed-profile extraction (arcs into loops, holes).
 
-### Next concrete tasks (Phase 3 / remaining)
-1. Scale/rotate parametric intent (update driving dimension or plane).
-2. Optional richer mate solver (rotation composition, revolute/slider stubs).
-3. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
-4. Constraint-aware sketch updates when applying transform intent.
+### Next concrete tasks (Phase 3 remaining / Phase 4 start)
+1. Optional richer mate solver (rotation composition, revolute/slider stubs).
+2. Further profile improvements (arcs properly joined into loops, holes, non-Y axis for revolve).
+3. Constraint-aware sketch updates when applying transform intent (respect fixed/constrained points better).
+4. Begin Phase 4: simple Fillet or Hole feature stub (schema + basic mesh).
 
 ## Recently Completed
+- Scale + rotate parametric intent (points/radii/dimensions + plane axes) on gizmo commit
 - Gizmo polish: pure tip/ring/marker hit-testing + drag visual feedback (brighter active axis)
 - Restored complete MainWindow (was empty on main) with parametric translation wiring
 - Parametric-intent translation: gizmo translate on current part offsets sketches and recomputes the part
