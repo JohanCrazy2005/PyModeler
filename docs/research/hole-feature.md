@@ -46,4 +46,6 @@ Current mesh-based approach:
 3. **Done**: integrate with mesh Boolean (cut) against the target solid in Part.recompute.
 4. Next: support counterbore/countersink, sketch-point placement, through-all, and thread stubs.
 
+**2026-11-20**: Core implementation of `extent` (`blind` | `through_all`) and optional `through_depth` is complete. through_all produces a long tool cylinder (default 1000 or explicit) for Boolean pierce.
+
 This is the first Phase 4 feature and aligns with the design-to-manufacture goal.
