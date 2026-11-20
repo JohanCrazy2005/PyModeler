@@ -26,12 +26,14 @@ Sources: Onshape Help – Extrude, Revolve.
 
 ## Implications for PyModeler
 
-Current implementation only handles axis-aligned bounding boxes of points (simple rectangles) and falls back to a cube/cylinder.
+Current implementation (updated 2026-11-19):
+- Detects simple closed polygons from connected line entities.
+- Standalone circles as circular profiles.
+- **Arcs are now properly joined into closed loops**: when an arc's computed start/end match existing point entities within tolerance, the arc is discretized and inserted into the polygon points of the cycle.
 
 Next increments:
-1. Detect simple closed polygons formed by connected line entities.
-2. Support circle entities as circular profiles (faceted).
-3. Discretize arcs into polyline segments for inclusion in profiles.
-4. Later: full region detection with holes, proper loop finding.
+1. Support for holes / nested profiles (outer + inner regions).
+2. Better loop finding for more complex sketches.
+3. Non-Y axis support and true solid-of-revolution from profile points for Revolve.
 
-This keeps the mesh-based approach while making feature generation more useful for real sketches.
+This keeps the mesh-based approach while making feature generation more useful for real sketches that include arcs.
