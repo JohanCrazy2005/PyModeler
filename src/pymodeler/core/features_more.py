@@ -1,5 +1,6 @@
 """Additional features: Fillet, Chamfer, FeatureHistory."""
 from __future__ import annotations
+import math
 from typing import Any, Dict, List, Optional
 from .mesh import Mesh
 from .parameters import ParameterStore
@@ -91,10 +92,11 @@ class FilletFeature:
 
 
 class ChamferFeature:
-    """Parametric Chamfer feature stub.
+    """Parametric Chamfer feature.
 
-    Stores distance and optional edge selection. Full edge bevel mesh is deferred.
-    generate_mesh returns a small placeholder cone of the chamfer distance.
+    Supports equal-distance, two-distance, and distance-and-angle modes.
+    generate_mesh returns a small placeholder cone.
+    apply_to_mesh uses Mesh.bevel_edges (basic approximation).
     """
 
     def __init__(
@@ -103,6 +105,9 @@ class ChamferFeature:
         name: str = "Chamfer",
         edges: Optional[list] = None,
         operation: str = "modify",
+        mode: str = "equal_distance",
+        distance2: float | str | None = None,
+        angle: float | str | None = None,
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
     ):
@@ -110,6 +115,9 @@ class ChamferFeature:
         self.type = "chamfer"
         self.name = name
         self.distance = distance
+        self.mode = mode
+        self.distance2 = distance2
+        self.angle = angle
         self.edges = edges or []
         self.operation = operation
         self.metadata = metadata or {}
@@ -121,9 +129,14 @@ class ChamferFeature:
             "type": self.type,
             "name": self.name,
             "distance": self.distance,
+            "mode": self.mode,
             "edges": self.edges,
             "operation": self.operation,
         }
+        if self.distance2 is not None:
+            data["distance2"] = self.distance2
+        if self.angle is not None:
+            data["angle"] = self.angle
         if self.metadata:
             data["metadata"] = self.metadata
         return data
@@ -139,12 +152,25 @@ class ChamferFeature:
             name=data.get("name", "Chamfer"),
             edges=data.get("edges", []),
             operation=data.get("operation", "modify"),
+            mode=data.get("mode", "equal_distance"),
+            distance2=data.get("distance2"),
+            angle=data.get("angle"),
             metadata=data.get("metadata"),
             id=data.get("id"),
         )
 
     def resolved_distance(self, parameters: Optional[ParameterStore] = None) -> float:
         return _resolve_value(self.distance, parameters, 1.0)
+
+    def resolved_distance2(self, parameters: Optional[ParameterStore] = None) -> Optional[float]:
+        if self.distance2 is None:
+            return None
+        return _resolve_value(self.distance2, parameters, 1.0)
+
+    def resolved_angle(self, parameters: Optional[ParameterStore] = None) -> Optional[float]:
+        if self.angle is None:
+            return None
+        return _resolve_value(self.angle, parameters, 45.0)
 
     def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
         """Placeholder mesh for timeline visibility when no base body is available."""
@@ -156,12 +182,27 @@ class ChamferFeature:
         return mesh
 
     def apply_to_mesh(self, base: Mesh, parameters: Optional[ParameterStore] = None) -> Mesh:
-        """Apply a basic single-segment edge bevel (flat chamfer) on *base*."""
-        d = self.resolved_distance(parameters)
-        if d <= 0:
+        """Apply a basic edge bevel on *base*, honoring the chamfer mode."""
+        d1 = self.resolved_distance(parameters)
+        if d1 <= 0:
             raise FeatureValidationError("Chamfer distance must be positive")
+        d2 = self.resolved_distance2(parameters)
+        ang = self.resolved_angle(parameters)
         edges = self.edges if self.edges else None
-        return base.bevel_edges(edges=edges, amount=d, segments=1, name=f"{base.name}_chamfer")
+
+        if self.mode == "two_distance" and d2 is not None:
+            return base.bevel_edges(
+                edges=edges, amount=d1, amount2=d2, segments=1, name=f"{base.name}_chamfer"
+            )
+        elif self.mode == "distance_angle" and ang is not None:
+            # Approximate second distance from angle (simple tan relation for stub)
+            d2_approx = d1 * abs(math.tan(math.radians(ang))) if ang != 90 else d1
+            return base.bevel_edges(
+                edges=edges, amount=d1, amount2=d2_approx, segments=1, name=f"{base.name}_chamfer"
+            )
+        else:
+            # equal_distance or fallback
+            return base.bevel_edges(edges=edges, amount=d1, segments=1, name=f"{base.name}_chamfer")
 
 
 class FeatureHistory:
