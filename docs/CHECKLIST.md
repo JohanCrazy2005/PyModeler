@@ -66,7 +66,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
-- [~] Fillet / Chamfer / Shell / Hole features (Hole feature: simple + counterbore/countersink stubs + Boolean cut; Fillet feature stub: schema + radius + edge list + placeholder mesh)
+- [~] Fillet / Chamfer / Shell / Hole features (Hole feature: simple + counterbore/countersink stubs + Boolean cut; Fillet + Chamfer feature stubs: schema + radius/distance + edge list + placeholder mesh)
 - [ ] Sheet metal / panel basics
 - [ ] Simple nesting concepts
 - [ ] Early toolpath / G-code generation stubs
@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-19 (Fillet feature stub: schema + radius/edges + placeholder mesh + history)
+Last updated: 2026-11-19 (Chamfer feature stub: schema + distance/edges + placeholder mesh + history)

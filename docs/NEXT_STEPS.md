@@ -10,21 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 Fillet feature stub complete; next is Chamfer stub or profile improvements.**
+**Phase 4 Chamfer feature stub complete; next is profile improvements or basic mesh bevel.**
 
-- FilletFeature stub: JSON Schema (radius, edges list, operation=modify), parametric radius, placeholder sphere mesh, FeatureHistory integration, tests.
-- Research note: docs/research/fillet-feature.md.
-- Full rolling-ball / mesh bevel fillet deferred (mesh-based limitation).
+- ChamferFeature stub: JSON Schema (distance, edges list, operation=modify), parametric distance, placeholder cone mesh, FeatureHistory integration, tests.
+- Research note: docs/research/chamfer-feature.md.
+- Full mesh bevel chamfer deferred (mesh-based limitation). Equal-distance mode only for now.
 
 ### Next concrete tasks (Phase 4)
-1. Begin simple Chamfer feature stub (schema + distance + edge selection + basic mesh approximation or note as deferred).
-2. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
-3. Constraint-aware sketch updates when applying transform intent.
-4. Early sheet-metal / panel thinking or nesting concepts.
-5. Through-all / to-face extents for Hole.
-6. Basic mesh bevel approximation for Fillet on selected edges.
+1. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
+2. Constraint-aware sketch updates when applying transform intent.
+3. Early sheet-metal / panel thinking or nesting concepts.
+4. Through-all / to-face extents for Hole.
+5. Basic mesh bevel approximation for Fillet / Chamfer on selected edges.
+6. Two-distance or distance-angle modes for Chamfer.
 
 ## Recently Completed
+- Chamfer feature stub (schema + distance/edges + placeholder mesh + history + tests)
 - Fillet feature stub (schema + radius/edges + placeholder mesh + history + tests)
 - Hole feature counterbore/countersink stubs (schema + tool mesh variants)
 - Hole feature Boolean cut integration (Part.recompute respects operation=cut and applies mesh_boolean difference)

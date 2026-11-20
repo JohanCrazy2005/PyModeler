@@ -7,10 +7,12 @@ from pymodeler.core.features import (
     FeatureHistory,
     FeatureValidationError,
     FilletFeature,
+    ChamferFeature,
     HoleFeature,
     RevolveFeature,
     validate_extrude_data,
     validate_fillet_data,
+    validate_chamfer_data,
     validate_history_data,
     validate_hole_data,
     validate_revolve_data,
@@ -345,4 +347,60 @@ def test_fillet_in_history():
     meshes = hist.recompute_meshes({})
     assert feat.id in meshes
     assert len(meshes[feat.id].vertices) > 0
+
+
+def test_chamfer_numeric():
+    feat = ChamferFeature(distance=2.5, name="EdgeBevel")
+    assert feat.type == "chamfer"
+    assert feat.resolved_distance() == 2.5
+    mesh = feat.generate_mesh()
+    assert len(mesh.vertices) > 0
+    feat.validate()
+
+
+def test_chamfer_parameter():
+    store = ParameterStore()
+    store.add("D", value=1.5)
+    feat = ChamferFeature(distance="D")
+    assert feat.resolved_distance(store) == 1.5
+    mesh = feat.generate_mesh(store)
+    assert len(mesh.vertices) > 0
+
+
+def test_chamfer_schema_roundtrip():
+    feat = ChamferFeature(distance="ChamferD", edges=[0, 1, "edge_top"], name="TopChamfer")
+    data = feat.to_dict()
+    validate_chamfer_data(data)
+    restored = ChamferFeature.from_dict(data)
+    assert restored.distance == "ChamferD"
+    assert restored.edges == [0, 1, "edge_top"]
+    assert restored.name == "TopChamfer"
+
+
+def test_chamfer_invalid_schema():
+    with pytest.raises(FeatureValidationError):
+        ChamferFeature.from_dict({"type": "chamfer"})  # missing distance
+
+
+def test_chamfer_positive_required():
+    feat = ChamferFeature(distance=0.0)
+    with pytest.raises(FeatureValidationError):
+        feat.generate_mesh()
+    feat2 = ChamferFeature(distance=-1.0)
+    with pytest.raises(FeatureValidationError):
+        feat2.generate_mesh()
+
+
+def test_chamfer_in_history():
+    hist = FeatureHistory(name="WithChamfer")
+    feat = ChamferFeature(distance=1.0)
+    hist.add_chamfer(feat)
+    assert len(hist.features) == 1
+    hist.validate()
+    restored = FeatureHistory.from_dict(hist.to_dict())
+    assert len(restored.get_chamfer_features()) == 1
+    meshes = hist.recompute_meshes({})
+    assert feat.id in meshes
+    assert len(meshes[feat.id].vertices) > 0
+
 

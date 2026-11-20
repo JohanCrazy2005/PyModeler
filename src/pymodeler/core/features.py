@@ -25,6 +25,7 @@ _EXTRUDE_SCHEMA_PATH = _SCHEMA_DIR / "extrude.schema.json"
 _REVOLVE_SCHEMA_PATH = _SCHEMA_DIR / "revolve.schema.json"
 _HOLE_SCHEMA_PATH = _SCHEMA_DIR / "hole.schema.json"
 _FILLET_SCHEMA_PATH = _SCHEMA_DIR / "fillet.schema.json"
+_CHAMFER_SCHEMA_PATH = _SCHEMA_DIR / "chamfer.schema.json"
 _HISTORY_SCHEMA_PATH = _SCHEMA_DIR / "feature_history.schema.json"
 
 with open(_EXTRUDE_SCHEMA_PATH, encoding="utf-8") as f:
@@ -35,6 +36,8 @@ with open(_HOLE_SCHEMA_PATH, encoding="utf-8") as f:
     HOLE_SCHEMA = json.load(f)
 with open(_FILLET_SCHEMA_PATH, encoding="utf-8") as f:
     FILLET_SCHEMA = json.load(f)
+with open(_CHAMFER_SCHEMA_PATH, encoding="utf-8") as f:
+    CHAMFER_SCHEMA = json.load(f)
 with open(_HISTORY_SCHEMA_PATH, encoding="utf-8") as f:
     HISTORY_SCHEMA = json.load(f)
 
@@ -42,6 +45,7 @@ _EXTRUDE_VALIDATOR = Draft202012Validator(EXTRUDE_SCHEMA)
 _REVOLVE_VALIDATOR = Draft202012Validator(REVOLVE_SCHEMA)
 _HOLE_VALIDATOR = Draft202012Validator(HOLE_SCHEMA)
 _FILLET_VALIDATOR = Draft202012Validator(FILLET_SCHEMA)
+_CHAMFER_VALIDATOR = Draft202012Validator(CHAMFER_SCHEMA)
 _HISTORY_VALIDATOR = Draft202012Validator(HISTORY_SCHEMA)
 
 
@@ -75,6 +79,13 @@ def validate_fillet_data(data: dict) -> None:
     if errors:
         messages = [f"{list(e.path)}: {e.message}" for e in errors]
         raise FeatureValidationError("Fillet schema validation failed:\n" + "\n".join(messages))
+
+
+def validate_chamfer_data(data: dict) -> None:
+    errors = sorted(_CHAMFER_VALIDATOR.iter_errors(data), key=lambda e: e.path)
+    if errors:
+        messages = [f"{list(e.path)}: {e.message}" for e in errors]
+        raise FeatureValidationError("Chamfer schema validation failed:\n" + "\n".join(messages))
 
 
 def validate_history_data(data: dict) -> None:
@@ -509,6 +520,77 @@ class FilletFeature:
         return mesh
 
 
+class ChamferFeature:
+    """Parametric Chamfer feature stub.
+
+    Stores distance and optional edge selection. Full mesh bevel (edge chamfer) is deferred.
+    generate_mesh returns a small placeholder cone whose base radius matches the chamfer distance
+    so the feature is visible in the timeline / recompute path.
+    """
+
+    def __init__(
+        self,
+        distance: float | str = 1.0,
+        name: str = "Chamfer",
+        edges: Optional[list] = None,
+        operation: str = "modify",
+        metadata: Optional[dict] = None,
+        id: Optional[str] = None,
+    ):
+        self.id = id or _new_id("chamfer")
+        self.type = "chamfer"
+        self.name = name
+        self.distance = distance
+        self.edges = edges or []
+        self.operation = operation
+        self.metadata = metadata or {}
+        self.validate()
+
+    def to_dict(self) -> dict:
+        data: dict[str, Any] = {
+            "id": self.id,
+            "type": self.type,
+            "name": self.name,
+            "distance": self.distance,
+            "edges": self.edges,
+            "operation": self.operation,
+        }
+        if self.metadata:
+            data["metadata"] = self.metadata
+        return data
+
+    def validate(self) -> None:
+        validate_chamfer_data(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ChamferFeature":
+        validate_chamfer_data(data)
+        return cls(
+            distance=data["distance"],
+            name=data.get("name", "Chamfer"),
+            edges=data.get("edges"),
+            operation=data.get("operation", "modify"),
+            metadata=data.get("metadata"),
+            id=data.get("id"),
+        )
+
+    def resolved_distance(self, parameters: Optional[ParameterStore] = None) -> float:
+        return _resolve_value(self.distance, parameters, 1.0)
+
+    def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Return a small placeholder cone of the chamfer distance.
+
+        Real edge chamfering on the part body is deferred (requires robust mesh bevel or B-rep).
+        """
+        d = self.resolved_distance(parameters)
+        if d <= 0:
+            raise FeatureValidationError("Chamfer distance must be positive")
+        from .mesh import create_cone
+        # Use a short cone as visual placeholder for the bevel
+        mesh = create_cone(radius=d, height=d * 0.5, name=self.id)
+        return mesh
+
+
 class FeatureHistory:
     """Ordered timeline of features with rollback support."""
 
@@ -569,6 +651,10 @@ class FeatureHistory:
         self.features.append(feat.to_dict())
         self.validate()
 
+    def add_chamfer(self, feat: "ChamferFeature") -> None:
+        self.features.append(feat.to_dict())
+        self.validate()
+
     def get_extrude_features(self) -> List[ExtrudeFeature]:
         return [ExtrudeFeature.from_dict(f) for f in self.features if f.get("type") == "extrude"]
 
@@ -580,6 +666,9 @@ class FeatureHistory:
 
     def get_fillet_features(self) -> List["FilletFeature"]:
         return [FilletFeature.from_dict(f) for f in self.features if f.get("type") == "fillet"]
+
+    def get_chamfer_features(self) -> List["ChamferFeature"]:
+        return [ChamferFeature.from_dict(f) for f in self.features if f.get("type") == "chamfer"]
 
     def recompute_meshes(
         self, sketches: Dict[str, Sketch], parameters: Optional[ParameterStore] = None
@@ -612,6 +701,9 @@ class FeatureHistory:
                     result[fid] = feat.generate_mesh(params)
                 elif fdict.get("type") == "fillet":
                     feat = FilletFeature.from_dict(fdict)
+                    result[fid] = feat.generate_mesh(params)
+                elif fdict.get("type") == "chamfer":
+                    feat = ChamferFeature.from_dict(fdict)
                     result[fid] = feat.generate_mesh(params)
             except Exception:
                 from .mesh import create_cube
