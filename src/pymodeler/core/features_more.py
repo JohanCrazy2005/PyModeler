@@ -28,7 +28,7 @@ class FilletFeature:
         radius: float | str = 1.0,
         name: str = "Fillet",
         edges: Optional[list] = None,
-        operation: str = "join",
+        operation: str = "modify",
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
     ):
@@ -64,7 +64,7 @@ class FilletFeature:
             radius=data["radius"],
             name=data.get("name", "Fillet"),
             edges=data.get("edges", []),
-            operation=data.get("operation", "join"),
+            operation=data.get("operation", "modify"),
             metadata=data.get("metadata"),
             id=data.get("id"),
         )
@@ -73,11 +73,21 @@ class FilletFeature:
         return _resolve_value(self.radius, parameters, 1.0)
 
     def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Placeholder mesh for timeline visibility when no base body is available."""
         r = self.resolved_radius(parameters)
         if r <= 0:
             raise FeatureValidationError("Fillet radius must be positive")
         from .mesh import create_sphere
         return create_sphere(radius=r, name=self.id)
+
+    def apply_to_mesh(self, base: Mesh, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Apply a basic multi-segment edge bevel approximating a fillet on *base*."""
+        r = self.resolved_radius(parameters)
+        if r <= 0:
+            raise FeatureValidationError("Fillet radius must be positive")
+        edges = self.edges if self.edges else None
+        # segments=4 gives a coarse rounded look
+        return base.bevel_edges(edges=edges, amount=r, segments=4, name=f"{base.name}_fillet")
 
 
 class ChamferFeature:
@@ -92,7 +102,7 @@ class ChamferFeature:
         distance: float | str = 1.0,
         name: str = "Chamfer",
         edges: Optional[list] = None,
-        operation: str = "join",
+        operation: str = "modify",
         metadata: Optional[dict] = None,
         id: Optional[str] = None,
     ):
@@ -128,7 +138,7 @@ class ChamferFeature:
             distance=data["distance"],
             name=data.get("name", "Chamfer"),
             edges=data.get("edges", []),
-            operation=data.get("operation", "join"),
+            operation=data.get("operation", "modify"),
             metadata=data.get("metadata"),
             id=data.get("id"),
         )
@@ -137,12 +147,21 @@ class ChamferFeature:
         return _resolve_value(self.distance, parameters, 1.0)
 
     def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Placeholder mesh for timeline visibility when no base body is available."""
         d = self.resolved_distance(parameters)
         if d <= 0:
             raise FeatureValidationError("Chamfer distance must be positive")
         from .mesh import create_cone
         mesh = create_cone(radius=d, height=d * 0.5, name=self.id)
         return mesh
+
+    def apply_to_mesh(self, base: Mesh, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Apply a basic single-segment edge bevel (flat chamfer) on *base*."""
+        d = self.resolved_distance(parameters)
+        if d <= 0:
+            raise FeatureValidationError("Chamfer distance must be positive")
+        edges = self.edges if self.edges else None
+        return base.bevel_edges(edges=edges, amount=d, segments=1, name=f"{base.name}_chamfer")
 
 
 class FeatureHistory:
