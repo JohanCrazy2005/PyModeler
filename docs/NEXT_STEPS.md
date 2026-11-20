@@ -10,21 +10,23 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 Chamfer feature stub complete; next is profile improvements or basic mesh bevel.**
+**Phase 4: Profile extraction improved with proper arc joining into closed loops; next is holes in profiles or true solid-of-revolution for Revolve / basic mesh bevel.**
 
-- ChamferFeature stub: JSON Schema (distance, edges list, operation=modify), parametric distance, placeholder cone mesh, FeatureHistory integration, tests.
-- Research note: docs/research/chamfer-feature.md.
-- Full mesh bevel chamfer deferred (mesh-based limitation). Equal-distance mode only for now.
+- extract_simple_profiles now treats arcs as edges when start/end match existing points, discretizes them, and inserts into the cycle polygon.
+- Research note updated: docs/research/profile-extraction.md.
+- Test added for arc-joined loop.
 
 ### Next concrete tasks (Phase 4)
-1. Further profile improvements: proper arc joining into loops, holes in profiles, non-Y axis for revolve.
-2. Constraint-aware sketch updates when applying transform intent.
-3. Early sheet-metal / panel thinking or nesting concepts.
-4. Through-all / to-face extents for Hole.
-5. Basic mesh bevel approximation for Fillet / Chamfer on selected edges.
-6. Two-distance or distance-angle modes for Chamfer.
+1. Support holes / nested profiles in extraction (outer + inner regions).
+2. True solid-of-revolution mesh from profile points for Revolve (Y-axis first, then arbitrary axis).
+3. Through-all / to-face extents for Hole.
+4. Basic mesh bevel approximation for Fillet / Chamfer on selected edges.
+5. Constraint-aware sketch updates when applying transform intent.
+6. Early sheet-metal / panel thinking or nesting concepts.
+7. Two-distance or distance-angle modes for Chamfer.
 
 ## Recently Completed
+- Profile extraction: proper arc joining into closed loops (discretize + insert into polygon)
 - Chamfer feature stub (schema + distance/edges + placeholder mesh + history + tests)
 - Fillet feature stub (schema + radius/edges + placeholder mesh + history + tests)
 - Hole feature counterbore/countersink stubs (schema + tool mesh variants)
