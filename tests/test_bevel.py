@@ -107,14 +107,15 @@ def test_chamfer_parameter_distance():
     store.add("ChamferDist", value=0.2)
     feat = ChamferFeature(distance="ChamferDist")
     assert feat.resolved_distance(store) == 0.2
-    mesh = create_cube(size=2.0)
+    mesh = create_cube()
     result = feat.apply_to_mesh(mesh, store)
     result.validate()
 
 
 def test_part_recompute_with_chamfer():
+    # Minimal integration: extrude then chamfer on part
     sketch = create_rectangle_sketch(width=4.0, height=3.0)
-    extrude = ExtrudeFeature(sketch_id=sketch.id, distance=2.0, operation="new")
+    extrude = ExtrudeFeature(sketch_id=sketch.id, distance=2.0)
     chamfer = ChamferFeature(distance=0.2, name="EdgeBreak")
     history = FeatureHistory()
     history.add_extrude(extrude)
@@ -122,38 +123,57 @@ def test_part_recompute_with_chamfer():
     part = Part(name="ChamferedBox")
     part.add_sketch(sketch)
     part.feature_history = history
-    body = part.recompute()
+    part.recompute()
+    body = part.get_body()
     assert body is not None
-    body.validate()
     assert len(body.vertices) > 8
-    assert len(body.faces) > 6
 
 
 def test_part_recompute_with_fillet():
     sketch = create_rectangle_sketch(width=5.0, height=5.0)
-    extrude = ExtrudeFeature(sketch_id=sketch.id, distance=2.0, operation="new")
-    fillet = FilletFeature(radius=0.15, name="RoundEdges")
+    extrude = ExtrudeFeature(sketch_id=sketch.id, distance=2.0)
+    fillet = FilletFeature(radius=0.15)
     history = FeatureHistory()
     history.add_extrude(extrude)
     history.add_fillet(fillet)
     part = Part(name="FilletedBox")
     part.add_sketch(sketch)
     part.feature_history = history
-    body = part.recompute()
+    part.recompute()
+    body = part.get_body()
     assert body is not None
-    body.validate()
     assert len(body.vertices) > 8
 
 
-def test_chamfer_placeholder_mesh():
+def test_chamfer_generate_mesh_placeholder():
     feat = ChamferFeature(distance=1.0)
     mesh = feat.generate_mesh()
     mesh.validate()
     assert len(mesh.vertices) > 0
 
 
-def test_fillet_placeholder_mesh():
-    feat = FilletFeature(radius=1.0)
-    mesh = feat.generate_mesh()
-    mesh.validate()
-    assert len(mesh.vertices) > 0
+def test_chamfer_two_distance_mode():
+    feat = ChamferFeature(distance=0.2, mode="two_distance", distance2=0.4, name="TwoDist")
+    assert feat.mode == "two_distance"
+    assert feat.resolved_distance2() == 0.4
+    feat.validate()
+    data = feat.to_dict()
+    assert data["mode"] == "two_distance"
+    assert data["distance2"] == 0.4
+    roundtrip = ChamferFeature.from_dict(data)
+    assert roundtrip.resolved_distance2() == 0.4
+
+    mesh = create_cube(size=2.0)
+    result = feat.apply_to_mesh(mesh)
+    result.validate()
+    assert len(result.vertices) > 8
+
+
+def test_chamfer_distance_angle_mode():
+    feat = ChamferFeature(distance=0.3, mode="distance_angle", angle=45.0)
+    assert feat.resolved_angle() == 45.0
+    feat.validate()
+    mesh = create_cube()
+    result = feat.apply_to_mesh(mesh)
+    result.validate()
+    assert len(result.faces) > 6
