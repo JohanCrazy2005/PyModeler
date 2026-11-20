@@ -46,4 +46,4 @@ This file is updated by every automation run.
 - Keep PyQt6, JSON Schemas, cross-platform public Python libs only.
 - Put generated artifacts under output/ when appropriate.
 
-Last updated: 2026-11-20 (Hole through-all extent + tests)
+Last updated: 2026-11-20 (Hole through-all core implementation + tests complete)
