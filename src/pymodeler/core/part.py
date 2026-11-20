@@ -117,25 +117,52 @@ class Part:
     def recompute(self) -> Optional[Mesh]:
         """Recompute the part body from active features.
 
-        Applies Boolean operations according to each feature's `operation` field:
-        - "new" or first feature: starts the body
+        Applies operations according to each feature's `operation` field:
+        - "new" or first solid feature: starts the body
         - "join": mesh_boolean join
         - "cut": mesh_boolean cut (difference)
+        - "modify": in-place mesh modification (Fillet / Chamfer bevel)
         Falls back gracefully when the Boolean engine is unavailable.
         Returns the resulting Mesh or None if no features produced geometry.
         """
-        meshes = self.feature_history.recompute_meshes(self.sketches, self.parameters)
-        if not meshes:
+        from .features import FilletFeature, ChamferFeature
+
+        active = self.feature_history.active_features()
+        if not active:
             self._body = None
             return None
 
-        # Build lookup of feature operation by id
-        op_by_id = {f["id"]: f.get("operation", "join") for f in self.feature_history.features}
+        # Pre-generate tool meshes for features that produce independent geometry
+        meshes = self.feature_history.recompute_meshes(self.sketches, self.parameters)
 
         body: Optional[Mesh] = None
-        for fid, mesh in meshes.items():
+        for fdict in active:
+            fid = fdict.get("id", "feat")
+            ftype = fdict.get("type")
+            op = fdict.get("operation", "join")
+
+            # Modify features act on the current body
+            if ftype in ("fillet", "chamfer") and op == "modify":
+                if body is None:
+                    continue
+                try:
+                    if ftype == "fillet":
+                        feat = FilletFeature.from_dict(fdict)
+                        body = feat.apply_to_mesh(body, self.parameters)
+                    else:
+                        feat = ChamferFeature.from_dict(fdict)
+                        body = feat.apply_to_mesh(body, self.parameters)
+                    body.name = f"{self.name}_{fid}"
+                except Exception:
+                    # Keep previous body if bevel fails
+                    pass
+                continue
+
+            mesh = meshes.get(fid)
+            if mesh is None:
+                continue
             mesh.name = f"{self.name}_{fid}"
-            op = op_by_id.get(fid, "join")
+
             if body is None or op == "new":
                 body = mesh
             else:
@@ -143,8 +170,6 @@ class Part:
                 try:
                     body = mesh_boolean(body, mesh, bool_op, name=self.name)
                 except Exception:
-                    # For cut, if engine missing we keep the previous body (tool not subtracted)
-                    # For join, mesh_boolean already falls back to concatenation
                     if bool_op == "join":
                         body = mesh_boolean(body, mesh, "join", name=self.name)
                     # else: leave body unchanged on cut failure
