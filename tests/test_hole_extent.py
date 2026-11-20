@@ -64,3 +64,33 @@ def test_hole_schema_extent_roundtrip():
     assert feat.extent == "through_all"
     out = feat.to_dict()
     validate_hole_data(out)
+
+
+def test_hole_direction_x_axis():
+    """Direction [1,0,0] should orient the hole along X instead of Y."""
+    feat = HoleFeature(diameter=4.0, depth=10.0, extent="blind", direction=[1.0, 0.0, 0.0], center=[0.0, 0.0, 0.0])
+    mesh = feat.generate_mesh()
+    xs = [v[0] for v in mesh.vertices]
+    ys = [v[1] for v in mesh.vertices]
+    zs = [v[2] for v in mesh.vertices]
+    # Length should appear primarily along X
+    x_span = max(xs) - min(xs)
+    y_span = max(ys) - min(ys)
+    z_span = max(zs) - min(zs)
+    assert x_span == pytest.approx(10.0, abs=1e-4)
+    # Diameter extents on the other axes should be ~4
+    assert y_span == pytest.approx(4.0, abs=1e-3) or z_span == pytest.approx(4.0, abs=1e-3)
+    feat.validate()
+    restored = HoleFeature.from_dict(feat.to_dict())
+    assert restored.direction == [1.0, 0.0, 0.0]
+    restored.validate()
+
+
+def test_hole_direction_negative_z():
+    """Default-like direction [0,0,-1] should put length along Z."""
+    feat = HoleFeature(diameter=2.0, depth=6.0, direction=[0.0, 0.0, -1.0])
+    mesh = feat.generate_mesh()
+    zs = [v[2] for v in mesh.vertices]
+    z_span = max(zs) - min(zs)
+    assert z_span == pytest.approx(6.0, abs=1e-4)
+    feat.validate()

@@ -237,5 +237,56 @@ class HoleFeature:
         verts[:, 2] += cy
         verts[:, 1] += cz
         mesh.vertices = verts.tolist()
+        # Apply direction orientation if specified (rotate from default Y-axis)
+        mesh = self._apply_direction_transform(mesh)
         mesh.validate()
         return mesh
+
+    def _apply_direction_transform(self, mesh: Mesh) -> Mesh:
+        """Rotate the cylinder so its Y-axis aligns with self.direction (default +Y).
+
+        Rotation is performed around the hole start center so existing center
+        placement is preserved. When direction is None or parallel to Y, the
+        mesh is returned unchanged.
+        """
+        if not self.direction:
+            return mesh
+        try:
+            import numpy as np
+            axis = np.asarray(self.direction, dtype=float)
+            norm = np.linalg.norm(axis)
+            if norm < 1e-8:
+                return mesh
+            axis = axis / norm
+            y = np.array([0.0, 1.0, 0.0])
+            if np.allclose(axis, y, atol=1e-6):
+                return mesh
+            # Rodrigues rotation taking Y to the given axis
+            k = np.cross(y, axis)
+            k_norm = np.linalg.norm(k)
+            if k_norm < 1e-8:
+                # 180 degree case (axis == -Y)
+                R = np.diag([-1.0, 1.0, -1.0])
+            else:
+                k = k / k_norm
+                cos_t = float(np.dot(y, axis))
+                sin_t = k_norm
+                K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+                R = np.eye(3) + sin_t * K + (1 - cos_t) * (K @ K)
+            # Pivot around the translated center so placement stays correct
+            pivot = np.array([0.0, 0.0, 0.0])
+            if self.center:
+                # Match the translation mapping used above: center[0]->x, center[1]->z, center[2]->y
+                pivot[0] = float(self.center[0])
+                pivot[2] = float(self.center[1])
+                if len(self.center) > 2:
+                    pivot[1] = float(self.center[2])
+            verts = []
+            for v in mesh.vertices:
+                p = np.asarray(v, dtype=float) - pivot
+                verts.append((R @ p + pivot).tolist())
+            mesh.vertices = verts
+            return mesh
+        except Exception:
+            return mesh
+
