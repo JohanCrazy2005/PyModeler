@@ -66,7 +66,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
-- [~] Fillet / Chamfer / Shell / Hole features (Hole + Fillet + Chamfer stubs; profile extraction now supports arcs + nested holes)
+- [~] Fillet / Chamfer / Shell / Hole features (Hole + Fillet + Chamfer stubs; profile extraction arcs + nested holes; true solid-of-revolution for Revolve)
 - [ ] Sheet metal / panel basics
 - [ ] Simple nesting concepts
 - [ ] Early toolpath / G-code generation stubs
@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-20 (Profile extraction: nested holes / outer+inner regions + tests)
+Last updated: 2026-11-20 (True solid-of-revolution mesh for Revolve from profile points + tests)

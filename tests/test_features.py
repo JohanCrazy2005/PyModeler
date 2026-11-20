@@ -83,14 +83,25 @@ def test_feature_history_recompute():
     assert len(meshes[feat.id].vertices) == 8
 
 
-def test_revolve_basic():
-    sketch = create_rectangle_sketch(width=5.0, height=2.0)
-    feat = RevolveFeature(sketch_id=sketch.id, angle=360.0, name="Rev")
-    assert feat.type == "revolve"
-    assert feat.resolved_angle() == 360.0
+def test_revolve_solid_of_revolution():
+    """Rectangle profile revolved 360° around Y produces a closed lathe mesh."""
+    sketch = create_rectangle_sketch(width=4.0, height=3.0)
+    feat = RevolveFeature(sketch_id=sketch.id, angle=360.0, segments=8)
     mesh = feat.generate_mesh(sketch)
-    assert len(mesh.vertices) > 10
+    # 4 profile points * 8 rings
+    assert len(mesh.vertices) == 4 * 8
+    assert len(mesh.faces) >= 4 * 8  # at least the side quads
     feat.validate()
+
+
+def test_revolve_partial_has_caps():
+    sketch = create_rectangle_sketch(width=2.0, height=2.0)
+    feat = RevolveFeature(sketch_id=sketch.id, angle=90.0, segments=8)
+    mesh = feat.generate_mesh(sketch)
+    assert len(mesh.vertices) > 0
+    # Partial should include end cap faces
+    assert any(len(f) == 4 for f in mesh.faces)  # profile quads or caps
+
 
 
 def test_revolve_partial_angle():

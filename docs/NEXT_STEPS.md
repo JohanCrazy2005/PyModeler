@@ -10,23 +10,24 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Profile extraction now supports nested holes (outer + inner regions via containment); next is true solid-of-revolution improvements or basic mesh bevel / through-all extents.**
+**Phase 4: True solid-of-revolution mesh from profile points for Revolve (Y-axis lathe, partial angles with caps) is now implemented; next is through-all extents for Hole or basic mesh bevel for Fillet/Chamfer.**
 
-- extract_simple_profiles joins arcs into closed loops (discretize + insert intermediates when endpoints match points).
-- Nested profiles: larger polygons receive contained smaller polygons as "holes" list.
-- Research note updated: docs/research/profile-extraction.md.
-- Tests added for arc-joined loop and nested holes.
+- RevolveFeature.generate_mesh now builds rings of vertices from polygon profile points (radial |x|, height y) and connects them into a closed surface of revolution.
+- Partial angles add end-cap faces.
+- Tests verify vertex counts and basic validity.
+- Fallback to cylinder for non-polygon profiles remains.
 
 ### Next concrete tasks (Phase 4)
-1. True solid-of-revolution mesh from profile points for Revolve (already partial; improve arbitrary axis).
-2. Through-all / to-face extents for Hole.
-3. Basic mesh bevel approximation for Fillet / Chamfer on selected edges.
-4. Constraint-aware sketch updates when applying transform intent.
-5. Early sheet-metal / panel thinking or nesting concepts.
-6. Two-distance or distance-angle modes for Chamfer.
-7. Use hole profiles in Extrude mesh generation (subtract holes).
+1. Through-all / to-face extents for Hole (or depth relative to body).
+2. Basic mesh bevel approximation for Fillet / Chamfer on selected edges.
+3. Use hole profiles in Extrude mesh generation (subtract holes).
+4. Arbitrary axis support for Revolve (rotation matrix from given axis vector).
+5. Constraint-aware sketch updates when applying transform intent.
+6. Early sheet-metal / panel thinking or nesting concepts.
+7. Two-distance or distance-angle modes for Chamfer.
 
 ## Recently Completed
+- True solid-of-revolution mesh from profile points for Revolve (Y-axis, partial angle caps)
 - Profile extraction: nested holes / outer+inner regions via point-in-polygon containment
 - Profile extraction: proper arc joining into closed loops (discretize + insert into polygon)
 - Chamfer feature stub (schema + distance/edges + placeholder mesh + history + tests)

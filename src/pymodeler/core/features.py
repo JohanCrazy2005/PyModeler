@@ -327,6 +327,15 @@ class RevolveFeature:
         if angle <= 0 or angle > 360:
             raise FeatureValidationError("Revolve angle must be in (0, 360]")
         profiles = extract_simple_profiles(sketch)
+        segs = max(4, min(64, self.segments))
+        if not profiles:
+            from .mesh import create_cylinder
+            return create_cylinder(radius=1.0, height=2.0, segments=segs, name=self.id)
+        # Prefer first polygon profile for solid-of-revolution
+        prof = profiles[0]
+        if prof["type"] == "polygon" and prof.get("points"):
+            return self._revolve_polygon(prof["points"], angle, segs)
+        # Fallback for circle or empty
         from .mesh import create_cylinder
         xs = []
         for p in profiles:
@@ -335,8 +344,69 @@ class RevolveFeature:
             elif p["type"] == "circle":
                 xs.append(p["center"][0] + p["radius"])
         radius = max((abs(x) for x in xs), default=1.0) or 1.0
-        segs = max(4, min(64, self.segments))
         return create_cylinder(radius=radius, height=2.0, segments=segs, name=self.id)
+
+    def _revolve_polygon(self, points, angle_deg: float, segs: int) -> Mesh:
+        """Generate a solid of revolution mesh by revolving a 2D polygon profile around the Y axis.
+
+        Assumes sketch points (x, y) where |x| is the radial distance from the Y axis and y is the height.
+        Supports partial angles (adds end caps). For full 360° produces a closed surface of revolution.
+        Nested holes are ignored in this increment (future: difference).
+        """
+        import math
+        import numpy as np
+        from .mesh import Mesh
+
+        if len(points) < 3:
+            from .mesh import create_cylinder
+            return create_cylinder(radius=1.0, height=1.0, segments=segs, name=self.id)
+
+        # Ensure consistent winding and positive area roughly
+        pts = [(float(x), float(y)) for x, y in points]
+        # Use absolute x as radius (profile should be on one side; take max side)
+        radii = [abs(x) for x, _ in pts]
+        heights = [y for _, y in pts]
+
+        n_profile = len(pts)
+        angle_rad = math.radians(angle_deg)
+        full = abs(angle_deg - 360.0) < 1e-3
+        n_angle = segs if full else max(2, int(segs * angle_deg / 360.0))
+        n_angle = max(2, min(64, n_angle))
+
+        # Vertices: for each profile point, a ring of n_angle vertices
+        verts: list[list[float]] = []
+        for i, (x, y) in enumerate(pts):
+            r = abs(x)
+            for j in range(n_angle + (0 if full else 1)):
+                theta = angle_rad * j / max(1, n_angle)
+                if full:
+                    theta = 2 * math.pi * j / n_angle
+                vx = r * math.cos(theta)
+                vz = r * math.sin(theta)
+                verts.append([vx, y, vz])
+
+        # Faces: side quads between consecutive profile rings
+        faces: list[list[int]] = []
+        ring_size = n_angle if full else n_angle + 1
+        for i in range(n_profile):
+            ni = (i + 1) % n_profile
+            for j in range(n_angle):
+                a = i * ring_size + j
+                b = i * ring_size + (j + 1) % ring_size if full else i * ring_size + j + 1
+                c = ni * ring_size + (j + 1) % ring_size if full else ni * ring_size + j + 1
+                d = ni * ring_size + j
+                faces.append([a, b, c, d])
+
+        # For partial angle, add end caps (the two radial faces)
+        if not full and n_angle >= 1:
+            # Start cap (theta=0)
+            start_face = [i * ring_size for i in range(n_profile)]
+            faces.append(start_face)
+            # End cap (theta=angle)
+            end_face = [i * ring_size + n_angle for i in range(n_profile - 1, -1, -1)]
+            faces.append(end_face)
+
+        return Mesh(vertices=verts, faces=faces, name=self.id)
 
 
 class HoleFeature:
