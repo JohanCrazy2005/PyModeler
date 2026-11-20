@@ -2,9 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/hole.schema.json",
   "title": "HoleFeature",
-  "description": "Parametric Hole feature: creates a cylindrical cut (simple, counterbore, or countersink) at a given position. Intended for manufacturing (fasteners, joinery). Tool mesh is generated and Boolean-cut against the part body when operation=cut.",
+  "description": "Parametric Hole feature: creates a cylindrical cut (simple, counterbore, or countersink) at a given position. Supports blind depth or through-all extents. Tool mesh is generated and Boolean-cut against the part body when operation=cut.",
   "type": "object",
-  "required": ["id", "type", "diameter", "depth"],
+  "required": [
+    "id",
+    "type",
+    "diameter"
+  ],
   "additionalProperties": false,
   "properties": {
     "id": {
@@ -24,62 +28,121 @@
     },
     "hole_type": {
       "type": "string",
-      "enum": ["simple", "counterbore", "countersink"],
+      "enum": [
+        "simple",
+        "counterbore",
+        "countersink"
+      ],
       "default": "simple",
       "description": "Hole variant: simple cylinder, counterbore (stepped), or countersink (conical)"
     },
     "diameter": {
       "description": "Hole diameter: numeric value or parameter name / expression string",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "depth": {
-      "description": "Hole depth (blind). Numeric or parameter/expression. Positive value.",
+      "description": "Hole depth for blind holes. Numeric or parameter/expression. Positive value. Ignored when extent=through_all (a large default is used).",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "extent": {
+      "type": "string",
+      "enum": [
+        "blind",
+        "through_all"
+      ],
+      "default": "blind",
+      "description": "Extent of the hole. 'blind' uses depth; 'through_all' generates a long tool cylinder that fully pierces typical part bodies (depth is ignored or used as a minimum)."
+    },
+    "through_depth": {
+      "description": "Optional explicit length for through_all tool cylinder. Defaults to a large value (1000) if omitted.",
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "counterbore_diameter": {
       "description": "Counterbore diameter (larger). Required for hole_type=counterbore.",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "counterbore_depth": {
       "description": "Counterbore depth. Required for hole_type=counterbore.",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "countersink_diameter": {
       "description": "Countersink major diameter. Required for hole_type=countersink.",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "countersink_angle": {
       "description": "Countersink included angle in degrees (default 82 or 90). Optional.",
       "oneOf": [
-        { "type": "number" },
-        { "type": "string", "minLength": 1 }
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
       ]
     },
     "center": {
       "type": "array",
-      "items": { "type": "number" },
+      "items": {
+        "type": "number"
+      },
       "minItems": 2,
       "maxItems": 3,
       "description": "Optional center position [x, y] or [x, y, z]. Defaults to origin. Z is the start plane."
     },
     "direction": {
       "type": "array",
-      "items": { "type": "number" },
+      "items": {
+        "type": "number"
+      },
       "minItems": 3,
       "maxItems": 3,
       "description": "Optional direction vector of the hole axis (defaults to [0, 0, -1] or sketch normal)."
@@ -93,7 +156,10 @@
     },
     "operation": {
       "type": "string",
-      "enum": ["cut", "new"],
+      "enum": [
+        "cut",
+        "new"
+      ],
       "default": "cut",
       "description": "Boolean operation intent. 'cut' subtracts the tool cylinder from the current part body."
     },
