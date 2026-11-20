@@ -234,6 +234,29 @@ def test_profile_extraction_arc_near_circle():
     assert any(p["type"] == "circle" for p in profs)
 
 
+def test_profile_extraction_arc_joined_into_loop():
+    """Arc whose start/end match existing points should be discretized into a closed polygon."""
+    from pymodeler.core.sketch import Sketch, extract_simple_profiles
+    sketch = Sketch()
+    p_bl = sketch.add_point(0, 0)
+    p_br = sketch.add_point(4, 0)
+    p_tr = sketch.add_point(4, 2)
+    p_tl = sketch.add_point(0, 2)
+    sketch.add_line(p_bl, p_br)
+    sketch.add_line(p_tr, p_tl)
+    sketch.add_line(p_tl, p_bl)
+    center = sketch.add_point(4, 1)
+    sketch.add_arc(center, radius=1.0, start_angle=-90, end_angle=90)
+    profs = extract_simple_profiles(sketch)
+    assert len(profs) >= 1
+    poly = next(p for p in profs if p["type"] == "polygon")
+    # Should have more than the 4 corner points because of arc discretization
+    assert len(poly["points"]) > 8
+    # Area should be positive and reasonable
+    from pymodeler.core.sketch import _polygon_area
+    assert _polygon_area(poly["points"]) > 5.0
+
+
 def test_hole_numeric():
     feat = HoleFeature(diameter=6.0, depth=10.0, name="M6Hole")
     assert feat.type == "hole"
@@ -402,5 +425,4 @@ def test_chamfer_in_history():
     meshes = hist.recompute_meshes({})
     assert feat.id in meshes
     assert len(meshes[feat.id].vertices) > 0
-
 
