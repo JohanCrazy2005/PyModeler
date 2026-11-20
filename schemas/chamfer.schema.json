@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/chamfer.schema.json",
   "title": "ChamferFeature",
-  "description": "Parametric Chamfer feature: bevels selected edges with a given distance (equal-distance style). Stub implementation stores intent; full mesh bevel is deferred. Intended for manufacturing (edge breaking, tool access, aesthetics).",
+  "description": "Parametric Chamfer feature: bevels selected edges. Supports equal-distance, two-distance, and distance-and-angle modes. Mesh bevel is a basic approximation. Intended for manufacturing (edge breaking, tool access, aesthetics).",
   "type": "object",
   "required": ["id", "type", "distance"],
   "additionalProperties": false,
@@ -22,8 +22,28 @@
       "default": "Chamfer",
       "description": "Human-readable feature name"
     },
+    "mode": {
+      "type": "string",
+      "enum": ["equal_distance", "two_distance", "distance_angle"],
+      "default": "equal_distance",
+      "description": "Chamfer style: equal distance on both faces, two independent distances, or one distance + angle."
+    },
     "distance": {
-      "description": "Chamfer distance (equal-distance mode): numeric value or parameter name / expression string. Positive.",
+      "description": "Primary chamfer distance: numeric value or parameter name / expression string. Positive.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "distance2": {
+      "description": "Secondary distance for two_distance mode (or ignored). Numeric or parameter. Positive.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "angle": {
+      "description": "Angle in degrees for distance_angle mode. Numeric or parameter.",
       "oneOf": [
         { "type": "number" },
         { "type": "string", "minLength": 1 }
@@ -39,7 +59,7 @@
       "type": "string",
       "enum": ["modify", "new"],
       "default": "modify",
-      "description": "Intent: modify the current solid by chamfering edges. Full Boolean-style application deferred."
+      "description": "Intent: modify the current solid by chamfering edges."
     },
     "metadata": {
       "type": "object",
