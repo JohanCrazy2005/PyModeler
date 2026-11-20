@@ -10,27 +10,25 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Basic mesh bevel for Fillet/Chamfer is implemented. Next priorities below.**
+**Phase 4: Hole profiles are now used in Extrude mesh generation. Next priorities below.**
 
 ### Done this run
-- `Mesh.get_unique_edges()`, `Mesh.edge_face_map()`, `Mesh.bevel_edges(edges, amount, segments)` — basic equal-distance edge bevel.
-- segments=1 → flat chamfer; segments>1 → multi-cut fillet approximation.
-- `ChamferFeature.apply_to_mesh` / `FilletFeature.apply_to_mesh` call bevel_edges.
-- Default `operation` fixed to `"modify"` (was invalid `"join"` vs schema enum).
-- `Part.recompute` applies fillet/chamfer as in-place mesh modifications on the current body.
-- 16 new tests in `tests/test_bevel.py` (all passing).
+- `ExtrudeFeature.generate_mesh` now consumes nested holes from `extract_simple_profiles`.
+- `_extrude_polygon_with_holes` attempts a true Boolean cut (via `mesh_boolean`) when an engine is present.
+- Pure-Python fallback `_extrude_walls_with_holes` builds outer + reversed inner walls so holes are geometrically present even without manifold3d.
+- New test `test_extrude_with_nested_holes` (passes).
 
 ### Next concrete tasks (Phase 4)
-1. Use hole profiles in Extrude mesh generation (subtract nested holes from profiles).
-2. Arbitrary axis support for Revolve (rotation matrix from given axis vector).
-3. Two-distance or distance-angle modes for Chamfer (schema + apply path).
-4. Direction vector applied to Hole tool orientation (currently Y-axis + center offset only).
-5. Constraint-aware sketch updates when applying transform intent.
-6. Improve bevel quality (better corner fans, optional manifold cleanup).
-7. Early sheet-metal / panel thinking or nesting concepts.
-8. Shell feature stub.
+1. Arbitrary axis support for Revolve (rotation matrix from given axis vector).
+2. Two-distance or distance-angle modes for Chamfer (schema + apply path).
+3. Direction vector applied to Hole tool orientation (currently Y-axis + center offset only).
+4. Constraint-aware sketch updates when applying transform intent.
+5. Improve bevel quality (better corner fans, optional manifold cleanup).
+6. Early sheet-metal / panel thinking or nesting concepts.
+7. Shell feature stub.
 
 ## Recently Completed
+- Hole profiles used in Extrude mesh generation (Boolean cut + pure wall fallback + test)
 - Basic mesh bevel approximation for Fillet / Chamfer (Mesh.bevel_edges + apply_to_mesh + Part.recompute modify path + tests)
 - Fixed Fillet/Chamfer operation default to schema-valid `"modify"`
 - Through-all / blind extents for Hole
@@ -48,4 +46,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-20 (Mesh bevel for Fillet/Chamfer)
+Last updated: 2026-11-20 (Extrude hole profiles)

@@ -119,11 +119,17 @@ class ExtrudeFeature:
         if not profiles:
             from .mesh import create_cube
             return create_cube(size=dist, name=self.id)
-        prof = profiles[0]
-        if prof["type"] == "polygon":
+        # Prefer the largest polygon (already sorted by area in extraction for nesting)
+        poly_profs = [p for p in profiles if p["type"] == "polygon"]
+        if poly_profs:
+            prof = poly_profs[0]
+            holes = prof.get("holes") or []
+            if holes:
+                return self._extrude_polygon_with_holes(prof["points"], holes, length, start)
             return self._extrude_polygon(prof["points"], length, start)
-        if prof["type"] == "circle":
-            return self._extrude_circle(prof["center"], prof["radius"], length, start)
+        circ = next((p for p in profiles if p["type"] == "circle"), None)
+        if circ:
+            return self._extrude_circle(circ["center"], circ["radius"], length, start)
         from .mesh import create_cube
         return create_cube(size=1.0, name=self.id)
 
@@ -153,4 +159,67 @@ class ExtrudeFeature:
             faces.append([i, (i + 1) % segs, segs * 2])
             faces.append([segs + i, segs * 2 + 1, segs + (i + 1) % segs])
             faces.append([i, (i + 1) % segs, segs + (i + 1) % segs, segs + i])
+        return Mesh(vertices=verts, faces=faces, name=self.id)
+
+    def _extrude_polygon_with_holes(self, outer_points, holes, dist, offset):
+        """Extrude an outer polygon while subtracting nested hole profiles.
+
+        Prefers a Boolean cut (via mesh_boolean / trimesh) when an engine is
+        available. Falls back to a pure side-wall construction that includes
+        outer walls + reversed inner walls so the holes are geometrically present.
+        """
+        outer = self._extrude_polygon(outer_points, dist, offset)
+        # Try Boolean subtraction for a true solid with holes
+        try:
+            from .boolean import mesh_boolean
+            result = outer
+            for hole_pts in holes:
+                tool = self._extrude_polygon(hole_pts, dist, offset)
+                result = mesh_boolean(result, tool, "cut", name=self.id)
+            return result
+        except Exception:
+            # Pure fallback: build walls for outer + each hole
+            return self._extrude_walls_with_holes(outer_points, holes, dist, offset)
+
+    def _extrude_walls_with_holes(self, outer_points, holes, dist, offset):
+        """Pure-Python extrusion that includes hole walls (no external Boolean).
+
+        Top/bottom faces are the outer polygon; hole polygons are added with
+        opposite winding so simple renderers still see the cut. Side walls are
+        generated for the outer boundary and every hole.
+        """
+        verts = []
+        faces = []
+        # Outer bottom + top
+        n = len(outer_points)
+        for x, y in outer_points:
+            verts.append([x, y, offset])
+        for x, y in outer_points:
+            verts.append([x, y, offset + dist])
+        # Bottom face
+        faces.append(list(range(n)))
+        # Top face reversed
+        faces.append(list(range(n, 2 * n))[::-1])
+        # Outer sides
+        for i in range(n):
+            j = (i + 1) % n
+            faces.append([i, j, j + n, i + n])
+
+        # Holes
+        for hole in holes:
+            hn = len(hole)
+            base = len(verts)
+            for x, y in hole:
+                verts.append([x, y, offset])
+            for x, y in hole:
+                verts.append([x, y, offset + dist])
+            # Bottom hole face (opposite winding so it "cuts")
+            faces.append(list(range(base + hn - 1, base - 1, -1)))
+            # Top hole face
+            faces.append(list(range(base + hn, base + 2 * hn)))
+            # Inner sides (winding so normals point into the hole)
+            for i in range(hn):
+                j = (i + 1) % hn
+                faces.append([base + i, base + i + hn, base + j + hn, base + j])
+
         return Mesh(vertices=verts, faces=faces, name=self.id)

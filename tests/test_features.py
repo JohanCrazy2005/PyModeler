@@ -226,3 +226,44 @@ def test_hole_parameter():
     assert feat.resolved_depth(store) == 15.0
     mesh = feat.generate_mesh(store)
     assert len(mesh.vertices) > 0
+
+
+def test_extrude_with_nested_holes():
+    """Extrude of a profile that contains a nested hole should produce a mesh
+    that includes the hole (more vertices than the plain outer box, or a
+    Boolean-cut result).
+    """
+    from pymodeler.core.sketch import Sketch, extract_simple_profiles
+    sketch = Sketch()
+    # outer 0-10
+    bl = sketch.add_point(0, 0)
+    br = sketch.add_point(10, 0)
+    tr = sketch.add_point(10, 10)
+    tl = sketch.add_point(0, 10)
+    sketch.add_line(bl, br)
+    sketch.add_line(br, tr)
+    sketch.add_line(tr, tl)
+    sketch.add_line(tl, bl)
+    # inner 3-7
+    ibl = sketch.add_point(3, 3)
+    ibr = sketch.add_point(7, 3)
+    itr = sketch.add_point(7, 7)
+    itl = sketch.add_point(3, 7)
+    sketch.add_line(ibl, ibr)
+    sketch.add_line(ibr, itr)
+    sketch.add_line(itr, itl)
+    sketch.add_line(itl, ibl)
+
+    profs = extract_simple_profiles(sketch)
+    assert len(profs) == 1
+    assert len(profs[0].get("holes", [])) == 1
+
+    feat = ExtrudeFeature(sketch_id=sketch.id, distance=2.0)
+    mesh = feat.generate_mesh(sketch)
+    # Plain outer would be 8 verts / 6 faces. With hole walls we expect more.
+    assert len(mesh.vertices) >= 8
+    assert len(mesh.faces) >= 6
+    # Should have vertices from both outer and inner
+    assert len(mesh.vertices) > 8
+    mesh.validate()
+    feat.validate()

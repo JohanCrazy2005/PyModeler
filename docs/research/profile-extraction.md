@@ -33,7 +33,7 @@ Current implementation (updated 2026-11-20):
 - **Nested holes**: after extraction, polygons are sorted by area; containment is tested with ray-casting point-in-polygon on the centroid of candidate inners. Contained polygons are attached as the "holes" list on the outer; only top-level profiles are returned.
 
 Next increments:
-1. Use hole profiles in Extrude mesh generation (subtract holes from solid).
+1. (done) Use hole profiles in Extrude mesh generation (subtract holes from solid).
 2. Better loop finding for more complex sketches.
 3. Non-Y axis support and true solid-of-revolution from profile points for Revolve.
 
@@ -45,6 +45,7 @@ This keeps the mesh-based approach while making feature generation more useful f
 - Containment is tested via ray-casting point-in-polygon on the centroid of candidate inner polygons.
 - Contained polygons are attached as the "holes" list on the outer profile; only top-level profiles are returned.
 - Circles remain independent for now.
-- This enables future Extrude/Revolve to cut holes from the solid.
+- This enables Extrude/Revolve to cut holes from the solid.
+- **Update 2026-11-20**: ExtrudeFeature.generate_mesh now consumes the holes list. It prefers a Boolean cut (mesh_boolean) and falls back to a pure side-wall construction that includes outer + reversed inner walls.
 
 Sources: Fusion 360 and Onshape profile/region selection behavior (outer region with inner loops).
