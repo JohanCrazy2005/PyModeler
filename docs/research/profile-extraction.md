@@ -26,14 +26,25 @@ Sources: Onshape Help – Extrude, Revolve.
 
 ## Implications for PyModeler
 
-Current implementation (updated 2026-11-19):
+Current implementation (updated 2026-11-20):
 - Detects simple closed polygons from connected line entities.
 - Standalone circles as circular profiles.
 - **Arcs are now properly joined into closed loops**: when an arc's computed start/end match existing point entities within tolerance, the arc is discretized and inserted into the polygon points of the cycle.
+- **Nested holes**: after extraction, polygons are sorted by area; containment is tested with ray-casting point-in-polygon on the centroid of candidate inners. Contained polygons are attached as the "holes" list on the outer; only top-level profiles are returned.
 
 Next increments:
-1. Support for holes / nested profiles (outer + inner regions).
+1. Use hole profiles in Extrude mesh generation (subtract holes from solid).
 2. Better loop finding for more complex sketches.
 3. Non-Y axis support and true solid-of-revolution from profile points for Revolve.
 
-This keeps the mesh-based approach while making feature generation more useful for real sketches that include arcs.
+This keeps the mesh-based approach while making feature generation more useful for real sketches that include arcs and holes.
+
+## Update 2026-11-20: Nested holes
+
+- After extracting closed polygons (including those with discretized arcs inserted), profiles are sorted by area.
+- Containment is tested via ray-casting point-in-polygon on the centroid of candidate inner polygons.
+- Contained polygons are attached as the "holes" list on the outer profile; only top-level profiles are returned.
+- Circles remain independent for now.
+- This enables future Extrude/Revolve to cut holes from the solid.
+
+Sources: Fusion 360 and Onshape profile/region selection behavior (outer region with inner loops).
