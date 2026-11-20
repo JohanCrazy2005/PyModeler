@@ -33,7 +33,7 @@
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation, scale, and rotate on gizmo commit are complete (sketch offset/scale/dimensions + plane axes + recompute). Gizmo hit-testing prefers tips/rings with drag highlight.
 - Phase 4 started: **HoleFeature** (schema, parametric diameter/depth, center, cylindrical tool mesh, FeatureHistory integration, **Boolean cut against part body**). Research documented in docs/research/hole-feature.md. Extrude symmetric mesh generation also corrected. **FilletFeature stub** (schema, parametric radius, edge list, placeholder mesh, FeatureHistory). Research in docs/research/fillet-feature.md. **ChamferFeature stub** (schema, parametric distance, edge list, placeholder cone mesh, FeatureHistory). Research in docs/research/chamfer-feature.md. **Profile extraction improved**: arcs now join into closed loops when start/end match points (discretized into polygon). **Nested holes**: outer polygons receive contained inner polygons as holes list. **True solid-of-revolution**: RevolveFeature now generates a lathe mesh from polygon profile points around the Y-axis, with partial-angle end caps.
-- Done: through-all extents for Hole (extent=blind|through_all, through_depth). Next: basic mesh bevel for Fillet/Chamfer, arbitrary axis for Revolve.
+- Done: through-all extents for Hole (extent=blind|through_all, through_depth). Done: basic mesh bevel for Fillet/Chamfer (Mesh.bevel_edges, apply_to_mesh, Part.recompute modify). Next: hole profiles in Extrude, arbitrary axis for Revolve.
 
 
 ## Near-term Roadmap
@@ -50,6 +50,6 @@
 11. (done) Fillet feature stub (schema + placeholder).
 12. (done) Chamfer feature stub (schema + placeholder).
 13. (done) Profile extraction improvements (arcs into loops, holes).
-14. Basic mesh bevel approximation for Fillet/Chamfer.
+14. (done) Basic mesh bevel approximation for Fillet/Chamfer.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
