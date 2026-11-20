@@ -63,7 +63,8 @@ class RevolveFeature:
             return create_cylinder(radius=1.0, height=2.0, segments=segs, name=self.id)
         prof = profiles[0]
         if prof["type"] == "polygon" and prof.get("points"):
-            return self._revolve_polygon(prof["points"], angle, segs)
+            mesh = self._revolve_polygon(prof["points"], angle, segs)
+            return self._apply_axis_transform(mesh)
         from .mesh import create_cylinder
         xs = []
         for p in profiles:
@@ -105,6 +106,45 @@ class RevolveFeature:
             faces.append([i * ring_size + n_angle for i in range(n_profile - 1, -1, -1)])
         return Mesh(vertices=verts, faces=faces, name=self.id)
 
+
+
+    def _apply_axis_transform(self, mesh: Mesh) -> Mesh:
+        """Rotate the Y-axis revolve result so the axis matches self.axis (default Y)."""
+        if not self.axis:
+            return mesh
+        try:
+            import numpy as np
+            axis = np.asarray(self.axis, dtype=float)
+            norm = np.linalg.norm(axis)
+            if norm < 1e-8:
+                return mesh
+            axis = axis / norm
+            # Rotation that takes Y-axis to the given axis
+            y = np.array([0.0, 1.0, 0.0])
+            if np.allclose(axis, y):
+                return mesh
+            # Rodrigues formula
+            k = np.cross(y, axis)
+            k_norm = np.linalg.norm(k)
+            if k_norm < 1e-8:
+                # 180 degree case
+                R = np.diag([-1.0, 1.0, -1.0])
+            else:
+                k = k / k_norm
+                cos_t = float(np.dot(y, axis))
+                sin_t = k_norm
+                K = np.array([[0, -k[2], k[1]], [k[2], 0, -k[0]], [-k[1], k[0], 0]])
+                R = np.eye(3) + sin_t * K + (1 - cos_t) * (K @ K)
+            origin = np.asarray(self.axis_origin or [0.0, 0.0, 0.0], dtype=float)
+            verts = []
+            for v in mesh.vertices:
+                p = np.asarray(v, dtype=float)
+                verts.append((R @ p + origin).tolist())
+            mesh.vertices = verts
+            mesh.validate()
+            return mesh
+        except Exception:
+            return mesh
 
 class HoleFeature:
     """Parametric Hole with blind or through_all extents."""

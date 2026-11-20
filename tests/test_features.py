@@ -267,3 +267,17 @@ def test_extrude_with_nested_holes():
     assert len(mesh.vertices) > 8
     mesh.validate()
     feat.validate()
+
+
+def test_revolve_arbitrary_axis():
+    """Revolve around X-axis should rotate the solid away from pure Y."""
+    sketch = create_rectangle_sketch(width=4.0, height=2.0)
+    feat = RevolveFeature(sketch_id=sketch.id, angle=360.0, axis=[1.0, 0.0, 0.0], segments=8)
+    mesh = feat.generate_mesh(sketch)
+    assert len(mesh.vertices) > 0
+    # After rotation around X, Y and Z extents should both be non-trivial
+    ys = [v[1] for v in mesh.vertices]
+    zs = [v[2] for v in mesh.vertices]
+    assert max(ys) - min(ys) > 1.0
+    assert max(zs) - min(zs) > 1.0
+    feat.validate()

@@ -10,7 +10,7 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Hole profiles are now used in Extrude mesh generation. Next priorities below.**
+**Phase 4: Arbitrary axis for Revolve is implemented. Next priorities below.**
 
 ### Done this run
 - `ExtrudeFeature.generate_mesh` now consumes nested holes from `extract_simple_profiles`.
@@ -19,15 +19,15 @@ This file is updated by every automation run.
 - New test `test_extrude_with_nested_holes` (passes).
 
 ### Next concrete tasks (Phase 4)
-1. Arbitrary axis support for Revolve (rotation matrix from given axis vector).
-2. Two-distance or distance-angle modes for Chamfer (schema + apply path).
-3. Direction vector applied to Hole tool orientation (currently Y-axis + center offset only).
-4. Constraint-aware sketch updates when applying transform intent.
-5. Improve bevel quality (better corner fans, optional manifold cleanup).
-6. Early sheet-metal / panel thinking or nesting concepts.
-7. Shell feature stub.
+1. Two-distance or distance-angle modes for Chamfer (schema + apply path).
+2. Direction vector applied to Hole tool orientation (currently Y-axis + center offset only).
+3. Constraint-aware sketch updates when applying transform intent.
+4. Improve bevel quality (better corner fans, optional manifold cleanup).
+5. Early sheet-metal / panel thinking or nesting concepts.
+6. Shell feature stub.
 
 ## Recently Completed
+- Arbitrary axis support for Revolve (Rodrigues rotation from Y-axis to given axis vector + origin)
 - Hole profiles used in Extrude mesh generation (Boolean cut + pure wall fallback + test)
 - Basic mesh bevel approximation for Fillet / Chamfer (Mesh.bevel_edges + apply_to_mesh + Part.recompute modify path + tests)
 - Fixed Fillet/Chamfer operation default to schema-valid `"modify"`
