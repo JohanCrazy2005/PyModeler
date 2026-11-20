@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-19 (Chamfer feature stub: schema + distance/edges + placeholder mesh + history)
+Last updated: 2026-11-19 (Profile extraction: proper arc joining into closed loops + tests)
