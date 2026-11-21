@@ -66,7 +66,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
-- [~] Fillet / Chamfer / Shell / Hole features (Hole through-all; Fillet/Chamfer basic mesh bevel via Mesh.bevel_edges + apply_to_mesh; **Chamfer equal/two-distance/distance-angle modes**; **Hole direction vector orientation**; profile arcs + nested holes; true solid-of-revolution for Revolve; Extrude subtracts nested hole profiles)
+- [~] Fillet / Chamfer / Shell / Hole features (Hole through-all; Fillet/Chamfer basic mesh bevel via Mesh.bevel_edges + apply_to_mesh; **Chamfer equal/two-distance/distance-angle modes**; **Hole direction vector orientation**; **Shell feature stub (schema + history + placeholder)**; profile arcs + nested holes; true solid-of-revolution for Revolve; Extrude subtracts nested hole profiles)
 - [ ] Sheet metal / panel basics
 - [ ] Simple nesting concepts
 - [ ] Early toolpath / G-code generation stubs
@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-20 (Hole direction)
+Last updated: 2026-11-20 (Shell feature stub)
