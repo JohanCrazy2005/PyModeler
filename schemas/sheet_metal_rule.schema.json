@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/sheet_metal_rule.schema.json",
+  "title": "SheetMetalRuleStore",
+  "description": "Library of sheet-metal rules (thickness, bend radius, K-factor, relief). Used for future flange / flat-pattern / nesting features.",
+  "type": "object",
+  "required": ["rules"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional store identifier"
+    },
+    "name": {
+      "type": "string",
+      "default": "Sheet Metal Rules",
+      "description": "Human-readable name for the rule library"
+    },
+    "rules": {
+      "type": "array",
+      "description": "List of sheet-metal rule definitions",
+      "items": { "$ref": "#/$defs/rule" }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "required": ["name", "thickness", "bend_radius", "k_factor"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name, e.g. 'Mild Steel 1.5mm'"
+        },
+        "thickness": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Sheet thickness (gauge) in the rule's unit"
+        },
+        "bend_radius": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Inside bend radius"
+        },
+        "k_factor": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.5,
+          "description": "Neutral-axis factor (0.0–0.5). Typical 0.33–0.45 for air bending"
+        },
+        "relief_type": {
+          "type": "string",
+          "enum": ["none", "rectangular", "tear", "round", "obround"],
+          "default": "rectangular",
+          "description": "Corner relief style"
+        },
+        "unit": {
+          "type": "string",
+          "default": "mm",
+          "description": "Length unit for thickness and radius"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Free-form note"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
