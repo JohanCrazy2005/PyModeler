@@ -62,7 +62,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Camera controls, selection, feature highlighting (selection clear-on-miss + keyboard frame/views + full transform framing/picking + paint path)
 - [x] Full object transform (scale + rotation + location) applied to world vertices for framing, picking, and (when GL restored) drawing
 - [x] Selection outline / edge highlight overlay in the viewport
-- [x] Transform tools that respect parametric intent where possible (gizmo visuals + translate/scale/rotate drive sketches/planes + recompute)
+- [x] Transform tools that respect parametric intent where possible (gizmo visuals + translate/scale/rotate drive sketches/planes + recompute; **constraint-aware: locked/coincident points preserved**)
 - [x] Gizmo polish: better hit-testing (tips/rings) + drag visual feedback
 
 ## Phase 4 – Advanced CAD + Path to CAM
@@ -79,4 +79,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-21 (Fillet/Chamfer/Shell UI)
+Last updated: 2026-11-21 (Constraint-aware transforms)
