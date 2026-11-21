@@ -37,6 +37,7 @@ from .features import (
     HoleFeature,
     FilletFeature,
     ChamferFeature,
+    ShellFeature,
     FeatureHistory,
     FeatureValidationError,
     validate_extrude_data,
@@ -44,6 +45,7 @@ from .features import (
     validate_hole_data,
     validate_fillet_data,
     validate_chamfer_data,
+    validate_shell_data,
     validate_history_data,
 )
 from .part import Part, PartValidationError, validate_part_data
@@ -122,6 +124,7 @@ __all__ = [
     "HoleFeature",
     "FilletFeature",
     "ChamferFeature",
+    "ShellFeature",
     "FeatureHistory",
     "FeatureValidationError",
     "validate_extrude_data",
@@ -129,6 +132,7 @@ __all__ = [
     "validate_hole_data",
     "validate_fillet_data",
     "validate_chamfer_data",
+    "validate_shell_data",
     "validate_history_data",
     "Part",
     "PartValidationError",
