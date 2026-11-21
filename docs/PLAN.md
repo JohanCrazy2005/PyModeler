@@ -36,6 +36,7 @@
 - Done: through-all extents for Hole. Done: basic mesh bevel for Fillet/Chamfer. Done: hole profiles used in Extrude. Done: arbitrary axis for Revolve. Done: Chamfer modes (equal / two-distance / distance-angle) in schema + apply path with basic bevel stub. Done: Hole direction vector orientation (Rodrigues rotation of tool cylinder). Done: Shell feature (schema + FeatureHistory + basic mesh shell approximation via normal-offset + walls).
 - Done: Hole direction exposed in property panel (diameter, depth, direction vector editor).
 - Done: Fillet / Chamfer / Shell property panel UI exposure (radius, mode + secondary, thickness, direction).
+- Done: Constraint-aware parametric transforms (translation/scale skip locked points and coincident components with fixed points; radii scaled only for unlocked centers).
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
