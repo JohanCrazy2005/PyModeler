@@ -13,13 +13,11 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Simple rectangular nesting concepts:
-  - Research notes in `docs/research/nesting.md` (Mozaik Optimizer, rectangular vs true-shape, inputs/outputs, yield).
-  - New `schemas/nesting_job.schema.json` + `NestingJob` class (sheet size, kerf, trim, parts with optional rotation).
-  - Pure-Python shelf packer producing sheet layouts + per-sheet and total yield.
-  - `nesting_job_from_cutlist()` helper to seed from existing CutList (width × depth blanks).
-  - Full unit tests covering schema, single/multi-sheet, rotation, overlap safety, cutlist bridge.
-- All new tests pass; core suite remains runnable.
+- Completed the missing NestingJob implementation:
+  - Pure-Python shelf packer in `src/pymodeler/core/nesting.py` (schema-validated, optional 90° rotation, kerf spacing, multi-sheet).
+  - Matches existing schema, tests, and `nesting_job_from_cutlist` helper.
+  - All nesting tests pass (schema, packing, rotation, cannot-fit, cutlist bridge, summary).
+- CHECKLIST updated to mark simple nesting concepts done.
 
 ### Next concrete tasks (Phase 4)
 1. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
@@ -27,9 +25,10 @@ This file is updated by every automation run.
 3. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
 4. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 5. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
+6. Early toolpath / G-code generation stubs.
 
 ## Recently Completed
-- Rectangular NestingJob schema + shelf packer + from-cutlist helper + research
+- Rectangular NestingJob schema + shelf packer + from-cutlist helper + research (implementation completed)
 - Sheet-metal rule schema + bend-allowance helper + research
 - Improved bevel quality (normal-based offsets, corner fans, optional cleanup)
 - Constraint-aware sketch updates when applying transform intent (locked points + coincident components)
@@ -50,4 +49,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Rectangular nesting job stub)
+Last updated: 2026-11-21 (NestingJob implementation completed)
