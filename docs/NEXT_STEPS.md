@@ -10,22 +10,22 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Hole direction vector orientation implemented. Next priorities below.**
+**Phase 4: Shell feature stub implemented. Next priorities below.**
 
 ### Done this run
-- Applied direction vector to HoleFeature tool orientation.
-- After the existing center translation (preserving default +Y behavior), the cylinder is rotated via Rodrigues so its axis aligns with the given direction (around the center pivot).
-- Default (no direction or parallel to Y) is unchanged so existing tests pass.
-- Added tests for X-axis and negative-Z directions (span checks + roundtrip).
+- Researched Shell feature in Fusion 360 and Onshape (docs/research/shell-feature.md).
+- Added ShellFeature stub: JSON schema, parametric thickness, optional faces, direction (inside/outside/both), FeatureHistory integration, placeholder mesh, apply_to_mesh stub that returns a copy.
+- Added tests covering construction, parameters, schema roundtrip, history, and apply stub.
 
 ### Next concrete tasks (Phase 4)
 1. Constraint-aware sketch updates when applying transform intent.
 2. Improve bevel quality (better corner fans, optional manifold cleanup).
 3. Early sheet-metal / panel thinking or nesting concepts.
-4. Shell feature stub.
+4. Basic mesh shell approximation (offset faces + Boolean cut or wall construction).
 5. UI exposure for hole direction (property panel or sketch normal picker).
 
 ## Recently Completed
+- Shell feature stub (schema, history, placeholder mesh)
 - Direction vector applied to Hole tool orientation (Rodrigues rotation from Y-axis)
 - Two-distance / distance-angle modes for Chamfer (schema + apply path + basic bevel)
 - Arbitrary axis support for Revolve (Rodrigues rotation from Y-axis to given axis vector + origin)
@@ -47,4 +47,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-20 (Hole direction orientation)
+Last updated: 2026-11-20 (Shell feature stub)
