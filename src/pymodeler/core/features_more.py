@@ -8,6 +8,7 @@ from .features_core import (
     FeatureValidationError,
     validate_fillet_data,
     validate_chamfer_data,
+    validate_shell_data,
     validate_history_data,
     _new_id,
     _resolve_value,
@@ -205,6 +206,94 @@ class ChamferFeature:
             return base.bevel_edges(edges=edges, amount=d1, segments=1, name=f"{base.name}_chamfer")
 
 
+class ShellFeature:
+    """Parametric Shell feature stub.
+
+    Stores thickness, optional faces to remove, and direction.
+    Full offset + Boolean shell is deferred.
+    generate_mesh returns a small placeholder box whose size reflects thickness
+    so the feature is visible in the timeline / recompute path.
+    """
+
+    def __init__(
+        self,
+        thickness: float | str = 1.0,
+        name: str = "Shell",
+        faces: Optional[list] = None,
+        direction: str = "inside",
+        operation: str = "modify",
+        metadata: Optional[dict] = None,
+        id: Optional[str] = None,
+    ):
+        self.id = id or _new_id("shell")
+        self.type = "shell"
+        self.name = name
+        self.thickness = thickness
+        self.faces = faces or []
+        self.direction = direction
+        self.operation = operation
+        self.metadata = metadata or {}
+        self.validate()
+
+    def to_dict(self) -> dict:
+        data: dict[str, Any] = {
+            "id": self.id,
+            "type": self.type,
+            "name": self.name,
+            "thickness": self.thickness,
+            "faces": self.faces,
+            "direction": self.direction,
+            "operation": self.operation,
+        }
+        if self.metadata:
+            data["metadata"] = self.metadata
+        return data
+
+    def validate(self) -> None:
+        validate_shell_data(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ShellFeature":
+        validate_shell_data(data)
+        return cls(
+            thickness=data["thickness"],
+            name=data.get("name", "Shell"),
+            faces=data.get("faces", []),
+            direction=data.get("direction", "inside"),
+            operation=data.get("operation", "modify"),
+            metadata=data.get("metadata"),
+            id=data.get("id"),
+        )
+
+    def resolved_thickness(self, parameters: Optional[ParameterStore] = None) -> float:
+        return _resolve_value(self.thickness, parameters, 1.0)
+
+    def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Placeholder mesh for timeline visibility when no base body is available."""
+        t = self.resolved_thickness(parameters)
+        if t <= 0:
+            raise FeatureValidationError("Shell thickness must be positive")
+        from .mesh import create_cube
+        # Scale placeholder by thickness so it is visible
+        return create_cube(size=max(t * 2.0, 0.5), name=self.id)
+
+    def apply_to_mesh(self, base: Mesh, parameters: Optional[ParameterStore] = None) -> Mesh:
+        """Stub: currently returns the base unchanged (full shell deferred).
+
+        Future: offset faces, Boolean-cut interior, or pure wall construction.
+        """
+        t = self.resolved_thickness(parameters)
+        if t <= 0:
+            raise FeatureValidationError("Shell thickness must be positive")
+        # For now, just return a copy so the feature can be applied without crashing.
+        # Real implementation will modify the mesh.
+        return Mesh(
+            vertices=list(base.vertices),
+            faces=list(base.faces),
+            name=f"{base.name}_shell",
+        )
+
+
 class FeatureHistory:
     """Ordered timeline of features with rollback support."""
 
@@ -269,6 +358,10 @@ class FeatureHistory:
         self.features.append(feat.to_dict())
         self.validate()
 
+    def add_shell(self, feat: "ShellFeature") -> None:
+        self.features.append(feat.to_dict())
+        self.validate()
+
     def active_features(self) -> List[dict]:
         if self.rollback_marker is None:
             return list(self.features)
@@ -297,6 +390,9 @@ class FeatureHistory:
                     result[fid] = feat.generate_mesh(params)
                 elif fdict.get("type") == "chamfer":
                     feat = ChamferFeature.from_dict(fdict)
+                    result[fid] = feat.generate_mesh(params)
+                elif fdict.get("type") == "shell":
+                    feat = ShellFeature.from_dict(fdict)
                     result[fid] = feat.generate_mesh(params)
             except Exception:
                 from .mesh import create_cube
