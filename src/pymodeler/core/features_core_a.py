@@ -18,12 +18,14 @@ REVOLVE_SCHEMA = _load("revolve.schema.json")
 HOLE_SCHEMA = _load("hole.schema.json")
 FILLET_SCHEMA = _load("fillet.schema.json")
 CHAMFER_SCHEMA = _load("chamfer.schema.json")
+SHELL_SCHEMA = _load("shell.schema.json")
 HISTORY_SCHEMA = _load("feature_history.schema.json")
 _EXTRUDE_VALIDATOR = Draft202012Validator(EXTRUDE_SCHEMA)
 _REVOLVE_VALIDATOR = Draft202012Validator(REVOLVE_SCHEMA)
 _HOLE_VALIDATOR = Draft202012Validator(HOLE_SCHEMA)
 _FILLET_VALIDATOR = Draft202012Validator(FILLET_SCHEMA)
 _CHAMFER_VALIDATOR = Draft202012Validator(CHAMFER_SCHEMA)
+_SHELL_VALIDATOR = Draft202012Validator(SHELL_SCHEMA)
 _HISTORY_VALIDATOR = Draft202012Validator(HISTORY_SCHEMA)
 
 class FeatureValidationError(ValueError):
@@ -45,6 +47,8 @@ def validate_fillet_data(data: dict) -> None:
     _validate(_FILLET_VALIDATOR, data, "Fillet")
 def validate_chamfer_data(data: dict) -> None:
     _validate(_CHAMFER_VALIDATOR, data, "Chamfer")
+def validate_shell_data(data: dict) -> None:
+    _validate(_SHELL_VALIDATOR, data, "Shell")
 def validate_history_data(data: dict) -> None:
     _validate(_HISTORY_VALIDATOR, data, "FeatureHistory")
 
