@@ -10,25 +10,26 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Hole direction exposed in property panel. Next priorities below.**
+**Phase 4: Fillet / Chamfer / Shell property panel UI exposure. Next priorities below.**
 
 ### Done this run
-- Extended FeatureTreeWidget to instantiate HoleFeature on selection.
-- Extended PropertyPanel to display and edit HoleFeature:
-  - Diameter (in distance field)
-  - Depth (in offset/depth field)
-  - Direction vector as "x,y,z" text field (optional)
+- Extended FeatureTreeWidget to instantiate FilletFeature, ChamferFeature, and ShellFeature on selection.
+- Extended PropertyPanel to display and edit:
+  - Fillet: radius (distance field)
+  - Chamfer: distance, mode (combo: equal_distance / two_distance / distance_angle), secondary (distance2 or angle)
+  - Shell: thickness (distance field), direction (inside/outside/both in direction field)
 - Apply path updates history dict and validates.
-- Added test_property_panel_hole_direction covering show + edit of direction and diameter.
+- Added tests: test_property_panel_fillet, test_property_panel_chamfer, test_property_panel_shell covering show + edit.
 
 ### Next concrete tasks (Phase 4)
 1. Constraint-aware sketch updates when applying transform intent.
 2. Improve bevel quality (better corner fans, optional manifold cleanup).
 3. Early sheet-metal / panel thinking or nesting concepts.
 4. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
-5. UI exposure for other Phase 4 features (fillet radius, chamfer mode, shell thickness/faces).
+5. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
 
 ## Recently Completed
+- UI exposure for Fillet radius, Chamfer mode/distance/secondary, Shell thickness/direction (property panel)
 - UI exposure for hole direction (property panel)
 - Shell basic mesh approximation (normal offset + walls + openings)
 - Shell feature stub (schema, history, placeholder mesh)
@@ -45,4 +46,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-20 (Hole direction UI)
+Last updated: 2026-11-21 (Fillet/Chamfer/Shell UI)

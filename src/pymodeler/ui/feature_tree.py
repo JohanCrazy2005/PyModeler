@@ -11,6 +11,7 @@ from typing import Optional, Union
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QColor
 from PyQt6.QtWidgets import (
+    QComboBox,
     QFormLayout,
     QLabel,
     QLineEdit,
@@ -23,11 +24,14 @@ from PyQt6.QtWidgets import (
 )
 
 from pymodeler.core import (
+    ChamferFeature,
     ExtrudeFeature,
     FeatureHistory,
+    FilletFeature,
     HoleFeature,
     ParameterStore,
     RevolveFeature,
+    ShellFeature,
 )
 
 
@@ -71,12 +75,19 @@ class FeatureTreeWidget(QListWidget):
         if items and self.history is not None:
             idx = items[0].data(Qt.ItemDataRole.UserRole)
             fdict = self.history.features[idx]
-            if fdict.get("type") == "extrude":
+            ftype = fdict.get("type")
+            if ftype == "extrude":
                 feat = ExtrudeFeature.from_dict(fdict)
-            elif fdict.get("type") == "revolve":
+            elif ftype == "revolve":
                 feat = RevolveFeature.from_dict(fdict)
-            elif fdict.get("type") == "hole":
+            elif ftype == "hole":
                 feat = HoleFeature.from_dict(fdict)
+            elif ftype == "fillet":
+                feat = FilletFeature.from_dict(fdict)
+            elif ftype == "chamfer":
+                feat = ChamferFeature.from_dict(fdict)
+            elif ftype == "shell":
+                feat = ShellFeature.from_dict(fdict)
             else:
                 feat = None
             self.feature_selected.emit(feat)
@@ -107,7 +118,7 @@ class FeatureTreeWidget(QListWidget):
 
 
 class PropertyPanel(QWidget):
-    """Simple property editor for Extrude / Revolve / Hole features."""
+    """Simple property editor for Extrude / Revolve / Hole / Fillet / Chamfer / Shell features."""
 
     properties_changed = pyqtSignal()
 
@@ -124,17 +135,22 @@ class PropertyPanel(QWidget):
         self.distance_edit = QLineEdit()
         self.distance_edit.setPlaceholderText("number or parameter name")
         self.distance_edit.editingFinished.connect(self._apply)
-        form.addRow("Distance / Angle / Diameter:", self.distance_edit)
+        form.addRow("Distance / Angle / Diameter / Radius / Thickness:", self.distance_edit)
 
         self.offset_edit = QLineEdit()
-        self.offset_edit.setPlaceholderText("start offset (extrude) or depth (hole)")
+        self.offset_edit.setPlaceholderText("start offset (extrude), depth (hole), distance2 or angle (chamfer)")
         self.offset_edit.editingFinished.connect(self._apply)
-        form.addRow("Offset / Depth:", self.offset_edit)
+        form.addRow("Offset / Depth / Secondary:", self.offset_edit)
 
         self.direction_edit = QLineEdit()
-        self.direction_edit.setPlaceholderText("x,y,z  (hole direction, optional)")
+        self.direction_edit.setPlaceholderText("x,y,z (hole direction) or inside/outside/both (shell)")
         self.direction_edit.editingFinished.connect(self._apply)
         form.addRow("Direction:", self.direction_edit)
+
+        self.mode_combo = QComboBox()
+        self.mode_combo.addItems(["equal_distance", "two_distance", "distance_angle"])
+        self.mode_combo.currentTextChanged.connect(self._apply)
+        form.addRow("Chamfer Mode:", self.mode_combo)
 
         self.sketch_label = QLabel()
         form.addRow("Sketch ID:", self.sketch_label)
@@ -146,7 +162,16 @@ class PropertyPanel(QWidget):
         layout.addWidget(self.apply_btn)
         layout.addStretch()
 
-        self.current_feature: Optional[Union[ExtrudeFeature, RevolveFeature, HoleFeature]] = None
+        self.current_feature: Optional[
+            Union[
+                ExtrudeFeature,
+                RevolveFeature,
+                HoleFeature,
+                FilletFeature,
+                ChamferFeature,
+                ShellFeature,
+            ]
+        ] = None
         self.history: Optional[FeatureHistory] = None
         self.parameters: Optional[ParameterStore] = None
 
@@ -159,7 +184,17 @@ class PropertyPanel(QWidget):
         self.parameters = parameters
 
     def show_feature(
-        self, feature: Optional[Union[ExtrudeFeature, RevolveFeature, HoleFeature]]
+        self,
+        feature: Optional[
+            Union[
+                ExtrudeFeature,
+                RevolveFeature,
+                HoleFeature,
+                FilletFeature,
+                ChamferFeature,
+                ShellFeature,
+            ]
+        ],
     ) -> None:
         self.current_feature = feature
         if feature is None:
@@ -168,12 +203,18 @@ class PropertyPanel(QWidget):
             self.offset_edit.clear()
             self.direction_edit.clear()
             self.sketch_label.clear()
+            self.mode_combo.setEnabled(False)
             self.setEnabled(False)
             return
         self.setEnabled(True)
         self.name_edit.setText(feature.name)
         self.direction_edit.setEnabled(False)
         self.direction_edit.clear()
+        self.offset_edit.setEnabled(False)
+        self.offset_edit.clear()
+        self.mode_combo.setEnabled(False)
+        self.mode_combo.setCurrentText("equal_distance")
+
         if isinstance(feature, ExtrudeFeature):
             dist = feature.distance
             self.distance_edit.setText(str(dist) if not isinstance(dist, str) else dist)
@@ -184,8 +225,6 @@ class PropertyPanel(QWidget):
         elif isinstance(feature, RevolveFeature):
             ang = feature.angle
             self.distance_edit.setText(str(ang) if not isinstance(ang, str) else ang)
-            self.offset_edit.clear()
-            self.offset_edit.setEnabled(False)
             self.sketch_label.setText(feature.sketch_id)
         elif isinstance(feature, HoleFeature):
             diam = feature.diameter
@@ -197,6 +236,30 @@ class PropertyPanel(QWidget):
                 self.direction_edit.setText(
                     ",".join(str(c) for c in feature.direction)
                 )
+            self.direction_edit.setEnabled(True)
+            self.sketch_label.setText("(none)")
+        elif isinstance(feature, FilletFeature):
+            rad = feature.radius
+            self.distance_edit.setText(str(rad) if not isinstance(rad, str) else rad)
+            self.sketch_label.setText("(none)")
+        elif isinstance(feature, ChamferFeature):
+            dist = feature.distance
+            self.distance_edit.setText(str(dist) if not isinstance(dist, str) else dist)
+            self.mode_combo.setEnabled(True)
+            self.mode_combo.setCurrentText(feature.mode or "equal_distance")
+            if feature.distance2 is not None:
+                d2 = feature.distance2
+                self.offset_edit.setText(str(d2) if not isinstance(d2, str) else d2)
+                self.offset_edit.setEnabled(True)
+            elif feature.angle is not None:
+                ang = feature.angle
+                self.offset_edit.setText(str(ang) if not isinstance(ang, str) else ang)
+                self.offset_edit.setEnabled(True)
+            self.sketch_label.setText("(none)")
+        elif isinstance(feature, ShellFeature):
+            thick = feature.thickness
+            self.distance_edit.setText(str(thick) if not isinstance(thick, str) else thick)
+            self.direction_edit.setText(feature.direction or "inside")
             self.direction_edit.setEnabled(True)
             self.sketch_label.setText("(none)")
         else:
@@ -245,6 +308,34 @@ class PropertyPanel(QWidget):
                             self.current_feature.direction = None
                     else:
                         self.current_feature.direction = None
+                elif isinstance(self.current_feature, FilletFeature):
+                    self.current_feature.radius = value
+                elif isinstance(self.current_feature, ChamferFeature):
+                    self.current_feature.distance = value
+                    self.current_feature.mode = self.mode_combo.currentText()
+                    sec_text = self.offset_edit.text().strip()
+                    if self.current_feature.mode == "two_distance":
+                        try:
+                            self.current_feature.distance2 = float(sec_text) if sec_text else None
+                        except ValueError:
+                            self.current_feature.distance2 = sec_text or None
+                        self.current_feature.angle = None
+                    elif self.current_feature.mode == "distance_angle":
+                        try:
+                            self.current_feature.angle = float(sec_text) if sec_text else None
+                        except ValueError:
+                            self.current_feature.angle = sec_text or None
+                        self.current_feature.distance2 = None
+                    else:
+                        self.current_feature.distance2 = None
+                        self.current_feature.angle = None
+                elif isinstance(self.current_feature, ShellFeature):
+                    self.current_feature.thickness = value
+                    dir_text = self.direction_edit.text().strip().lower()
+                    if dir_text in ("inside", "outside", "both"):
+                        self.current_feature.direction = dir_text
+                    else:
+                        self.current_feature.direction = "inside"
                 self.history.features[i] = self.current_feature.to_dict()
                 self.history.validate()
                 break
