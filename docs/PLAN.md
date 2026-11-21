@@ -10,7 +10,7 @@
 7. **Design-to-Manufacture Mindset**: Even early features should keep manufacturing usefulness in mind (parameters, cut lists, clear part definitions).
 
 ## Architecture (updated for CAD focus)
-- `schemas/` – Sketch, Feature, Part, Assembly, Parameter, Material, CutList, etc.
+- `schemas/` – Sketch, Feature, Part, Assembly, Parameter, Material, CutList, SheetMetalRule, etc.
 - `src/pymodeler/core/` – pure parametric logic (no Qt)
 - `src/pymodeler/ui/` – PyQt6 (feature tree, viewport, property panels, sketch editor)
 - `src/pymodeler/render/` – viewport
@@ -38,6 +38,7 @@
 - Done: Fillet / Chamfer / Shell property panel UI exposure (radius, mode + secondary, thickness, direction).
 - Done: Constraint-aware parametric transforms (translation/scale skip locked points and coincident components with fixed points; radii scaled only for unlocked centers).
 - Done: Improved bevel quality (adjacent-face normal offsets, corner fans, multi-segment support, optional vertex-merge / degenerate cleanup).
+- Done: Early sheet-metal / panel thinking — research notes + `SheetMetalRule` schema + store + `bend_allowance` helper + starter rules.
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).
@@ -55,5 +56,6 @@
 13. (done) Profile extraction improvements (arcs into loops, holes).
 14. (done) Basic mesh bevel approximation for Fillet/Chamfer.
 15. (done) Hole profiles used in Extrude mesh generation (subtract nested holes).
+16. (done) Sheet-metal rule schema + bend-allowance helper.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
