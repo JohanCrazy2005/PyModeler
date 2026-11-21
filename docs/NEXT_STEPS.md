@@ -10,25 +10,25 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Fillet / Chamfer / Shell property panel UI exposure. Next priorities below.**
+**Phase 4 polish + constraint-aware transforms. Next priorities below.**
 
 ### Done this run
-- Extended FeatureTreeWidget to instantiate FilletFeature, ChamferFeature, and ShellFeature on selection.
-- Extended PropertyPanel to display and edit:
-  - Fillet: radius (distance field)
-  - Chamfer: distance, mode (combo: equal_distance / two_distance / distance_angle), secondary (distance2 or angle)
-  - Shell: thickness (distance field), direction (inside/outside/both in direction field)
-- Apply path updates history dict and validates.
-- Added tests: test_property_panel_fillet, test_property_panel_chamfer, test_property_panel_shell covering show + edit.
+- Made sketch transform helpers (translation + scale) constraint-aware.
+- Added `_locked_point_ids` that locks points with `fixed=True`, a `"fixed"` constraint, or transitive coincident membership with a locked point.
+- Translation and scale now skip locked points so coincidence and fixed intent are preserved.
+- Radii of circles/arcs are scaled only when their center is unlocked.
+- Added tests covering coincident-with-fixed and fixed-constraint locking for both translation and scale.
+- All existing + new parametric_transform tests pass.
 
 ### Next concrete tasks (Phase 4)
-1. Constraint-aware sketch updates when applying transform intent.
-2. Improve bevel quality (better corner fans, optional manifold cleanup).
-3. Early sheet-metal / panel thinking or nesting concepts.
-4. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
-5. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
+1. Improve bevel quality (better corner fans, optional manifold cleanup).
+2. Early sheet-metal / panel thinking or nesting concepts.
+3. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
+4. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
+5. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
 
 ## Recently Completed
+- Constraint-aware sketch updates when applying transform intent (locked points + coincident components)
 - UI exposure for Fillet radius, Chamfer mode/distance/secondary, Shell thickness/direction (property panel)
 - UI exposure for hole direction (property panel)
 - Shell basic mesh approximation (normal offset + walls + openings)
@@ -46,4 +46,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Fillet/Chamfer/Shell UI)
+Last updated: 2026-11-21 (Constraint-aware transforms)
