@@ -10,26 +10,25 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 polish + better bevel quality. Next priorities below.**
+**Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Improved `Mesh.bevel_edges` quality:
-  - Offsets now use adjacent-face average normals and a true perpendicular direction instead of fixed world-axis offsets.
-  - Adds proper chamfer quads.
-  - Multi-segment path inserts intermediate vertices for a coarser fillet approximation.
-  - Vertices where multiple beveled edges meet receive simple corner fans (triangles from the original vertex).
-  - Optional `cleanup=True` (default) merges near-coincident vertices and drops degenerate faces.
-- Added a focused test verifying corner fans + cleanup still produce a valid mesh with increased face count.
-- Existing bevel / fillet / chamfer apply tests continue to pass (pre-existing Part.get_body failures remain unrelated).
+- Early sheet-metal / panel thinking:
+  - Research notes in `docs/research/sheet-metal.md` (Fusion rules/flanges/flat pattern, Onshape simultaneous folded+flat, Mozaik nesting).
+  - New `schemas/sheet_metal_rule.schema.json` + `SheetMetalRuleStore` (thickness, inside bend radius, K-factor 0–0.5, relief type).
+  - `bend_allowance()` helper implementing BA = (π/180)·A·(R + K·T).
+  - `create_default_sheet_metal_rules()` starter library + full unit tests.
+- All new tests pass; existing suite remains runnable.
 
 ### Next concrete tasks (Phase 4)
-1. Early sheet-metal / panel thinking or nesting concepts (research + schema stub).
+1. Simple nesting concepts: rectangular packer stub + NestingJob schema (parts → sheet layouts, yield).
 2. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
 3. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
 4. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
 5. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 
 ## Recently Completed
+- Sheet-metal rule schema + bend-allowance helper + research
 - Improved bevel quality (normal-based offsets, corner fans, optional cleanup)
 - Constraint-aware sketch updates when applying transform intent (locked points + coincident components)
 - UI exposure for Fillet radius, Chamfer mode/distance/secondary, Shell thickness/direction (property panel)
@@ -49,4 +48,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Improved bevel quality)
+Last updated: 2026-11-21 (Sheet-metal rule schema + bend allowance)

@@ -12,6 +12,7 @@ This folder holds structured research on features of parametric CAD and design-t
 - `assembly-mates.md` – Rigid / fastened mates (Fusion Joints, Onshape Fastened).
 - `bom.md` – Basic Bill of Materials generation from Parts or Assemblies.
 - `dxf-export.md` – DXF export stub using ezdxf for sketches and closed profiles.
+- `sheet-metal.md` – Sheet-metal rules (thickness, bend radius, K-factor), flanges, flat patterns, nesting concepts (Fusion / Onshape / Mozaik).
 - Legacy notes (from earlier Blender-focused research): `blender-core-features.md`, `extrude-operator.md`, `inset-operator.md`, `viewport-essentials.md`.
 
-Last updated: 2026-11-17 (basic BOM research note added)
+Last updated: 2026-11-21 (sheet-metal research note added)
