@@ -101,3 +101,48 @@ def test_apply_scale_and_rotation_to_part():
     apply_rotation_to_part_sketch_planes(part, 0.0, 0.0, 0.1)
     assert sk.plane["x_axis"] != pytest.approx([1.0, 0.0, 0.0])
     sk.validate()
+
+
+def test_apply_translation_preserves_coincident_with_fixed():
+    """A free point coincident with a fixed point must stay put (constraint-aware)."""
+    sketch = Sketch()
+    fixed = sketch.add_point(5.0, 5.0, fixed=True)
+    free = sketch.add_point(5.0, 5.0)  # coincident position
+    sketch.add_coincident(free, fixed)
+    # also a truly free point
+    loose = sketch.add_point(0.0, 0.0)
+
+    apply_translation_to_sketch(sketch, dx=2.0, dy=3.0)
+
+    assert sketch.get_entity(fixed)["x"] == pytest.approx(5.0)
+    assert sketch.get_entity(free)["x"] == pytest.approx(5.0)  # locked by coincidence
+    assert sketch.get_entity(loose)["x"] == pytest.approx(2.0)
+    sketch.validate()
+
+
+def test_apply_translation_respects_fixed_constraint():
+    """A 'fixed' constraint on a point locks it even without the fixed flag."""
+    sketch = Sketch()
+    pt = sketch.add_point(1.0, 1.0)
+    sketch.add_constraint("fixed", [pt])
+    other = sketch.add_point(0.0, 0.0)
+
+    apply_translation_to_sketch(sketch, 10.0, 10.0)
+
+    assert sketch.get_entity(pt)["x"] == pytest.approx(1.0)
+    assert sketch.get_entity(other)["x"] == pytest.approx(10.0)
+
+
+def test_apply_scale_preserves_coincident_with_fixed():
+    sketch = Sketch()
+    fixed = sketch.add_point(2.0, 2.0, fixed=True)
+    free = sketch.add_point(2.0, 2.0)
+    sketch.add_coincident(free, fixed)
+    loose = sketch.add_point(4.0, 0.0)
+
+    apply_scale_to_sketch(sketch, sx=2.0, sy=2.0)
+
+    assert sketch.get_entity(fixed)["x"] == pytest.approx(2.0)
+    assert sketch.get_entity(free)["x"] == pytest.approx(2.0)
+    assert sketch.get_entity(loose)["x"] == pytest.approx(8.0)
+    sketch.validate()
