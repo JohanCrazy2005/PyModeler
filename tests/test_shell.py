@@ -1,4 +1,4 @@
-"""Tests for ShellFeature stub."""
+"""Tests for ShellFeature."""
 
 import pytest
 
@@ -47,14 +47,28 @@ def test_shell_invalid_schema():
         ShellFeature.from_dict({"type": "shell"})  # missing thickness
 
 
-def test_shell_apply_to_mesh_stub():
+def test_shell_apply_to_mesh():
     base = create_cube(size=4.0)
     feat = ShellFeature(thickness=0.5)
     result = feat.apply_to_mesh(base)
     result.validate()
-    # Stub currently returns a copy
-    assert len(result.vertices) == len(base.vertices)
-    assert len(result.faces) == len(base.faces)
+    # Basic shell should produce more geometry than the original solid
+    assert len(result.vertices) > len(base.vertices)
+    assert len(result.faces) > len(base.faces)
+    # Thickness is reflected in the name
+    assert "shell" in result.name
+
+
+def test_shell_apply_with_opening():
+    base = create_cube(size=4.0)
+    # Open the top face (index 1 is the top face in create_cube)
+    feat = ShellFeature(thickness=0.4, faces=[1])
+    result = feat.apply_to_mesh(base)
+    result.validate()
+    assert len(result.vertices) > len(base.vertices)
+    # Opening means fewer outer/inner faces than a fully closed shell
+    closed = ShellFeature(thickness=0.4).apply_to_mesh(base)
+    assert len(result.faces) < len(closed.faces)
 
 
 def test_shell_history_integration():

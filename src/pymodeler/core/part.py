@@ -121,11 +121,11 @@ class Part:
         - "new" or first solid feature: starts the body
         - "join": mesh_boolean join
         - "cut": mesh_boolean cut (difference)
-        - "modify": in-place mesh modification (Fillet / Chamfer bevel)
+        - "modify": in-place mesh modification (Fillet / Chamfer bevel / Shell)
         Falls back gracefully when the Boolean engine is unavailable.
         Returns the resulting Mesh or None if no features produced geometry.
         """
-        from .features import FilletFeature, ChamferFeature
+        from .features import FilletFeature, ChamferFeature, ShellFeature
 
         active = self.feature_history.active_features()
         if not active:
@@ -142,19 +142,22 @@ class Part:
             op = fdict.get("operation", "join")
 
             # Modify features act on the current body
-            if ftype in ("fillet", "chamfer") and op == "modify":
+            if ftype in ("fillet", "chamfer", "shell") and op == "modify":
                 if body is None:
                     continue
                 try:
                     if ftype == "fillet":
                         feat = FilletFeature.from_dict(fdict)
                         body = feat.apply_to_mesh(body, self.parameters)
-                    else:
+                    elif ftype == "chamfer":
                         feat = ChamferFeature.from_dict(fdict)
+                        body = feat.apply_to_mesh(body, self.parameters)
+                    else:
+                        feat = ShellFeature.from_dict(fdict)
                         body = feat.apply_to_mesh(body, self.parameters)
                     body.name = f"{self.name}_{fid}"
                 except Exception:
-                    # Keep previous body if bevel fails
+                    # Keep previous body if modification fails
                     pass
                 continue
 
