@@ -13,21 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Early sheet-metal / panel thinking:
-  - Research notes in `docs/research/sheet-metal.md` (Fusion rules/flanges/flat pattern, Onshape simultaneous folded+flat, Mozaik nesting).
-  - New `schemas/sheet_metal_rule.schema.json` + `SheetMetalRuleStore` (thickness, inside bend radius, K-factor 0–0.5, relief type).
-  - `bend_allowance()` helper implementing BA = (π/180)·A·(R + K·T).
-  - `create_default_sheet_metal_rules()` starter library + full unit tests.
-- All new tests pass; existing suite remains runnable.
+- Simple rectangular nesting concepts:
+  - Research notes in `docs/research/nesting.md` (Mozaik Optimizer, rectangular vs true-shape, inputs/outputs, yield).
+  - New `schemas/nesting_job.schema.json` + `NestingJob` class (sheet size, kerf, trim, parts with optional rotation).
+  - Pure-Python shelf packer producing sheet layouts + per-sheet and total yield.
+  - `nesting_job_from_cutlist()` helper to seed from existing CutList (width × depth blanks).
+  - Full unit tests covering schema, single/multi-sheet, rotation, overlap safety, cutlist bridge.
+- All new tests pass; core suite remains runnable.
 
 ### Next concrete tasks (Phase 4)
-1. Simple nesting concepts: rectangular packer stub + NestingJob schema (parts → sheet layouts, yield).
-2. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
-3. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
-4. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
-5. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
+1. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
+2. UI exposure for edges/faces selection on Fillet/Chamfer/Shell (or other remaining Phase 4 polish).
+3. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
+4. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
+5. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
 
 ## Recently Completed
+- Rectangular NestingJob schema + shelf packer + from-cutlist helper + research
 - Sheet-metal rule schema + bend-allowance helper + research
 - Improved bevel quality (normal-based offsets, corner fans, optional cleanup)
 - Constraint-aware sketch updates when applying transform intent (locked points + coincident components)
@@ -48,4 +50,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Sheet-metal rule schema + bend allowance)
+Last updated: 2026-11-21 (Rectangular nesting job stub)
