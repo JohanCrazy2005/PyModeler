@@ -3,7 +3,13 @@
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from pymodeler.core import ExtrudeFeature, FeatureHistory, ParameterStore, create_rectangle_sketch
+from pymodeler.core import (
+    ExtrudeFeature,
+    FeatureHistory,
+    HoleFeature,
+    ParameterStore,
+    create_rectangle_sketch,
+)
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
 
 
@@ -46,4 +52,34 @@ def test_property_panel_shows_and_edits(qapp):
     panel._apply()
     assert hist.features[0]["name"] == "Renamed"
     assert hist.features[0]["distance"] == 10.0
+    panel.close()
+
+
+def test_property_panel_hole_direction(qapp):
+    hist = FeatureHistory()
+    params = ParameterStore()
+    hole = HoleFeature(
+        diameter=8.0,
+        depth=20.0,
+        name="MountHole",
+        direction=[0.0, 0.0, -1.0],
+    )
+    hist.add_hole(hole)
+
+    panel = PropertyPanel()
+    panel.set_context(hist, params)
+    panel.show_feature(hole)
+    assert panel.name_edit.text() == "MountHole"
+    assert panel.distance_edit.text() == "8.0"
+    assert panel.offset_edit.text() == "20.0"
+    assert panel.direction_edit.text() == "0.0,0.0,-1.0"
+    assert panel.direction_edit.isEnabled()
+
+    # Edit direction and diameter
+    panel.distance_edit.setText("10")
+    panel.direction_edit.setText("1,0,0")
+    panel._apply()
+    updated = hist.features[0]
+    assert updated["diameter"] == 10.0
+    assert updated["direction"] == [1.0, 0.0, 0.0]
     panel.close()

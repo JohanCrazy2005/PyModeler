@@ -6,7 +6,7 @@ and context menu to set the rollback marker.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Union
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QAction, QColor
@@ -22,7 +22,13 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from pymodeler.core import ExtrudeFeature, FeatureHistory, ParameterStore, RevolveFeature
+from pymodeler.core import (
+    ExtrudeFeature,
+    FeatureHistory,
+    HoleFeature,
+    ParameterStore,
+    RevolveFeature,
+)
 
 
 class FeatureTreeWidget(QListWidget):
@@ -69,6 +75,8 @@ class FeatureTreeWidget(QListWidget):
                 feat = ExtrudeFeature.from_dict(fdict)
             elif fdict.get("type") == "revolve":
                 feat = RevolveFeature.from_dict(fdict)
+            elif fdict.get("type") == "hole":
+                feat = HoleFeature.from_dict(fdict)
             else:
                 feat = None
             self.feature_selected.emit(feat)
@@ -99,7 +107,7 @@ class FeatureTreeWidget(QListWidget):
 
 
 class PropertyPanel(QWidget):
-    """Simple property editor for Extrude / Revolve features."""
+    """Simple property editor for Extrude / Revolve / Hole features."""
 
     properties_changed = pyqtSignal()
 
@@ -116,12 +124,17 @@ class PropertyPanel(QWidget):
         self.distance_edit = QLineEdit()
         self.distance_edit.setPlaceholderText("number or parameter name")
         self.distance_edit.editingFinished.connect(self._apply)
-        form.addRow("Distance / Angle:", self.distance_edit)
+        form.addRow("Distance / Angle / Diameter:", self.distance_edit)
 
         self.offset_edit = QLineEdit()
-        self.offset_edit.setPlaceholderText("start offset (extrude)")
+        self.offset_edit.setPlaceholderText("start offset (extrude) or depth (hole)")
         self.offset_edit.editingFinished.connect(self._apply)
-        form.addRow("Start Offset:", self.offset_edit)
+        form.addRow("Offset / Depth:", self.offset_edit)
+
+        self.direction_edit = QLineEdit()
+        self.direction_edit.setPlaceholderText("x,y,z  (hole direction, optional)")
+        self.direction_edit.editingFinished.connect(self._apply)
+        form.addRow("Direction:", self.direction_edit)
 
         self.sketch_label = QLabel()
         form.addRow("Sketch ID:", self.sketch_label)
@@ -133,7 +146,7 @@ class PropertyPanel(QWidget):
         layout.addWidget(self.apply_btn)
         layout.addStretch()
 
-        self.current_feature: Optional[ExtrudeFeature | RevolveFeature] = None
+        self.current_feature: Optional[Union[ExtrudeFeature, RevolveFeature, HoleFeature]] = None
         self.history: Optional[FeatureHistory] = None
         self.parameters: Optional[ParameterStore] = None
 
@@ -145,29 +158,49 @@ class PropertyPanel(QWidget):
         self.history = history
         self.parameters = parameters
 
-    def show_feature(self, feature: Optional[ExtrudeFeature | RevolveFeature]) -> None:
+    def show_feature(
+        self, feature: Optional[Union[ExtrudeFeature, RevolveFeature, HoleFeature]]
+    ) -> None:
         self.current_feature = feature
         if feature is None:
             self.name_edit.clear()
             self.distance_edit.clear()
             self.offset_edit.clear()
+            self.direction_edit.clear()
             self.sketch_label.clear()
             self.setEnabled(False)
             return
         self.setEnabled(True)
         self.name_edit.setText(feature.name)
+        self.direction_edit.setEnabled(False)
+        self.direction_edit.clear()
         if isinstance(feature, ExtrudeFeature):
             dist = feature.distance
             self.distance_edit.setText(str(dist) if not isinstance(dist, str) else dist)
             off = feature.start_offset
             self.offset_edit.setText(str(off) if not isinstance(off, str) else str(off))
             self.offset_edit.setEnabled(True)
-        else:
+            self.sketch_label.setText(feature.sketch_id)
+        elif isinstance(feature, RevolveFeature):
             ang = feature.angle
             self.distance_edit.setText(str(ang) if not isinstance(ang, str) else ang)
             self.offset_edit.clear()
             self.offset_edit.setEnabled(False)
-        self.sketch_label.setText(feature.sketch_id)
+            self.sketch_label.setText(feature.sketch_id)
+        elif isinstance(feature, HoleFeature):
+            diam = feature.diameter
+            self.distance_edit.setText(str(diam) if not isinstance(diam, str) else diam)
+            dep = feature.depth
+            self.offset_edit.setText(str(dep) if not isinstance(dep, str) else str(dep))
+            self.offset_edit.setEnabled(True)
+            if feature.direction:
+                self.direction_edit.setText(
+                    ",".join(str(c) for c in feature.direction)
+                )
+            self.direction_edit.setEnabled(True)
+            self.sketch_label.setText("(none)")
+        else:
+            self.sketch_label.setText("")
 
     def _apply(self) -> None:
         if self.current_feature is None or self.history is None:
@@ -190,8 +223,28 @@ class PropertyPanel(QWidget):
                     except ValueError:
                         off = off_text or 0.0
                     self.current_feature.start_offset = off
-                else:
+                elif isinstance(self.current_feature, RevolveFeature):
                     self.current_feature.angle = value
+                elif isinstance(self.current_feature, HoleFeature):
+                    self.current_feature.diameter = value
+                    dep_text = self.offset_edit.text().strip()
+                    try:
+                        dep: float | str = float(dep_text) if dep_text else 1.0
+                    except ValueError:
+                        dep = dep_text or 1.0
+                    self.current_feature.depth = dep
+                    dir_text = self.direction_edit.text().strip()
+                    if dir_text:
+                        try:
+                            parts = [float(p.strip()) for p in dir_text.split(",")]
+                            if len(parts) == 3:
+                                self.current_feature.direction = parts
+                            else:
+                                self.current_feature.direction = None
+                        except ValueError:
+                            self.current_feature.direction = None
+                    else:
+                        self.current_feature.direction = None
                 self.history.features[i] = self.current_feature.to_dict()
                 self.history.validate()
                 break
