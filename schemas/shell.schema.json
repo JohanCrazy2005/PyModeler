@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/JohanCrazy2005/PyModeler/schemas/shell.schema.json",
   "title": "ShellFeature",
-  "description": "Parametric Shell feature: hollows a solid to a constant wall thickness, optionally removing selected faces as openings. Stub implementation stores intent; full mesh shell (offset + Boolean) is deferred. Intended for manufacturing (plastic parts, thin walls, weight reduction).",
+  "description": "Parametric Shell feature: hollows a solid to a constant wall thickness, optionally removing selected faces as openings. apply_to_mesh builds a basic mesh shell (vertex normal offset + connecting walls). Intended for manufacturing (plastic parts, thin walls, weight reduction).",
   "type": "object",
   "required": ["id", "type", "thickness"],
   "additionalProperties": false,
