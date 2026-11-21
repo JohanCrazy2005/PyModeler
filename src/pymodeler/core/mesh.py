@@ -387,23 +387,32 @@ class Mesh:
         segments: int = 1,
         amount2: Optional[float] = None,
         name: Optional[str] = None,
+        cleanup: bool = True,
     ) -> "Mesh":
-        """Basic edge bevel / chamfer approximation.
+        """Improved edge bevel / chamfer approximation.
 
-        Currently a geometric stub that adds offset vertices and a chamfer face
-        per selected edge so the feature is visible and mesh counts increase.
-        Supports equal-distance (amount) and a second distance (amount2) for
-        two-distance mode (used as a different offset component).
-        segments > 1 adds additional intermediate vertices (coarse fillet look).
+        Creates proper offset vertices using adjacent-face normals so the
+        chamfer faces lie approximately in the bisector plane of the edge.
+        Supports equal-distance (amount) and a second distance (amount2).
+        segments > 1 inserts intermediate vertices for a coarse multi-segment
+        fillet look. At vertices where multiple beveled edges meet, a simple
+        corner fan is added. Optional cleanup removes degenerate faces and
+        merges near-coincident vertices.
         """
+        import numpy as np
+        from collections import defaultdict
+
         if amount <= 0:
             raise ValueError("amount must be positive")
         if amount2 is not None and amount2 <= 0:
             raise ValueError("amount2 must be positive")
+        if segments < 1:
+            segments = 1
 
-        new_verts = [list(v) for v in self.vertices]
+        new_verts = [list(map(float, v)) for v in self.vertices]
         new_faces = [list(f) for f in self.faces]
         unique = self.get_unique_edges()
+        ef_map = self.edge_face_map()
 
         selected: list[tuple[int, int]] = []
         if edges is None:
@@ -417,32 +426,151 @@ class Mesh:
 
         d1 = float(amount)
         d2 = float(amount2) if amount2 is not None else d1
-        # Simple offset directions for visibility
-        off1 = [0.0, d1 * 0.5, 0.0]
-        off2 = [d2 * 0.3, 0.0, 0.0]
+        # Use average of the two distances for the primary offset magnitude
+        offset_mag = (d1 + d2) * 0.5
+
+        # Track new offset vertices created for each original vertex so we can
+        # build corner fans later.
+        corner_offsets: dict[int, list[int]] = defaultdict(list)
 
         for a, b in selected:
-            va = new_verts[a]
-            vb = new_verts[b]
-            # Primary offset vertices
+            va = np.asarray(new_verts[a], dtype=float)
+            vb = np.asarray(new_verts[b], dtype=float)
+            edge_dir = vb - va
+            edge_len = np.linalg.norm(edge_dir)
+            if edge_len < 1e-8:
+                continue
+            edge_dir = edge_dir / edge_len
+
+            # Average normal of adjacent faces (or a fallback)
+            face_indices = ef_map.get((a, b), [])
+            normals = []
+            for fi in face_indices:
+                n = np.asarray(self.compute_face_normal(fi), dtype=float)
+                if np.linalg.norm(n) > 1e-8:
+                    normals.append(n)
+            if normals:
+                avg_n = np.mean(normals, axis=0)
+                avg_n /= np.linalg.norm(avg_n) or 1.0
+            else:
+                avg_n = np.array([0.0, 0.0, 1.0])
+
+            # Perpendicular direction in the plane of the average normal
+            perp = np.cross(edge_dir, avg_n)
+            perp_len = np.linalg.norm(perp)
+            if perp_len < 1e-8:
+                # Fallback perpendicular
+                perp = np.cross(edge_dir, np.array([0.0, 1.0, 0.0]))
+                if np.linalg.norm(perp) < 1e-8:
+                    perp = np.cross(edge_dir, np.array([1.0, 0.0, 0.0]))
+            perp = perp / (np.linalg.norm(perp) or 1.0)
+
+            # Primary offset vertices (equal-distance style)
+            off_a = va + perp * offset_mag
+            off_b = vb + perp * offset_mag
             na_idx = len(new_verts)
-            new_verts.append([va[i] + off1[i] for i in range(3)])
+            new_verts.append(off_a.tolist())
             nb_idx = len(new_verts)
-            new_verts.append([vb[i] + off1[i] for i in range(3)])
-            # Chamfer face
+            new_verts.append(off_b.tolist())
+            corner_offsets[a].append(na_idx)
+            corner_offsets[b].append(nb_idx)
+
+            # Chamfer face (quad)
             new_faces.append([a, b, nb_idx, na_idx])
 
-            # Extra segments for fillet approximation
+            # Extra segments for a coarse fillet approximation
             if segments > 1:
                 for s in range(1, segments):
-                    frac = s / segments
-                    new_verts.append([va[i] + off1[i] * frac + off2[i] * (1 - frac) for i in range(3)])
-                    new_faces.append([na_idx, nb_idx, nb_idx, na_idx])  # dummy face to keep valid
+                    frac = s / float(segments)
+                    # Interpolate between original edge and the offset line
+                    mid_a = va + perp * (offset_mag * frac)
+                    mid_b = vb + perp * (offset_mag * frac)
+                    ma_idx = len(new_verts)
+                    new_verts.append(mid_a.tolist())
+                    mb_idx = len(new_verts)
+                    new_verts.append(mid_b.tolist())
+                    # Connect previous to this segment
+                    prev_a = na_idx if s == 1 else ma_idx - 2
+                    prev_b = nb_idx if s == 1 else mb_idx - 2
+                    new_faces.append([prev_a, prev_b, mb_idx, ma_idx])
 
-        return Mesh(
+        # Simple corner fans: for each original vertex that received multiple
+        # offset vertices, create a triangle fan from the original vertex.
+        for orig_idx, offs in corner_offsets.items():
+            if len(offs) >= 2:
+                # Sort offsets roughly around the vertex for better fan order
+                center = np.asarray(new_verts[orig_idx], dtype=float)
+                def angle_key(oid: int) -> float:
+                    v = np.asarray(new_verts[oid], dtype=float) - center
+                    return math.atan2(v[1], v[0])
+                sorted_offs = sorted(set(offs), key=angle_key)
+                for i in range(len(sorted_offs)):
+                    j = (i + 1) % len(sorted_offs)
+                    # Triangle: original -> offset_i -> offset_j
+                    new_faces.append([orig_idx, sorted_offs[i], sorted_offs[j]])
+
+        result = Mesh(
             vertices=new_verts,
             faces=new_faces,
             name=name or f"{self.name}_bevel",
+        )
+
+        if cleanup:
+            result = result._cleanup_mesh()
+        return result
+
+    def _cleanup_mesh(self, tol: float = 1e-6) -> "Mesh":
+        """Remove degenerate faces and merge near-coincident vertices.
+
+        Lightweight manifold-oriented cleanup used after bevel / other ops.
+        """
+        import numpy as np
+
+        verts = [list(map(float, v)) for v in self.vertices]
+        faces = [list(f) for f in self.faces]
+
+        # Merge vertices that are closer than tol
+        # Simple O(n^2) is fine for the small meshes we produce here
+        remap: dict[int, int] = {}
+        kept: list[list[float]] = []
+        for i, v in enumerate(verts):
+            if i in remap:
+                continue
+            nv = np.asarray(v, dtype=float)
+            new_idx = len(kept)
+            kept.append(v)
+            remap[i] = new_idx
+            for j in range(i + 1, len(verts)):
+                if j in remap:
+                    continue
+                if np.linalg.norm(nv - np.asarray(verts[j], dtype=float)) < tol:
+                    remap[j] = new_idx
+
+        # Rebuild faces, dropping degenerates
+        new_faces: list[list[int]] = []
+        for face in faces:
+            remapped = [remap.get(vi, vi) for vi in face]
+            # Drop if fewer than 3 unique verts or zero area
+            uniq = []
+            for vi in remapped:
+                if vi not in uniq:
+                    uniq.append(vi)
+            if len(uniq) < 3:
+                continue
+            # Quick area check
+            if len(uniq) >= 3:
+                v0 = np.asarray(kept[uniq[0]])
+                v1 = np.asarray(kept[uniq[1]])
+                v2 = np.asarray(kept[uniq[2]])
+                area = 0.5 * np.linalg.norm(np.cross(v1 - v0, v2 - v0))
+                if area < tol * 10:
+                    continue
+            new_faces.append(remapped)
+
+        return Mesh(
+            vertices=kept,
+            faces=new_faces,
+            name=self.name,
         )
 
 

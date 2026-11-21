@@ -52,7 +52,20 @@ def test_bevel_edges_by_index():
     assert len(beveled.faces) > 6
 
 
-def test_bevel_rejects_nonpositive():
+def test_bevel_corner_fans_and_cleanup():
+    """Improved bevel produces corner fans and survives cleanup on a cube."""
+    mesh = create_cube(size=2.0)
+    beveled = mesh.bevel_edges(amount=0.12, segments=1, cleanup=True)
+    beveled.validate()
+    # Corner fans + chamfer faces should increase face count substantially
+    assert len(beveled.faces) > 12
+    # Cleanup should not leave the mesh empty
+    assert len(beveled.vertices) > 8
+    # Calling without cleanup still validates
+    raw = mesh.bevel_edges(amount=0.12, cleanup=False)
+    raw.validate()
+    assert len(raw.vertices) >= len(beveled.vertices)
+
     mesh = create_cube(size=2.0)
     with pytest.raises(ValueError):
         mesh.bevel_edges(amount=0.0)

@@ -37,6 +37,7 @@
 - Done: Hole direction exposed in property panel (diameter, depth, direction vector editor).
 - Done: Fillet / Chamfer / Shell property panel UI exposure (radius, mode + secondary, thickness, direction).
 - Done: Constraint-aware parametric transforms (translation/scale skip locked points and coincident components with fixed points; radii scaled only for unlocked centers).
+- Done: Improved bevel quality (adjacent-face normal offsets, corner fans, multi-segment support, optional vertex-merge / degenerate cleanup).
 
 ## Near-term Roadmap
 1. (done) Visualize assembly instances in the viewport (apply transforms).

@@ -44,3 +44,10 @@ Current mesh-based approach:
 4. Later: basic mesh bevel approximation for selected edges, support for two-distance / distance-angle, or wait for geometry kernel.
 
 This continues Phase 4 advanced features after Fillet stub.
+
+## 2026-11-21 update
+Basic mesh bevel approximation improved:
+- Offsets now computed from average adjacent-face normals + true perpendicular direction.
+- Corner fans added where multiple beveled edges meet at a vertex.
+- Optional lightweight cleanup (merge near-coincident verts, drop degenerate faces).
+Still a mesh approximation; full rolling-ball / B-rep quality deferred until a geometry kernel is available.
