@@ -10,21 +10,28 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4: Shell feature stub implemented. Next priorities below.**
+**Phase 4: Shell basic mesh approximation implemented. Next priorities below.**
 
 ### Done this run
-- Researched Shell feature in Fusion 360 and Onshape (docs/research/shell-feature.md).
-- Added ShellFeature stub: JSON schema, parametric thickness, optional faces, direction (inside/outside/both), FeatureHistory integration, placeholder mesh, apply_to_mesh stub that returns a copy.
-- Added tests covering construction, parameters, schema roundtrip, history, and apply stub.
+- Researched and documented Shell (already present).
+- Implemented basic mesh shell approximation in ShellFeature.apply_to_mesh:
+  - Offset vertices along averaged face normals by thickness.
+  - Build outer + inner (reversed) surfaces + connecting wall faces.
+  - Integer face indices treated as openings (omitted).
+  - Directions: inside / outside / both.
+- Integrated into Part.recompute modify path.
+- Updated tests: shell now produces more geometry; opening reduces face count.
+- Schema and research note updated.
 
 ### Next concrete tasks (Phase 4)
 1. Constraint-aware sketch updates when applying transform intent.
 2. Improve bevel quality (better corner fans, optional manifold cleanup).
 3. Early sheet-metal / panel thinking or nesting concepts.
-4. Basic mesh shell approximation (offset faces + Boolean cut or wall construction).
-5. UI exposure for hole direction (property panel or sketch normal picker).
+4. UI exposure for hole direction (property panel or sketch normal picker).
+5. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
 
 ## Recently Completed
+- Shell basic mesh approximation (normal offset + walls + openings)
 - Shell feature stub (schema, history, placeholder mesh)
 - Direction vector applied to Hole tool orientation (Rodrigues rotation from Y-axis)
 - Two-distance / distance-angle modes for Chamfer (schema + apply path + basic bevel)
@@ -47,4 +54,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-20 (Shell feature stub)
+Last updated: 2026-11-20 (Shell basic mesh approximation)
