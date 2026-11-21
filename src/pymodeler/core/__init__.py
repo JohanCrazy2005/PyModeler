@@ -89,6 +89,13 @@ from .parametric_transform import (
     apply_translation_to_sketch,
     apply_translation_to_part_sketches,
 )
+from .sheet_metal import (
+    SheetMetalRuleStore,
+    SheetMetalRuleValidationError,
+    validate_sheet_metal_rule_data,
+    bend_allowance,
+    create_default_sheet_metal_rules,
+)
 
 __all__ = [
     "Mesh",
@@ -167,4 +174,9 @@ __all__ = [
     "validate_configuration_data",
     "apply_translation_to_sketch",
     "apply_translation_to_part_sketches",
+    "SheetMetalRuleStore",
+    "SheetMetalRuleValidationError",
+    "validate_sheet_metal_rule_data",
+    "bend_allowance",
+    "create_default_sheet_metal_rules",
 ]
