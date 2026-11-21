@@ -89,6 +89,12 @@ from .parametric_transform import (
     apply_translation_to_sketch,
     apply_translation_to_part_sketches,
 )
+from .nesting import (
+    NestingJob,
+    NestingValidationError,
+    validate_nesting_job_data,
+    nesting_job_from_cutlist,
+)
 from .sheet_metal import (
     SheetMetalRuleStore,
     SheetMetalRuleValidationError,
@@ -179,4 +185,8 @@ __all__ = [
     "validate_sheet_metal_rule_data",
     "bend_allowance",
     "create_default_sheet_metal_rules",
+    "NestingJob",
+    "NestingValidationError",
+    "validate_nesting_job_data",
+    "nesting_job_from_cutlist",
 ]
