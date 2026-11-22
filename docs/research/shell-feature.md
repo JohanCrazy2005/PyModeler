@@ -39,9 +39,9 @@ Sources: Onshape Help – Shell; troubleshooting tech tips.
 Current mesh-based approach:
 
 1. Schema for ShellFeature with thickness (numeric or parameter), optional faces list (identifiers or indices to remove), direction (inside/outside/both), operation="modify".
-2. Basic mesh shell approximation in apply_to_mesh: offset vertices along averaged face normals by thickness, create outer + inner surfaces (reversed winding), and connecting wall faces. Integer face indices are treated as openings (omitted from outer/inner).
+2. Basic mesh shell approximation in apply_to_mesh: offset vertices along averaged face normals by thickness * miter_scale (where miter_scale averages 1/(vn·nf) to better approximate constant thickness at sharp corners), create outer + inner surfaces (reversed winding), and connecting wall faces. Integer face indices are treated as openings (omitted from outer/inner).
 3. Integrate into FeatureHistory and Part.recompute (modify path).
 4. Placeholder generate_mesh for timeline visibility when no body exists.
-5. Later: true Boolean offset (scale-from-centroid + cut), better corner mitering, manifold cleanup, or a robust geometry kernel.
+5. Later: true Boolean offset (scale-from-centroid + cut), further corner improvements, manifold cleanup, or a robust geometry kernel.
 
 This continues Phase 4 advanced features after Hole / Fillet / Chamfer.
