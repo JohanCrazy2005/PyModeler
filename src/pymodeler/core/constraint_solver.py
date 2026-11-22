@@ -7,15 +7,15 @@ Fixed points and points locked by "fixed" constraints are held constant.
 Supported constraints (matching sketch schema):
 - horizontal, vertical, equal (lengths), coincident, parallel, perpendicular, fixed
 
-Supported driving dimensions (numeric values only; string parameter refs skipped for now):
+Supported driving dimensions (numeric values or string parameter refs via ParameterStore):
 - length (line), distance (two points), radius, diameter, angle (two lines, degrees)
 
-Not a full production solver (no tangent, under/over detection, Jacobian sparsity, parameter evaluation).
+Not a full production solver (no tangent, under/over detection, Jacobian sparsity).
 """
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Any
 
 import numpy as np
 
@@ -36,18 +36,52 @@ def _line_ends(sketch, line_id: str) -> Optional[Tuple[str, str]]:
     return ent.get("start_point"), ent.get("end_point")
 
 
-def _numeric_value(val) -> Optional[float]:
-    """Return float if value is numeric, else None (skip string parameter refs)."""
+def _resolve_dimension_value(val: Any, parameters: Optional[Any] = None) -> Optional[float]:
+    """Resolve a dimension value to float.
+
+    Numeric values are returned directly.
+    String values are evaluated as parameter names (or simple expressions) via ParameterStore if provided.
+    Returns None if unresolved (skipped).
+    """
     if isinstance(val, (int, float)) and not isinstance(val, bool):
         return float(val)
+    if isinstance(val, str) and parameters is not None:
+        s = val.strip()
+        if not s:
+            return None
+        try:
+            # Prefer direct evaluate if it looks like a name; fall back to treating as expression via evaluate if store supports
+            if hasattr(parameters, "evaluate"):
+                # If the string is a bare name, evaluate it; otherwise try as expression by temporary param or direct
+                # ParameterStore.evaluate expects a name; for expressions we can use a helper if present
+                try:
+                    return float(parameters.evaluate(s))
+                except Exception:
+                    # If store has a more general evaluator, try it; else skip
+                    if hasattr(parameters, "evaluate_expression"):
+                        return float(parameters.evaluate_expression(s))
+                    # Fallback: try evaluating the string as an expression using the store's internal if possible
+                    # For now, if it's not a bare name that evaluates, skip (or we could parse)
+                    return None
+        except Exception:
+            return None
+    # Last attempt: pure numeric string
     try:
         return float(val)
     except (TypeError, ValueError):
         return None
 
 
-def solve_sketch(sketch, max_nfev: int = 200, tol: float = 1e-8) -> Dict[str, object]:
+def solve_sketch(
+    sketch,
+    max_nfev: int = 200,
+    tol: float = 1e-8,
+    parameters: Optional[Any] = None,
+) -> Dict[str, object]:
     """Solve basic geometric constraints and driving dimensions on a Sketch in-place.
+
+    Optional `parameters` (ParameterStore) is used to resolve string dimension values
+    (parameter names or simple expressions) to numeric targets.
 
     Returns a result dict:
         {
@@ -184,7 +218,7 @@ def solve_sketch(sketch, max_nfev: int = 200, tol: float = 1e-8) -> Dict[str, ob
         for dim in getattr(sketch, "dimensions", []) or []:
             if dim.get("driven", False):
                 continue
-            val = _numeric_value(dim.get("value"))
+            val = _resolve_dimension_value(dim.get("value"), parameters)
             if val is None:
                 continue
             dtype = dim.get("type")

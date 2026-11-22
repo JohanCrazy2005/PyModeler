@@ -28,12 +28,13 @@
 ## PyModeler stub plan
 - Pure scipy + numpy implementation (no C++ dependency).
 - Handles the most common constraints already present in the schema: horizontal, vertical, equal, coincident, parallel, perpendicular, fixed.
-- Method `Sketch.solve(max_nfev=100)` that updates point coordinates in-place.
+- Method `Sketch.solve(max_nfev=100, parameters=None)` that updates point coordinates in-place.
 - Returns success flag + residual norm.
-- Driving dimensions (numeric values) as hard residuals: length, distance, radius, diameter, angle (two lines, degrees).
+- Driving dimensions (numeric values or string ParameterStore refs) as hard residuals: length, distance, radius, diameter, angle (two lines, degrees).
 - Free radii of circles/arcs are variables (bounded >= 0).
-- Later: string parameter evaluation, tangent, better under/over detection, Jacobian sparsity, arc angles as free variables.
+- Parameter evaluation: string dimension values resolved via ParameterStore.evaluate (bare names); unresolved skipped.
+- Later: full expression evaluation in dimension values, tangent, better under/over detection, Jacobian sparsity, arc angles as free variables.
 
 This keeps the main branch pure Python + public libs and gives a concrete foundation for further constraint propagation after transforms.
 
-Last updated: 2026-11-22 (driving dimensions + free radii)
+Last updated: 2026-11-22 (parameter evaluation for dimension values)

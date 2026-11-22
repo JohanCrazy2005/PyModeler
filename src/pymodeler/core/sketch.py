@@ -248,13 +248,14 @@ class Sketch:
     def entity_ids_by_type(self, etype: str) -> List[str]:
         return [e["id"] for e in self.entities if e["type"] == etype]
 
-    def solve(self, max_nfev: int = 200, tol: float = 1e-8) -> Dict[str, object]:
+    def solve(self, max_nfev: int = 200, tol: float = 1e-8, parameters: Optional[Any] = None) -> Dict[str, object]:
         """Solve basic geometric constraints in-place using the lightweight solver stub.
 
+        Optional `parameters` (ParameterStore) resolves string dimension values.
         Returns the result dict from constraint_solver.solve_sketch.
         """
         from .constraint_solver import solve_sketch
-        return solve_sketch(self, max_nfev=max_nfev, tol=tol)
+        return solve_sketch(self, max_nfev=max_nfev, tol=tol, parameters=parameters)
 
 
 def create_rectangle_sketch(

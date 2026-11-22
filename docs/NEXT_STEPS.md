@@ -13,15 +13,15 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Extended lightweight 2D constraint solver with driving dimensions:
-  - Numeric length, distance, radius, diameter, angle (two lines, degrees) as hard residuals.
-  - Free radii of circles/arcs are variables (bounded >= 0); written back after solve.
-  - Driven dimensions and non-numeric (parameter string) values skipped.
-  - Research notes updated in docs/research/constraint-solver-stub.md.
-  - Tests for length, distance, radius, diameter, driven-ignored.
+- Parameter evaluation for dimension values in the constraint solver:
+  - `solve_sketch` and `Sketch.solve` accept optional `parameters: ParameterStore`.
+  - String dimension values that are bare parameter names are resolved via `ParameterStore.evaluate` to numeric targets.
+  - Unresolved strings (expressions, unknown names) are skipped (same as before).
+  - Research notes updated.
+  - Tests for length and radius driven by parameter names.
 
 ### Next concrete tasks (Phase 4)
-1. Parameter evaluation for dimension values (string refs to ParameterStore) inside the solver.
+1. Full expression evaluation for dimension values (e.g. "width * 2 + offset") inside the solver (extend ParameterStore or add evaluate_expression).
 2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 3. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
 4. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
@@ -29,6 +29,7 @@ This file is updated by every automation run.
 6. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 
 ## Recently Completed
+- Parameter evaluation for dimension values (string parameter name refs) in constraint solver
 - Driving dimensions (length/distance/radius/diameter/angle) + free radii in constraint solver
 - Lightweight 2D constraint solver stub (scipy least_squares)
 - UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field)
@@ -56,4 +57,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (solver driving dimensions)
+Last updated: 2026-11-22 (parameter evaluation in solver)
