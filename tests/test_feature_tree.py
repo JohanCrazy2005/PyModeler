@@ -91,7 +91,7 @@ def test_property_panel_hole_direction(qapp):
 def test_property_panel_fillet(qapp):
     hist = FeatureHistory()
     params = ParameterStore()
-    fillet = FilletFeature(radius=2.5, name="EdgeRound")
+    fillet = FilletFeature(radius=2.5, name="EdgeRound", edges=[0, 1])
     hist.add_fillet(fillet)
 
     panel = PropertyPanel()
@@ -99,12 +99,16 @@ def test_property_panel_fillet(qapp):
     panel.show_feature(fillet)
     assert panel.name_edit.text() == "EdgeRound"
     assert panel.distance_edit.text() == "2.5"
+    assert panel.selection_edit.text() == "0,1"
+    assert panel.selection_edit.isEnabled()
     assert not panel.offset_edit.isEnabled()
     assert not panel.mode_combo.isEnabled()
 
     panel.distance_edit.setText("3.0")
+    panel.selection_edit.setText("2, 3, e5")
     panel._apply()
     assert hist.features[0]["radius"] == 3.0
+    assert hist.features[0]["edges"] == [2, 3, "e5"]
     panel.close()
 
 
@@ -112,7 +116,7 @@ def test_property_panel_chamfer(qapp):
     hist = FeatureHistory()
     params = ParameterStore()
     chamfer = ChamferFeature(
-        distance=1.0, mode="two_distance", distance2=2.0, name="Bevel"
+        distance=1.0, mode="two_distance", distance2=2.0, name="Bevel", edges=[5]
     )
     hist.add_chamfer(chamfer)
 
@@ -124,23 +128,27 @@ def test_property_panel_chamfer(qapp):
     assert panel.offset_edit.text() == "2.0"
     assert panel.mode_combo.currentText() == "two_distance"
     assert panel.mode_combo.isEnabled()
+    assert panel.selection_edit.text() == "5"
+    assert panel.selection_edit.isEnabled()
 
     panel.mode_combo.setCurrentText("distance_angle")
     panel.offset_edit.setText("45")
     panel.distance_edit.setText("1.5")
+    panel.selection_edit.setText("1,2")
     panel._apply()
     updated = hist.features[0]
     assert updated["distance"] == 1.5
     assert updated["mode"] == "distance_angle"
     assert updated["angle"] == 45.0
     assert "distance2" not in updated or updated.get("distance2") is None
+    assert updated["edges"] == [1, 2]
     panel.close()
 
 
 def test_property_panel_shell(qapp):
     hist = FeatureHistory()
     params = ParameterStore()
-    shell = ShellFeature(thickness=1.5, direction="outside", name="Hollow")
+    shell = ShellFeature(thickness=1.5, direction="outside", name="Hollow", faces=[1, 3])
     hist.add_shell(shell)
 
     panel = PropertyPanel()
@@ -150,11 +158,15 @@ def test_property_panel_shell(qapp):
     assert panel.distance_edit.text() == "1.5"
     assert panel.direction_edit.text() == "outside"
     assert panel.direction_edit.isEnabled()
+    assert panel.selection_edit.text() == "1,3"
+    assert panel.selection_edit.isEnabled()
 
     panel.distance_edit.setText("2.0")
     panel.direction_edit.setText("both")
+    panel.selection_edit.setText("0,2,4")
     panel._apply()
     updated = hist.features[0]
     assert updated["thickness"] == 2.0
     assert updated["direction"] == "both"
+    assert updated["faces"] == [0, 2, 4]
     panel.close()
