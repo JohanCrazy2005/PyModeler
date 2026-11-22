@@ -81,3 +81,28 @@ def test_evaluate_expression_free_form():
         store.evaluate_expression("unknown * 2")
     with pytest.raises(ParameterEvaluationError):
         store.evaluate_expression("width +")
+
+
+def test_evaluate_expression_math_functions_and_units():
+    store = ParameterStore()
+    store.add("angle", value=30.0)
+    store.add("length_in", value=2.0)
+    # trig in degrees (CAD convention)
+    assert abs(store.evaluate_expression("sin(angle)") - 0.5) < 1e-6
+    assert abs(store.evaluate_expression("cos(60)") - 0.5) < 1e-6
+    assert abs(store.evaluate_expression("sqrt(4)") - 2.0) < 1e-9
+    assert store.evaluate_expression("abs(-5)") == 5.0
+    assert store.evaluate_expression("max(1, 3, 2)") == 3.0
+    assert store.evaluate_expression("min(1, 3, 2)") == 1.0
+    # power
+    assert store.evaluate_expression("2 ** 3") == 8.0
+    # constants
+    assert abs(store.evaluate_expression("pi") - 3.141592653589793) < 1e-9
+    # unit helpers
+    assert abs(store.evaluate_expression("in_to_mm(length_in)") - 50.8) < 1e-6
+    assert abs(store.evaluate_expression("mm_to_in(25.4)") - 1.0) < 1e-9
+    # radians versions
+    assert abs(store.evaluate_expression("sin_rad(pi / 2)") - 1.0) < 1e-6
+    # unknown function
+    with pytest.raises(ParameterEvaluationError):
+        store.evaluate_expression("unknown_func(1)")
