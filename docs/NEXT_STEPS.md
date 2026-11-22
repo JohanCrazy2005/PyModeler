@@ -13,14 +13,15 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- UI exposure for edges/faces selection on Fillet/Chamfer/Shell:
-  - Added `selection_edit` QLineEdit to PropertyPanel ("Edges / Faces:").
-  - For Fillet/Chamfer shows/edits `edges` list; for Shell shows/edits `faces` list.
-  - Parses comma-separated values as int or str (e.g. "0,1,e5").
-  - Updated tests in test_feature_tree.py for fillet, chamfer, and shell selection round-trip.
+- Lightweight 2D constraint solver stub:
+  - Added `src/pymodeler/core/constraint_solver.py` using scipy.optimize.least_squares.
+  - Supports horizontal, vertical, equal (lengths), coincident, parallel, perpendicular, fixed.
+  - Free points adjusted; fixed points held. Sketch.solve() convenience method.
+  - Research notes in docs/research/constraint-solver-stub.md.
+  - Tests covering rectangle re-solve, equal lengths, parallel, fixed points.
 
 ### Next concrete tasks (Phase 4)
-1. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
+1. Extend solver with driving dimensions (length/distance/radius as hard residuals) and radii/angles.
 2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 3. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
 4. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
@@ -28,6 +29,7 @@ This file is updated by every automation run.
 6. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 
 ## Recently Completed
+- Lightweight 2D constraint solver stub (scipy least_squares)
 - UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field)
 - Shell corner mitering (scale-adjusted normal offset)
 - Toolpath polish – zig-zag pocket strategy
@@ -53,4 +55,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (UI edges/faces selection)
+Last updated: 2026-11-22 (constraint solver stub)
