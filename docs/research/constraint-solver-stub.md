@@ -33,8 +33,8 @@
 - Driving dimensions (numeric values or string ParameterStore refs) as hard residuals: length, distance, radius, diameter, angle (two lines, degrees).
 - Free radii of circles/arcs are variables (bounded >= 0).
 - Parameter evaluation: string dimension values resolved via ParameterStore.evaluate (bare names); unresolved skipped.
-- Later: full expression evaluation in dimension values, tangent, better under/over detection, Jacobian sparsity, arc angles as free variables.
+- Later: full expression evaluation in dimension values (done: arithmetic + trig/unit functions), tangent, better under/over detection, Jacobian sparsity, arc angles as free variables.
 
 This keeps the main branch pure Python + public libs and gives a concrete foundation for further constraint propagation after transforms.
 
-Last updated: 2026-11-22 (parameter evaluation for dimension values)
+Last updated: 2026-11-22 (trig / unit-aware functions)
