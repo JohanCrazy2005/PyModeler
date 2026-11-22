@@ -30,6 +30,7 @@
 
 ## Current Status (2026-11-22)
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
+- Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
 - Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators + zig-zag strategy).
 - Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist).
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
@@ -64,5 +65,6 @@
 18. (done) Early toolpath / G-code stubs.
 19. (done) Zig-zag pocket strategy for toolpaths.
 20. (done) Shell corner mitering.
+21. (done) UI edges/faces selection for Fillet/Chamfer/Shell.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
