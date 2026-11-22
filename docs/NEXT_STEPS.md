@@ -13,11 +13,12 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Toolpath polish: added `strategy` ("concentric" | "zigzag") to ToolpathJob.
-  - Schema updated with strategy enum.
-  - `_generate_zigzag_pocket` implements raster (X-direction passes stepping in Y) with tool-radius offset, stepover, multi-depth.
-  - Tests for zigzag generation, bad strategy rejection, and round-trip strategy field (all pass).
-  - Research note updated.
+- Toolpath polish – zig-zag pocket strategy:
+  - Extended `schemas/toolpath.schema.json` with optional `strategy` enum (`concentric` | `zigzag`, default concentric).
+  - `ToolpathJob` accepts `strategy`, validates it, serializes it.
+  - New `_generate_pocket_zigzag`: parallel passes along X, stepover in Y, alternating direction, multi-depth.
+  - Tests for zig-zag generation, bad strategy rejection, default concentric (all pass).
+  - Summary string includes strategy.
 
 ### Next concrete tasks (Phase 4)
 1. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
@@ -28,7 +29,8 @@ This file is updated by every automation run.
 6. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
 
 ## Recently Completed
-- Rectangular NestingJob schema + shelf packer + from-cutlist helper + research (implementation completed)
+- Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour + research)
+- Rectangular NestingJob schema + shelf packer + from-cutlist helper + research
 - Sheet-metal rule schema + bend-allowance helper + research
 - Improved bevel quality (normal-based offsets, corner fans, optional cleanup)
 - Constraint-aware sketch updates when applying transform intent (locked points + coincident components)
@@ -49,4 +51,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Toolpath zigzag strategy added)
+Last updated: 2026-11-22 (Zig-zag pocket strategy added to toolpath)

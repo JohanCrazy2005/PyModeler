@@ -29,9 +29,9 @@
 - Tests for schema, generation, and basic output content.
 - No UI yet (property panel later).
 
-## Polish (2026-11-21 follow-up)
-- Added `strategy` field: "concentric" (default, concentric rectangles) or "zigzag" (raster along X stepping in Y).
-- Zig-zag generator implemented with multi-depth, tool-radius offset, stepover.
-- Schema and tests updated; both strategies validate and generate valid G-code.
-
 Last researched: 2026-11-21
+
+## Update 2026-11-22
+- Added `strategy` field: `concentric` (default) or `zigzag`.
+- Zig-zag implementation: parallel passes along X, stepover in Y, alternating direction, multi-depth passes, continuous linking moves at feed rate.
+- Schema, generator, tests, and summary updated. Ready for later lead-in/out and arc support.

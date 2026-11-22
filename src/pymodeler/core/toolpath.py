@@ -53,6 +53,7 @@ class ToolpathJob:
         depth: float,
         tool_diameter: float,
         name: str = "Toolpath",
+        strategy: str = "concentric",
         stepover_fraction: float = 0.5,
         depth_of_cut: float = 1.0,
         feed: float = 500.0,
@@ -62,7 +63,6 @@ class ToolpathJob:
         origin_x: float = 0.0,
         origin_y: float = 0.0,
         unit: str = "mm",
-        strategy: str = "concentric",
         id: Optional[str] = None,
         metadata: Optional[dict] = None,
     ):
@@ -139,6 +139,7 @@ class ToolpathJob:
             depth=data["depth"],
             tool_diameter=data["tool_diameter"],
             name=data.get("name", "Toolpath"),
+            strategy=data.get("strategy", "concentric"),
             stepover_fraction=data.get("stepover_fraction", 0.5),
             depth_of_cut=data.get("depth_of_cut", 1.0),
             feed=data.get("feed", 500),
@@ -148,7 +149,6 @@ class ToolpathJob:
             origin_x=data.get("origin_x", 0.0),
             origin_y=data.get("origin_y", 0.0),
             unit=data.get("unit", "mm"),
-            strategy=data.get("strategy", "concentric"),
             id=data.get("id"),
             metadata=data.get("metadata"),
         )
@@ -181,7 +181,7 @@ class ToolpathJob:
 
         if self.operation == "pocket":
             if self.strategy == "zigzag":
-                total_length = self._generate_zigzag_pocket(lines, radius, stepover, z_levels)
+                total_length = self._generate_pocket_zigzag(lines, radius, stepover, z_levels)
             else:
                 total_length = self._generate_pocket(lines, radius, stepover, z_levels)
         else:
@@ -253,11 +253,11 @@ class ToolpathJob:
                 # Retract slightly between passes if desired; for stub stay at depth until next
         return total
 
-    def _generate_zigzag_pocket(
+    def _generate_pocket_zigzag(
         self, lines: List[str], radius: float, stepover: float, z_levels: List[float]
     ) -> float:
-        """Simple zig-zag (raster) pocket along X, stepping in Y."""
-        # Effective area
+        """Parallel zig-zag pocket clearing (along X, stepover in Y)."""
+        # Tool center stays at least radius from walls
         x_min = self.origin_x + radius
         x_max = self.origin_x + self.width - radius
         y_min = self.origin_y + radius
@@ -266,35 +266,37 @@ class ToolpathJob:
             raise ToolpathValidationError("Feature too small for tool diameter")
 
         total = 0.0
-        # Y steps
-        y_steps = []
+        # Build Y positions for passes
+        ys = []
         y = y_min
-        direction = 1
-        while y <= y_max + 1e-6:
-            y_steps.append(y)
+        while y < y_max - 1e-9:
+            ys.append(y)
             y += stepover
-        if y_steps[-1] < y_max - 1e-6:
-            y_steps.append(y_max)
+        if not ys or abs(ys[-1] - y_max) > 1e-6:
+            ys.append(y_max)
 
         for z in z_levels:
-            lines.append(f"G00 X{x_min:.3f} Y{y_steps[0]:.3f}")
-            lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
-            prev = (x_min, y_steps[0])
-            for i, y in enumerate(y_steps):
+            direction = 1  # alternate left-to-right / right-to-left
+            first = True
+            for y in ys:
                 if direction > 0:
-                    target = (x_max, y)
+                    x_start, x_end = x_min, x_max
                 else:
-                    target = (x_min, y)
-                lines.append(f"G01 X{target[0]:.3f} Y{target[1]:.3f} F{self.feed:.0f}")
-                total += math.hypot(target[0] - prev[0], target[1] - prev[1])
-                prev = target
-                direction = -direction
-                # short step to next Y if not last
-                if i + 1 < len(y_steps):
-                    next_y = y_steps[i + 1]
-                    lines.append(f"G01 X{prev[0]:.3f} Y{next_y:.3f} F{self.feed:.0f}")
-                    total += abs(next_y - prev[1])
-                    prev = (prev[0], next_y)
+                    x_start, x_end = x_max, x_min
+                if first:
+                    lines.append(f"G00 X{x_start:.3f} Y{y:.3f}")
+                    lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+                    first = False
+                    prev = (x_start, y)
+                else:
+                    # link move at feed (or could retract; keep simple continuous)
+                    lines.append(f"G01 X{x_start:.3f} Y{y:.3f} F{self.feed:.0f}")
+                    total += math.hypot(x_start - prev[0], y - prev[1])
+                    prev = (x_start, y)
+                lines.append(f"G01 X{x_end:.3f} Y{y:.3f} F{self.feed:.0f}")
+                total += abs(x_end - x_start)
+                prev = (x_end, y)
+                direction *= -1
         return total
 
     def _generate_contour(
@@ -321,9 +323,9 @@ class ToolpathJob:
 
     def summary(self) -> str:
         return (
-            f"Toolpath {self.name} ({self.operation}/{self.strategy})\n"
+            f"Toolpath {self.name} ({self.operation})\n"
             f"Size: {self.width} x {self.height} x {self.depth} {self.unit}\n"
-            f"Tool: Ø{self.tool_diameter}  stepover={self.stepover_fraction:.0%}\n"
+            f"Tool: Ø{self.tool_diameter}  strategy={self.strategy}  stepover={self.stepover_fraction:.0%}\n"
             f"Estimated cut length: {self.estimated_length:.1f}\n"
             f"G-code lines: {len(self.gcode.splitlines()) if self.gcode else 0}"
         )

@@ -69,7 +69,8 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [~] Fillet / Chamfer / Shell / Hole features (Hole through-all; Fillet/Chamfer basic mesh bevel via Mesh.bevel_edges + apply_to_mesh; Chamfer equal/two-distance/distance-angle modes; Hole direction vector orientation + property panel UI exposure; **Fillet/Chamfer/Shell property panel UI exposure (radius, mode, thickness, direction)**; Shell feature: schema + history + basic mesh shell approximation (normal offset + walls, optional openings); profile arcs + nested holes; true solid-of-revolution for Revolve; Extrude subtracts nested hole profiles; **Improved bevel: normal-based offsets, corner fans, optional cleanup**)
 - [~] Sheet metal / panel basics (**SheetMetalRule schema + store + bend_allowance helper + research notes done**; flange / flat-pattern / nesting still todo)
 - [x] Simple nesting concepts (NestingJob schema + shelf packer + from-cutlist helper + research)
-- [x] Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour G-code generator + research; **zigzag strategy added**)
+- [x] Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour G-code generator + research)
+- [x] Toolpath zig-zag pocket strategy (schema + generator + tests)
 - [ ] Import/Export improvements (DXF via ezdxf; STEP later if geometry kernel allows)
 - [ ] Joinery rules / automatic machining concepts
 
@@ -79,4 +80,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-21 (Toolpath/G-code stubs implemented)
+Last updated: 2026-11-22 (Zig-zag pocket strategy)
