@@ -102,6 +102,11 @@ from .sheet_metal import (
     bend_allowance,
     create_default_sheet_metal_rules,
 )
+from .toolpath import (
+    ToolpathJob,
+    ToolpathValidationError,
+    validate_toolpath_data,
+)
 
 __all__ = [
     "Mesh",
@@ -189,4 +194,7 @@ __all__ = [
     "NestingValidationError",
     "validate_nesting_job_data",
     "nesting_job_from_cutlist",
+    "ToolpathJob",
+    "ToolpathValidationError",
+    "validate_toolpath_data",
 ]
