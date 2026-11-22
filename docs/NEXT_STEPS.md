@@ -13,12 +13,13 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Full arithmetic expression evaluation for dimension values in the constraint solver:
-  - Added `ParameterStore.evaluate_expression` (numbers, names, + - * /, parentheses, unary).
-  - `_resolve_dimension_value` prefers `evaluate_expression` for string dimension values.
-  - Supports expressions like `"width * 2 + offset"` or `"(base + 1) * 2"`.
-  - Research notes updated.
-  - Tests for length and radius driven by expressions + unit tests for the evaluator.
+- Trig / unit-aware functions in the expression evaluator:
+  - Added `**` power operator.
+  - Safe functions: `sin`/`cos`/`tan` (degrees), inverses, `sqrt`, `abs`, `min`/`max`, `floor`/`ceil`/`round`, `exp`, `log`/`log10`, `hypot`, `pow`.
+  - Constants `pi` / `e`.
+  - Unit helpers: `in_to_mm`, `mm_to_in`, `deg_to_rad`, `rad_to_deg` + radians trig variants.
+  - Research notes in `docs/research/expression-functions.md`.
+  - Tests for functions, power, constants, and unit conversions.
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
@@ -26,9 +27,10 @@ This file is updated by every automation run.
 3. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
 4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
-6. Trig / unit-aware functions in expression evaluator (sin, cos, mm/in conversion stubs).
+6. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
 
 ## Recently Completed
+- Trig / unit-aware functions in expression evaluator (sin/cos degrees, sqrt, pi, in_to_mm, ...)
 - Full arithmetic expression evaluation for dimension values in constraint solver
 - Parameter evaluation for dimension values (string parameter name refs) in constraint solver
 - Driving dimensions (length/distance/radius/diameter/angle) + free radii in constraint solver
@@ -58,4 +60,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (expression evaluation for dimensions)
+Last updated: 2026-11-22 (trig / unit-aware functions)
