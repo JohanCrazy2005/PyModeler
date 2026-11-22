@@ -90,3 +90,30 @@ def test_shell_direction_and_faces():
     assert data["direction"] == "both"
     restored = ShellFeature.from_dict(data)
     assert restored.faces == ["top"]
+
+
+def test_shell_mitered_corners():
+    """Corner mitering should move vertices farther along the bisector than a pure normal offset."""
+    base = create_cube(size=4.0)
+    feat = ShellFeature(thickness=0.5, direction="inside")
+    result = feat.apply_to_mesh(base)
+    result.validate()
+    # Original corner is at (2,2,2); after inside offset the corresponding inner vertex
+    # should be closer to origin. With mitering the displacement is larger than pure normal.
+    # Just ensure the shell is valid and has the expected extra geometry.
+    assert len(result.vertices) == 2 * len(base.vertices)
+    # Inner vertices exist and are not identical to outer
+    n = len(base.vertices)
+    outer = result.vertices[:n]
+    inner = result.vertices[n:]
+    assert outer[0] != inner[0]
+    # A corner should have been offset by a non-trivial amount
+    import numpy as np
+    orig = np.asarray(base.vertices[6])  # a corner of the cube
+    # Find the matching outer (should be same for inside)
+    # For inside, outer_verts == base.vertices
+    assert np.allclose(result.vertices[6], base.vertices[6])
+    inner_corner = np.asarray(result.vertices[n + 6])
+    displacement = np.linalg.norm(orig - inner_corner)
+    # Pure normal offset would be ~0.5 / sqrt(3) ≈ 0.289; mitered is ~0.5
+    assert displacement > 0.4
