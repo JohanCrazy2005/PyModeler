@@ -29,7 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-22)
-- Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + Sketch.solve()).
+- Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + full arithmetic expression evaluation for dimension values + Sketch.solve()).
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
 - Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
 - Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators + zig-zag strategy).
@@ -67,8 +67,8 @@
 19. (done) Zig-zag pocket strategy for toolpaths.
 20. (done) Shell corner mitering.
 21. (done) UI edges/faces selection for Fillet/Chamfer/Shell.
-22. (done) Lightweight constraint solver stub (with driving dimensions + parameter evaluation).
+22. (done) Lightweight constraint solver stub (with driving dimensions + parameter evaluation + arithmetic expressions).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-22 (parameter evaluation in solver)
+Last updated: 2026-11-22 (expression evaluation for dimensions)

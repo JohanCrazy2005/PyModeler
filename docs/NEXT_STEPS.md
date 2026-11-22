@@ -13,22 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Parameter evaluation for dimension values in the constraint solver:
-  - `solve_sketch` and `Sketch.solve` accept optional `parameters: ParameterStore`.
-  - String dimension values that are bare parameter names are resolved via `ParameterStore.evaluate` to numeric targets.
-  - Unresolved strings (expressions, unknown names) are skipped (same as before).
+- Full arithmetic expression evaluation for dimension values in the constraint solver:
+  - Added `ParameterStore.evaluate_expression` (numbers, names, + - * /, parentheses, unary).
+  - `_resolve_dimension_value` prefers `evaluate_expression` for string dimension values.
+  - Supports expressions like `"width * 2 + offset"` or `"(base + 1) * 2"`.
   - Research notes updated.
-  - Tests for length and radius driven by parameter names.
+  - Tests for length and radius driven by expressions + unit tests for the evaluator.
 
 ### Next concrete tasks (Phase 4)
-1. Full expression evaluation for dimension values (e.g. "width * 2 + offset") inside the solver (extend ParameterStore or add evaluate_expression).
-2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
-3. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
-4. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
-5. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-6. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
+1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
+2. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
+3. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
+4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
+5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
+6. Trig / unit-aware functions in expression evaluator (sin, cos, mm/in conversion stubs).
 
 ## Recently Completed
+- Full arithmetic expression evaluation for dimension values in constraint solver
 - Parameter evaluation for dimension values (string parameter name refs) in constraint solver
 - Driving dimensions (length/distance/radius/diameter/angle) + free radii in constraint solver
 - Lightweight 2D constraint solver stub (scipy least_squares)
@@ -57,4 +58,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (parameter evaluation in solver)
+Last updated: 2026-11-22 (expression evaluation for dimensions)

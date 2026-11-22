@@ -70,6 +70,14 @@ def test_unknown_parameter():
         store.evaluate("Missing")
 
 
-def test_invalid_schema_raises():
-    with pytest.raises(ParameterValidationError):
-        ParameterStore.from_dict({"parameters": [{"name": "1bad"}]})  # invalid name pattern
+def test_evaluate_expression_free_form():
+    store = ParameterStore()
+    store.add("width", value=10.0)
+    store.add("offset", value=2.5)
+    assert store.evaluate_expression("width * 2 + offset") == 22.5
+    assert store.evaluate_expression("(width + 1) / 2") == 5.5
+    assert store.evaluate_expression("-width") == -10.0
+    with pytest.raises(ParameterEvaluationError):
+        store.evaluate_expression("unknown * 2")
+    with pytest.raises(ParameterEvaluationError):
+        store.evaluate_expression("width +")

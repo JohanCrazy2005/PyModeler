@@ -26,7 +26,9 @@
 - Introduce a `ParameterStore` of named user parameters (name, value or expression, optional unit).
 - Sketch dimensions (and later features) already support string values as parameter names; the store will resolve them.
 - Simple expression evaluation (numeric literals + named references + basic arithmetic) is sufficient for the first increment.
+- Free-form expression evaluation on dimension values (e.g. `width * 2 + offset`) is supported via `ParameterStore.evaluate_expression` and used by the constraint solver.
 - Schema-driven so parameters are versionable and serializable with the design.
-- Later: model parameters auto-created from dimensions, full expression engine, units handling, and UI Parameter table.
+- Later: model parameters auto-created from dimensions, full expression engine (trig, units), and UI Parameter table.
 
 Sources consulted: Autodesk Fusion Help, Onshape documentation/blogs, Mozaik support articles and user guides (2025–2026).
+Last updated: 2026-11-22 (expression evaluation for dimensions)

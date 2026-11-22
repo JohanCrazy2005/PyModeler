@@ -238,3 +238,22 @@ class ParameterStore:
     def evaluate_all(self) -> Dict[str, float]:
         """Evaluate every parameter (useful for debugging / UI)."""
         return {p["name"]: self.evaluate(p["name"]) for p in self.parameters}
+
+    def evaluate_expression(self, expression: str) -> float:
+        """Evaluate a free-form arithmetic expression using current parameter values.
+
+        Supports numbers, parameter names, + - * /, parentheses, and unary +/-.
+        Parameter references are resolved via evaluate (with cycle detection).
+        """
+        expr = str(expression).strip()
+        if not expr:
+            raise ParameterEvaluationError("Empty expression")
+        try:
+            tree = ast.parse(expr, mode="eval")
+        except SyntaxError as e:
+            raise ParameterEvaluationError(f"Invalid expression: {e}") from e
+
+        def resolve_name(n: str) -> float:
+            return self.evaluate(n)
+
+        return float(self._eval_with_resolver(tree, resolve_name))

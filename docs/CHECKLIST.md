@@ -40,7 +40,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Rectangle and Arc tools on the visual canvas
 - [x] Constraint visual feedback / badges on canvas (colored markers + tooltips)
 - [x] Real solid-of-revolution mesh for Revolve (profile points, partial angles, Y-axis)
-- [x] Lightweight 2D constraint solver stub (scipy least_squares for horizontal/vertical/equal/coincident/parallel/perpendicular + driving dimensions length/distance/radius/diameter/angle + free radii + **parameter name evaluation for dimension values**)
+- [x] Lightweight 2D constraint solver stub (scipy least_squares for horizontal/vertical/equal/coincident/parallel/perpendicular + driving dimensions length/distance/radius/diameter/angle + free radii + **parameter name evaluation for dimension values** + **full arithmetic expression evaluation for dimension values (e.g. "width * 2 + offset")**)
 
 ## Phase 2 – Parts, Assemblies & Manufacturing Helpers
 - [x] Multi-feature Part model
@@ -81,4 +81,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-22 (parameter evaluation in solver)
+Last updated: 2026-11-22 (expression evaluation for dimensions)

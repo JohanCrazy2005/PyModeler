@@ -40,7 +40,8 @@ def _resolve_dimension_value(val: Any, parameters: Optional[Any] = None) -> Opti
     """Resolve a dimension value to float.
 
     Numeric values are returned directly.
-    String values are evaluated as parameter names (or simple expressions) via ParameterStore if provided.
+    String values are evaluated as parameter names or arithmetic expressions
+    via ParameterStore.evaluate / evaluate_expression if provided.
     Returns None if unresolved (skipped).
     """
     if isinstance(val, (int, float)) and not isinstance(val, bool):
@@ -50,19 +51,12 @@ def _resolve_dimension_value(val: Any, parameters: Optional[Any] = None) -> Opti
         if not s:
             return None
         try:
-            # Prefer direct evaluate if it looks like a name; fall back to treating as expression via evaluate if store supports
+            # Prefer general expression evaluator if available
+            if hasattr(parameters, "evaluate_expression"):
+                return float(parameters.evaluate_expression(s))
+            # Fall back to bare-name evaluate
             if hasattr(parameters, "evaluate"):
-                # If the string is a bare name, evaluate it; otherwise try as expression by temporary param or direct
-                # ParameterStore.evaluate expects a name; for expressions we can use a helper if present
-                try:
-                    return float(parameters.evaluate(s))
-                except Exception:
-                    # If store has a more general evaluator, try it; else skip
-                    if hasattr(parameters, "evaluate_expression"):
-                        return float(parameters.evaluate_expression(s))
-                    # Fallback: try evaluating the string as an expression using the store's internal if possible
-                    # For now, if it's not a bare name that evaluates, skip (or we could parse)
-                    return None
+                return float(parameters.evaluate(s))
         except Exception:
             return None
     # Last attempt: pure numeric string
@@ -81,7 +75,7 @@ def solve_sketch(
     """Solve basic geometric constraints and driving dimensions on a Sketch in-place.
 
     Optional `parameters` (ParameterStore) is used to resolve string dimension values
-    (parameter names or simple expressions) to numeric targets.
+    (parameter names or arithmetic expressions such as "width * 2 + offset") to numeric targets.
 
     Returns a result dict:
         {

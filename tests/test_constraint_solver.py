@@ -193,3 +193,43 @@ def test_parameter_driven_radius():
     res = solve_sketch(sk, parameters=params)
     assert res["success"]
     assert abs(sk.get_entity(circ)["radius"] - 4.25) < 1e-4
+
+
+def test_expression_driven_length_dimension():
+    from pymodeler.core.parameters import ParameterStore
+
+    sk = Sketch("expr_len")
+    p1 = sk.add_point(0, 0, fixed=True)
+    p2 = sk.add_point(3.0, 0.2)
+    ln = sk.add_line(p1, p2)
+    sk.add_horizontal(ln)
+    sk.add_length_dimension(ln, "width * 2 + offset")  # expression
+
+    params = ParameterStore()
+    params.add("width", value=5.0)
+    params.add("offset", value=2.5)
+
+    res = solve_sketch(sk, parameters=params)
+    assert res["success"]
+    ent = sk.get_entity(ln)
+    a = sk.get_entity(ent["start_point"])
+    b = sk.get_entity(ent["end_point"])
+    length = ((b["x"] - a["x"]) ** 2 + (b["y"] - a["y"]) ** 2) ** 0.5
+    assert abs(length - 12.5) < 1e-4
+    assert abs(b["y"] - a["y"]) < 1e-4
+
+
+def test_expression_driven_radius_with_parentheses():
+    from pymodeler.core.parameters import ParameterStore
+
+    sk = Sketch("expr_rad")
+    c = sk.add_point(0, 0, fixed=True)
+    circ = sk.add_circle(c, 1.0)
+    sk.add_radius_dimension(circ, "(base + 1) * 2")
+
+    params = ParameterStore()
+    params.add("base", value=3.0)
+
+    res = solve_sketch(sk, parameters=params)
+    assert res["success"]
+    assert abs(sk.get_entity(circ)["radius"] - 8.0) < 1e-4
