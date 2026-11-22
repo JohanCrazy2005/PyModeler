@@ -62,11 +62,14 @@ class ToolpathJob:
         origin_x: float = 0.0,
         origin_y: float = 0.0,
         unit: str = "mm",
+        strategy: str = "concentric",
         id: Optional[str] = None,
         metadata: Optional[dict] = None,
     ):
         if operation not in ("pocket", "contour"):
             raise ToolpathValidationError("operation must be 'pocket' or 'contour'")
+        if strategy not in ("concentric", "zigzag"):
+            raise ToolpathValidationError("strategy must be 'concentric' or 'zigzag'")
         if width <= 0 or height <= 0 or depth <= 0 or tool_diameter <= 0:
             raise ToolpathValidationError("Dimensions and tool diameter must be positive")
         if tool_diameter >= min(width, height):
@@ -75,6 +78,7 @@ class ToolpathJob:
         self.id = id or _new_id()
         self.name = name
         self.operation = operation
+        self.strategy = strategy
         self.width = float(width)
         self.height = float(height)
         self.depth = float(depth)
@@ -99,6 +103,7 @@ class ToolpathJob:
             "id": self.id,
             "name": self.name,
             "operation": self.operation,
+            "strategy": self.strategy,
             "width": self.width,
             "height": self.height,
             "depth": self.depth,
@@ -143,6 +148,7 @@ class ToolpathJob:
             origin_x=data.get("origin_x", 0.0),
             origin_y=data.get("origin_y", 0.0),
             unit=data.get("unit", "mm"),
+            strategy=data.get("strategy", "concentric"),
             id=data.get("id"),
             metadata=data.get("metadata"),
         )
@@ -174,7 +180,10 @@ class ToolpathJob:
         total_length = 0.0
 
         if self.operation == "pocket":
-            total_length = self._generate_pocket(lines, radius, stepover, z_levels)
+            if self.strategy == "zigzag":
+                total_length = self._generate_zigzag_pocket(lines, radius, stepover, z_levels)
+            else:
+                total_length = self._generate_pocket(lines, radius, stepover, z_levels)
         else:
             total_length = self._generate_contour(lines, radius, z_levels)
 
@@ -244,6 +253,50 @@ class ToolpathJob:
                 # Retract slightly between passes if desired; for stub stay at depth until next
         return total
 
+    def _generate_zigzag_pocket(
+        self, lines: List[str], radius: float, stepover: float, z_levels: List[float]
+    ) -> float:
+        """Simple zig-zag (raster) pocket along X, stepping in Y."""
+        # Effective area
+        x_min = self.origin_x + radius
+        x_max = self.origin_x + self.width - radius
+        y_min = self.origin_y + radius
+        y_max = self.origin_y + self.height - radius
+        if x_max <= x_min or y_max <= y_min:
+            raise ToolpathValidationError("Feature too small for tool diameter")
+
+        total = 0.0
+        # Y steps
+        y_steps = []
+        y = y_min
+        direction = 1
+        while y <= y_max + 1e-6:
+            y_steps.append(y)
+            y += stepover
+        if y_steps[-1] < y_max - 1e-6:
+            y_steps.append(y_max)
+
+        for z in z_levels:
+            lines.append(f"G00 X{x_min:.3f} Y{y_steps[0]:.3f}")
+            lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+            prev = (x_min, y_steps[0])
+            for i, y in enumerate(y_steps):
+                if direction > 0:
+                    target = (x_max, y)
+                else:
+                    target = (x_min, y)
+                lines.append(f"G01 X{target[0]:.3f} Y{target[1]:.3f} F{self.feed:.0f}")
+                total += math.hypot(target[0] - prev[0], target[1] - prev[1])
+                prev = target
+                direction = -direction
+                # short step to next Y if not last
+                if i + 1 < len(y_steps):
+                    next_y = y_steps[i + 1]
+                    lines.append(f"G01 X{prev[0]:.3f} Y{next_y:.3f} F{self.feed:.0f}")
+                    total += abs(next_y - prev[1])
+                    prev = (prev[0], next_y)
+        return total
+
     def _generate_contour(
         self, lines: List[str], radius: float, z_levels: List[float]
     ) -> float:
@@ -268,7 +321,7 @@ class ToolpathJob:
 
     def summary(self) -> str:
         return (
-            f"Toolpath {self.name} ({self.operation})\n"
+            f"Toolpath {self.name} ({self.operation}/{self.strategy})\n"
             f"Size: {self.width} x {self.height} x {self.depth} {self.unit}\n"
             f"Tool: Ø{self.tool_diameter}  stepover={self.stepover_fraction:.0%}\n"
             f"Estimated cut length: {self.estimated_length:.1f}\n"

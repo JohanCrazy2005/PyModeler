@@ -14,6 +14,12 @@
       "enum": ["pocket", "contour"],
       "description": "pocket = clear interior; contour = follow boundary"
     },
+    "strategy": {
+      "type": "string",
+      "enum": ["concentric", "zigzag"],
+      "default": "concentric",
+      "description": "Pocket strategy: concentric rectangles or zig-zag raster"
+    },
     "width": { "type": "number", "exclusiveMinimum": 0, "description": "Feature width in X (mm)" },
     "height": { "type": "number", "exclusiveMinimum": 0, "description": "Feature height in Y (mm)" },
     "depth": { "type": "number", "exclusiveMinimum": 0, "description": "Cut depth (positive number, applied as negative Z)" },

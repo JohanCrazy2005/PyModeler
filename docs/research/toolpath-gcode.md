@@ -29,4 +29,9 @@
 - Tests for schema, generation, and basic output content.
 - No UI yet (property panel later).
 
+## Polish (2026-11-21 follow-up)
+- Added `strategy` field: "concentric" (default, concentric rectangles) or "zigzag" (raster along X stepping in Y).
+- Zig-zag generator implemented with multi-depth, tool-radius offset, stepover.
+- Schema and tests updated; both strategies validate and generate valid G-code.
+
 Last researched: 2026-11-21

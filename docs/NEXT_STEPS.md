@@ -13,13 +13,11 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Early toolpath / G-code generation stubs:
-  - Research notes in `docs/research/toolpath-gcode.md` (rectangular pocket & contour patterns, G00/G01, stepover, depth passes).
-  - JSON Schema `schemas/toolpath.schema.json` for ToolpathJob (pocket/contour, dimensions, tool, feeds).
-  - Pure-Python generator in `src/pymodeler/core/toolpath.py`: concentric rectangular pocket + outside contour, multi-depth, simple G-code emission, schema-validated.
-  - Tests covering schema, generation, round-trip, and edge cases (all pass).
-  - Exported from core `__init__.py`.
-- CHECKLIST updated to mark early toolpath stubs done.
+- Toolpath polish: added `strategy` ("concentric" | "zigzag") to ToolpathJob.
+  - Schema updated with strategy enum.
+  - `_generate_zigzag_pocket` implements raster (X-direction passes stepping in Y) with tool-radius offset, stepover, multi-depth.
+  - Tests for zigzag generation, bad strategy rejection, and round-trip strategy field (all pass).
+  - Research note updated.
 
 ### Next concrete tasks (Phase 4)
 1. Better shell: corner mitering, Boolean-based offset when engine available, or true face removal openings.
@@ -27,7 +25,7 @@ This file is updated by every automation run.
 3. Further constraint propagation (e.g., equal lengths, horizontal/vertical under non-uniform scale) or a lightweight solver stub.
 4. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 5. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
-6. Toolpath polish: zig-zag pocket, lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
+6. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
 
 ## Recently Completed
 - Rectangular NestingJob schema + shelf packer + from-cutlist helper + research (implementation completed)
@@ -51,4 +49,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-21 (Toolpath/G-code stubs completed)
+Last updated: 2026-11-21 (Toolpath zigzag strategy added)

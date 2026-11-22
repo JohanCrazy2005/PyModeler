@@ -29,7 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-21)
-- Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators).
+- Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators + zigzag strategy).
 - Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist).
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
