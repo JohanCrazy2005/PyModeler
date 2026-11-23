@@ -32,7 +32,7 @@
 - Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + full arithmetic expression evaluation for dimension values + **trig / unit-aware functions (sin/cos in degrees, sqrt, pi, in_to_mm, ...)** + Sketch.solve()).
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
 - Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
-- Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators + zig-zag strategy).
+- Done: Early toolpath / G-code stubs (ToolpathJob schema + rectangular pocket & contour generators + zig-zag strategy + linear lead-in/out).
 - Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist).
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
@@ -68,7 +68,8 @@
 20. (done) Shell corner mitering.
 21. (done) UI edges/faces selection for Fillet/Chamfer/Shell.
 22. (done) Lightweight constraint solver stub (with driving dimensions + parameter evaluation + arithmetic expressions + trig/unit functions).
+23. (done) Toolpath linear lead-in / lead-out.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-22 (trig / unit-aware functions)
+Last updated: 2026-11-22 (toolpath linear lead-in/out)
