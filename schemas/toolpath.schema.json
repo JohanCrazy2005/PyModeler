@@ -4,7 +4,13 @@
   "title": "ToolpathJob",
   "description": "Early CAM stub: a simple 2D rectangular pocket or contour toolpath that can emit G-code. Schema-validated manufacturing helper.",
   "type": "object",
-  "required": ["operation", "width", "height", "depth", "tool_diameter"],
+  "required": [
+    "operation",
+    "width",
+    "height",
+    "depth",
+    "tool_diameter"
+  ],
   "additionalProperties": false,
   "properties": {
     "id": {
@@ -108,6 +114,18 @@
     "metadata": {
       "type": "object",
       "additionalProperties": true
+    },
+    "lead_in_length": {
+      "type": "number",
+      "minimum": 0,
+      "default": 0.0,
+      "description": "Optional linear lead-in length (mm). 0 = disabled. Approach from outside then cut to path entry."
+    },
+    "lead_out_length": {
+      "type": "number",
+      "minimum": 0,
+      "default": 0.0,
+      "description": "Optional linear lead-out length (mm). 0 = disabled. Extend past exit."
     }
   }
 }
