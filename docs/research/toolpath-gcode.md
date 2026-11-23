@@ -42,3 +42,9 @@ Last researched: 2026-11-21
 - Linear lead-out: extend past final point in +X.
 - Applied on entry of each Z level for pocket (concentric/zigzag) and contour.
 - Schema, generator, tests updated. Circular arcs (G02/G03) and UI preview still future.
+
+## Update 2026-11-22 (restore + corner radius complete)
+- Restored full ToolpathJob implementation (was placeholder on main).
+- Concentric and zigzag strategies, linear lead-in/out, and corner_radius G03 R-format arcs all functional and tested.
+- Estimated length accounts for arc lengths.
+- Schema-validated; ready for UI preview later.
