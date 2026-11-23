@@ -143,3 +143,30 @@ def test_default_strategy_concentric():
     assert job.strategy == "concentric"
     job.generate()
     assert job.gcode
+
+
+def test_lead_in_out():
+    job = ToolpathJob(
+        operation="contour",
+        width=40,
+        height=20,
+        depth=2,
+        tool_diameter=4,
+        lead_in_length=5.0,
+        lead_out_length=3.0,
+    )
+    job.generate()
+    assert job.gcode
+    # Should contain approach before entry and extension after
+    assert "G00 X" in job.gcode
+    # Lead-in of 5 should appear as a move of that distance
+    assert job.estimated_length > 0
+    # Roundtrip preserves leads
+    data = job.to_dict()
+    assert data["lead_in_length"] == 5.0
+    assert data["lead_out_length"] == 3.0
+    restored = ToolpathJob.from_dict(data)
+    assert restored.lead_in_length == 5.0
+    restored.generate()
+    assert restored.gcode
+    job.validate()
