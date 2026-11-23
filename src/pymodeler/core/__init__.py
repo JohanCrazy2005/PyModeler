@@ -94,6 +94,8 @@ from .nesting import (
     NestingValidationError,
     validate_nesting_job_data,
     nesting_job_from_cutlist,
+    nesting_job_from_parts,
+    DEFAULT_SHEET_SIZES,
 )
 from .sheet_metal import (
     SheetMetalRuleStore,
@@ -194,6 +196,8 @@ __all__ = [
     "NestingValidationError",
     "validate_nesting_job_data",
     "nesting_job_from_cutlist",
+    "nesting_job_from_parts",
+    "DEFAULT_SHEET_SIZES",
     "ToolpathJob",
     "ToolpathValidationError",
     "validate_toolpath_data",
