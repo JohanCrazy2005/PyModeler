@@ -100,3 +100,14 @@ def test_summary():
     text = job.summary()
     assert "Sheets used" in text
     assert "yield" in text.lower()
+
+
+def test_remnant_area_tracked():
+    job = NestingJob(sheet_width=1000, sheet_height=500, kerf=0)
+    job.add_part(300, 200, quantity=1, name="panel")
+    job.pack()
+    layout = job.layouts[0]
+    assert "remnant_area" in layout
+    expected = 1000 * 500 - 300 * 200
+    assert abs(layout["remnant_area"] - expected) < 1.0
+    assert "remnant" in job.summary().lower()
