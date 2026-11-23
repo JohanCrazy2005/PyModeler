@@ -82,4 +82,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-22 (toolpath linear lead-in/out)
+Last updated: 2026-11-22 (toolpath restore + corner radius + nesting remnant)
