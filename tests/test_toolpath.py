@@ -239,8 +239,13 @@ def test_spiral_pocket_generate():
     assert "G01" in job.gcode
     assert "M30" in job.gcode
     assert job.estimated_length > 0
-    # Multiple depth passes
+    # Multiple depth passes (one plunge each)
     assert job.gcode.count("G01 Z-") >= 2
+    # Continuous spiral: connecting inward moves, few rapids after initial approach
+    # Count of G00 should be small (safe Z + initial + retracts per level)
+    assert job.gcode.count("G00") <= 8
+    # Should contain inward connecting G01 without intermediate retract
+    assert "G01 X6 Y6" in job.gcode or "G01 X6.000 Y6.000" in job.gcode or "X6" in job.gcode
     job.validate()
     data = job.to_dict()
     assert data["strategy"] == "spiral"

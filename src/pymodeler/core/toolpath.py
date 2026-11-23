@@ -372,7 +372,53 @@ class ToolpathJob:
             direction *= -1
 
     def _emit_spiral(self, lines, move_to, ox, oy, w, h, radius, z, is_first):
-        # Simple rectangular spiral approximation: concentric but connected continuously
-        # For stub we reuse concentric logic with continuous connection
-        self._emit_concentric(lines, move_to, lambda *a, **k: None, ox, oy, w, h, radius, z, is_first)
-        # (A true continuous spiral would be more involved; this satisfies tests)
+        """Emit a continuous rectangular spiral inward (single plunge per Z level).
+
+        Generates successive inset rectangles connected by a short feed move on the
+        bottom side so the tool stays down and spirals continuously. Falls back to
+        concentric behavior if the pocket is too small for multiple passes.
+        """
+        step = self.tool_diameter * self.stepover_fraction
+        inset = radius
+        first_pass = True
+        while True:
+            # Effective rectangle after inset
+            x0 = ox + inset
+            y0 = oy + inset
+            x1 = ox + w - inset
+            y1 = oy + h - inset
+            if x1 <= x0 or y1 <= y0:
+                break
+
+            if first_pass:
+                # Plunge at outer start
+                if self.lead_in_length > 0 and is_first:
+                    lead_x = x0 - self.lead_in_length
+                    lines.append(f"G00 X{_fmt(lead_x)} Y{_fmt(y0)}")
+                    lines.append(f"G00 Z{_fmt(self.safe_z)}")
+                    lines.append(f"G01 Z{_fmt(z)} F{_fmt(self.plunge_feed)}")
+                    move_to(x0, y0, feed=self.feed)
+                else:
+                    lines.append(f"G00 X{_fmt(x0)} Y{_fmt(y0)}")
+                    lines.append(f"G00 Z{_fmt(self.safe_z)}")
+                    lines.append(f"G01 Z{_fmt(z)} F{_fmt(self.plunge_feed)}")
+                first_pass = False
+            else:
+                # Connect from previous end (approx previous x0,y0) to new start with feed
+                # Previous rectangle ended near its start after full loop; move inward
+                move_to(x0, y0, feed=self.feed)
+
+            # Emit the four sides (sharp corners for continuous spiral; arcs optional later)
+            move_to(x1, y0, feed=self.feed)
+            move_to(x1, y1, feed=self.feed)
+            move_to(x0, y1, feed=self.feed)
+            move_to(x0, y0, feed=self.feed)
+
+            next_inset = inset + step
+            if next_inset * 2 >= min(w, h) - 1e-3:
+                break
+            inset = next_inset
+
+        # Optional lead-out on the final (innermost) rectangle
+        if self.lead_out_length > 0 and not first_pass:
+            move_to(x0 + self.lead_out_length, y0, feed=self.feed)

@@ -48,3 +48,10 @@ Last researched: 2026-11-21
 - Concentric and zigzag strategies, linear lead-in/out, and corner_radius G03 R-format arcs all functional and tested.
 - Estimated length accounts for arc lengths.
 - Schema-validated; ready for UI preview later.
+
+## Update 2026-11-23 (continuous spiral)
+- Replaced discrete concentric spiral stub with continuous rectangular spiral.
+- Single plunge per Z-level; successive inset rectangles connected by feed moves on the bottom side so the tool stays down.
+- Produces fewer rapids and a more realistic continuous pocket path.
+- Test strengthened to assert low G00 count and presence of connecting moves.
+

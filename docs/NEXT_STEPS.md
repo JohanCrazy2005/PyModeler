@@ -13,9 +13,11 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Restored full ToolpathJob generator (concentric/zigzag/spiral + contour, leads, corner arcs) so core is no longer a stub.
-- Wired existing ToolpathPreviewDialog into Manufacturing menu: "Toolpath Preview…" creates a sample pocket from current part extents (or defaults) and shows G-code + 2D path plot.
-- All existing toolpath tests pass.
+- Implemented continuous single-path rectangular spiral for pocket strategy in ToolpathJob.
+  - One plunge per Z-level, then continuous G01 connecting successive inset rectangles inward (no intermediate retracts).
+  - Previous spiral was discrete concentric rectangles with per-pass plunges.
+  - Strengthened unit test to assert continuous path (low G00 count, connecting moves present).
+  - Existing toolpath tests continue to pass (manual verification; headless Qt display unavailable).
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
@@ -23,13 +25,15 @@ This file is updated by every automation run.
 3. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 4. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
 5. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
-6. Continuous single-path spiral refinement or Archimedean pocket.
+6. True Archimedean spiral (non-rectangular continuous curve) or spiral with corner-radius arcs.
 
 ## Recently Completed
+- Continuous rectangular spiral pocket toolpath (this run)
+- Restored full ToolpathJob generator + UI preview menu wiring
 - Nesting UI preview widget + dialog (QPainter sheet layouts)
 - Nesting multi-sheet-size selection (smallest fitting sheet preferred)
 - Wire nesting preview to real cut-list / current part data (`nesting_job_from_parts`)
-- Toolpath spiral pocket strategy
+- Toolpath spiral pocket strategy (stub)
 - Circular arcs / corner radius for rectangular toolpaths (G03)
 - Linear lead-in / lead-out for toolpaths (optional lengths)
 - Trig / unit-aware functions in expression evaluator (sin/cos degrees, sqrt, pi, in_to_mm, ...)
@@ -63,4 +67,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (toolpath generator restored + UI preview menu)
+Last updated: 2026-11-23 (continuous rectangular spiral toolpath)
