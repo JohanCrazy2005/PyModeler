@@ -1,6 +1,6 @@
 """Early rectangular toolpath / G-code generator.
 
-Pure-Python stub for 2D pocket (concentric or zigzag) and contour operations.
+Pure-Python stub for 2D pocket (concentric, zigzag, or spiral) and contour operations.
 Emits simple G-code (G00/G01/G03, metric absolute). Supports optional linear
 lead-in/out and corner-radius arcs (G03 R-format) on rectangular paths.
 Validated against schemas/toolpath.schema.json.
@@ -79,7 +79,7 @@ class ToolpathJob:
     ):
         if width <= 0 or height <= 0 or depth <= 0 or tool_diameter <= 0:
             raise ToolpathValidationError("Dimensions and tool diameter must be positive")
-        if strategy not in ("concentric", "zigzag"):
+        if strategy not in ("concentric", "zigzag", "spiral"):
             raise ToolpathValidationError(f"Unknown strategy: {strategy}")
         if operation not in ("pocket", "contour"):
             raise ToolpathValidationError(f"Unknown operation: {operation}")
@@ -236,6 +236,8 @@ class ToolpathJob:
 
         if self.strategy == "zigzag":
             return self._generate_zigzag(lines, radius, stepover, z_levels, inner_w, inner_h)
+        if self.strategy == "spiral":
+            return self._generate_spiral(lines, radius, stepover, z_levels, inner_w, inner_h)
         # Concentric rectangles
         return self._generate_concentric(lines, radius, stepover, z_levels, inner_w, inner_h)
 
@@ -296,6 +298,45 @@ class ToolpathJob:
                     next_y = ys[i + 1]
                     lines.append(f"G01 Y{_fmt(next_y)} F{_fmt(self.feed)}")
                     length += abs(next_y - y)
+        return length
+
+    def _generate_spiral(
+        self, lines: List[str], radius: float, stepover: float, z_levels: List[float],
+        inner_w: float, inner_h: float
+    ) -> float:
+        """Continuous rectangular spiral from outside inward.
+
+        Starts at the outer tool-center offset and spirals in by stepover
+        each lap until the remaining rectangle is smaller than stepover.
+        """
+        length = 0.0
+        # Outer tool-center bounds
+        x_min0 = self.origin_x + radius
+        y_min0 = self.origin_y + radius
+        x_max0 = self.origin_x + self.width - radius
+        y_max0 = self.origin_y + self.height - radius
+
+        for z in z_levels:
+            x_min, y_min, x_max, y_max = x_min0, y_min0, x_max0, y_max0
+            first = True
+            while x_max - x_min > 1e-6 and y_max - y_min > 1e-6:
+                # One rectangular lap: bottom -> right -> top -> left
+                path = [
+                    (x_min, y_min),
+                    (x_max, y_min),
+                    (x_max, y_max),
+                    (x_min, y_max),
+                    (x_min, y_min),
+                ]
+                length += self._emit_path_with_leads(lines, path, z, is_first=first)
+                first = False
+                # Shrink for next lap
+                x_min += stepover
+                y_min += stepover
+                x_max -= stepover
+                y_max -= stepover
+                if x_max - x_min < stepover * 0.5 or y_max - y_min < stepover * 0.5:
+                    break
         return length
 
     def _generate_contour(

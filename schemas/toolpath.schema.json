@@ -52,10 +52,11 @@
       "type": "string",
       "enum": [
         "concentric",
-        "zigzag"
+        "zigzag",
+        "spiral"
       ],
       "default": "concentric",
-      "description": "Pocket clearing pattern: concentric rectangles or parallel zig-zag lines"
+      "description": "Pocket clearing pattern: concentric rectangles, parallel zig-zag lines, or continuous rectangular spiral inward"
     },
     "stepover_fraction": {
       "type": "number",

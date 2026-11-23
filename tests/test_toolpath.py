@@ -128,7 +128,7 @@ def test_bad_strategy_raises():
             height=30,
             depth=5,
             tool_diameter=6,
-            strategy="spiral",
+            strategy="random",
         )
 
 
@@ -221,3 +221,43 @@ def test_corner_radius_zero_is_sharp():
     assert "G02" not in job.gcode
     assert "G01" in job.gcode
     job.validate()
+
+
+def test_spiral_pocket_generate():
+    job = ToolpathJob(
+        operation="pocket",
+        width=50,
+        height=30,
+        depth=4,
+        tool_diameter=6,
+        strategy="spiral",
+        stepover_fraction=0.5,
+        depth_of_cut=2,
+    )
+    job.generate()
+    assert job.gcode
+    assert "G01" in job.gcode
+    assert "M30" in job.gcode
+    assert job.estimated_length > 0
+    # Multiple depth passes
+    assert job.gcode.count("G01 Z-") >= 2
+    job.validate()
+    data = job.to_dict()
+    assert data["strategy"] == "spiral"
+    # Roundtrip
+    restored = ToolpathJob.from_dict(data)
+    assert restored.strategy == "spiral"
+    restored.generate()
+    assert restored.gcode
+
+
+def test_spiral_schema_accepts():
+    data = {
+        "operation": "pocket",
+        "width": 40,
+        "height": 20,
+        "depth": 3,
+        "tool_diameter": 4,
+        "strategy": "spiral",
+    }
+    validate_toolpath_data(data)

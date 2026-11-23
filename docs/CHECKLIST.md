@@ -73,6 +73,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour G-code generator + research)
 - [x] Toolpath zig-zag pocket strategy (schema + generator + tests)
 - [x] Toolpath linear lead-in / lead-out (optional lengths, schema + generator + tests)
+- [x] Toolpath spiral pocket strategy (schema + generator + tests)
 - [ ] Import/Export improvements (DXF via ezdxf; STEP later if geometry kernel allows)
 - [ ] Joinery rules / automatic machining concepts
 
@@ -82,4 +83,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-22 (nesting multi-sheet sizes)
+Last updated: 2026-11-23 (toolpath spiral strategy)

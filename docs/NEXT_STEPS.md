@@ -13,17 +13,19 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Nesting multi-sheet-size selection: optional `sheet_sizes` list; packer prefers the smallest available sheet that can fit each part (with primary as fallback). Layouts record the sheet size/name used. Remnant tracking retained. All tests pass.
+- Toolpath spiral pocket strategy: continuous rectangular spiral inward by stepover. Schema enum extended, generator + tests (14 pass).
 
 ### Next concrete tasks (Phase 4)
-1. Further toolpath polish: UI preview of generated G-code or more strategies (e.g. spiral).
-2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
-3. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-4. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
-5. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
-6. Simple UI preview of nesting layouts (now that multi-size is done).
+1. Further toolpath polish: UI preview of generated G-code, or spiral continuous single-path refinement / true Archimedean option.
+2. Simple UI preview of nesting layouts (SVG or canvas from layouts).
+3. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
+4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
+5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
+6. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
 
 ## Recently Completed
+- Toolpath spiral pocket strategy
+- Nesting multi-sheet-size selection
 - Circular arcs / corner radius for rectangular toolpaths (G03)
 - Linear lead-in / lead-out for toolpaths (optional lengths)
 - Trig / unit-aware functions in expression evaluator (sin/cos degrees, sqrt, pi, in_to_mm, ...)
@@ -56,4 +58,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (nesting multi-sheet-size selection)
+Last updated: 2026-11-23 (toolpath spiral strategy)
