@@ -48,6 +48,8 @@ from pymodeler.core.parametric_transform import (
 from pymodeler.render import ViewportWidget
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
 from pymodeler.ui.nesting_preview import show_nesting_preview
+from pymodeler.ui.toolpath_preview import show_toolpath_preview
+from pymodeler.core.toolpath import ToolpathJob
 
 
 class ExtrudeDialog(QDialog):
@@ -168,6 +170,7 @@ class MainWindow(QMainWindow):
         mfg_menu.addAction("BOM (stub)", self._show_bom_stub)
         mfg_menu.addSeparator()
         mfg_menu.addAction("Nesting Preview…", self._show_nesting_preview)
+        mfg_menu.addAction("Toolpath Preview…", self._show_toolpath_preview)
 
         # View
         view_menu = menubar.addMenu("&View")
@@ -317,6 +320,38 @@ class MainWindow(QMainWindow):
             show_nesting_preview(job, self)
         except Exception as exc:
             QMessageBox.warning(self, "Nesting", f"Could not prepare nesting: {exc}")
+
+
+    def _show_toolpath_preview(self) -> None:
+        """Create a sample rectangular toolpath from current part size (or default) and show preview."""
+        # Prefer current part body extents if available; fall back to a sensible default
+        width, height, depth = 80.0, 50.0, 5.0
+        if self.current_part is not None and hasattr(self.current_part, "get_body"):
+            try:
+                body = self.current_part.get_body()
+                if body and getattr(body, "vertices", None):
+                    xs = [v[0] for v in body.vertices]
+                    ys = [v[1] for v in body.vertices]
+                    zs = [v[2] for v in body.vertices]
+                    width = max(max(xs) - min(xs), 20.0)
+                    height = max(max(ys) - min(ys), 20.0)
+                    depth = max(max(zs) - min(zs), 2.0)
+            except Exception:
+                pass
+        try:
+            job = ToolpathJob(
+                operation="pocket",
+                width=width,
+                height=height,
+                depth=depth,
+                tool_diameter=6.0,
+                strategy="concentric",
+                name="Sample Pocket",
+            )
+            job.generate()
+            show_toolpath_preview(job, self)
+        except Exception as exc:
+            QMessageBox.warning(self, "Toolpath", f"Could not prepare toolpath: {exc}")
 
     def undo(self) -> None:
         self.history.undo()

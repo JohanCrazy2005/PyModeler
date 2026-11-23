@@ -13,20 +13,17 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Completed nesting-from-parts wiring (was partially committed):
-  - Added missing `nesting_job_from_parts` + `DEFAULT_SHEET_SIZES` in core/nesting.py so core import no longer breaks.
-  - Manufacturing menu: "Nesting Preview…" builds job from current parts (sample fallback when no geometry) and shows NestingPreviewDialog.
-  - "Cut List" menu now shows real generated text.
-  - Tests cover geometry path, fallback sample, no-fallback empty, and the constant.
+- Restored full ToolpathJob generator (concentric/zigzag/spiral + contour, leads, corner arcs) so core is no longer a stub.
+- Wired existing ToolpathPreviewDialog into Manufacturing menu: "Toolpath Preview…" creates a sample pocket from current part extents (or defaults) and shows G-code + 2D path plot.
+- All existing toolpath tests pass.
 
 ### Next concrete tasks (Phase 4)
-1. Toolpath UI preview: simple dialog showing generated G-code text + optional 2D path plot (QPainter).
-   (or spiral continuous single-path / Archimedean refinement).
-2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
-3. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-4. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
-5. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
-6. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
+1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
+2. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
+3. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
+4. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
+5. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
+6. Continuous single-path spiral refinement or Archimedean pocket.
 
 ## Recently Completed
 - Nesting UI preview widget + dialog (QPainter sheet layouts)
@@ -66,4 +63,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (complete nesting-from-parts wiring + menu)
+Last updated: 2026-11-23 (toolpath generator restored + UI preview menu)
