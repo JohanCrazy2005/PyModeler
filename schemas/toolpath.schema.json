@@ -126,6 +126,12 @@
       "minimum": 0,
       "default": 0.0,
       "description": "Optional linear lead-out length (mm). 0 = disabled. Extend past exit."
+    },
+    "corner_radius": {
+      "type": "number",
+      "minimum": 0,
+      "default": 0.0,
+      "description": "Optional corner radius (mm) for rectangular paths. 0 = sharp corners (G01 only). >0 emits G02/G03 arcs at corners."
     }
   }
 }
