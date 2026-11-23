@@ -72,6 +72,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [x] Simple nesting concepts (NestingJob schema + shelf packer + from-cutlist helper + research)
 - [x] Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour G-code generator + research)
 - [x] Toolpath zig-zag pocket strategy (schema + generator + tests)
+- [x] Toolpath linear lead-in / lead-out (optional lengths, schema + generator + tests)
 - [ ] Import/Export improvements (DXF via ezdxf; STEP later if geometry kernel allows)
 - [ ] Joinery rules / automatic machining concepts
 
@@ -81,4 +82,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-22 (trig / unit-aware functions in expression evaluator)
+Last updated: 2026-11-22 (toolpath linear lead-in/out)
