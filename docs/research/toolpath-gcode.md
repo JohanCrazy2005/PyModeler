@@ -35,3 +35,10 @@ Last researched: 2026-11-21
 - Added `strategy` field: `concentric` (default) or `zigzag`.
 - Zig-zag implementation: parallel passes along X, stepover in Y, alternating direction, multi-depth passes, continuous linking moves at feed rate.
 - Schema, generator, tests, and summary updated. Ready for later lead-in/out and arc support.
+
+## Update 2026-11-22 (lead-in/out)
+- Added optional `lead_in_length` and `lead_out_length` (default 0).
+- Linear lead-in: approach from left of entry point, plunge outside, then feed to path start.
+- Linear lead-out: extend past final point in +X.
+- Applied on entry of each Z level for pocket (concentric/zigzag) and contour.
+- Schema, generator, tests updated. Circular arcs (G02/G03) and UI preview still future.
