@@ -13,16 +13,15 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Wire nesting preview to real cut-list / current part data:
-  - `nesting_job_from_parts()` builds a packed NestingJob from live Parts via cut-list.
-  - Multi sheet-size defaults (half / full / square mm).
-  - Fallback sample layout when parts have no geometry yet so the UI always shows something.
-  - Manufacturing menu: **Nesting Preview…** opens `NestingPreviewDialog` with the live job.
-  - Cut List menu action now shows real generated cut-list text (not stub).
-  - Tests for `nesting_job_from_cutlist(..., sheet_sizes=)` and `nesting_job_from_parts` (fallback + no-fallback).
+- Completed nesting-from-parts wiring (was partially committed):
+  - Added missing `nesting_job_from_parts` + `DEFAULT_SHEET_SIZES` in core/nesting.py so core import no longer breaks.
+  - Manufacturing menu: "Nesting Preview…" builds job from current parts (sample fallback when no geometry) and shows NestingPreviewDialog.
+  - "Cut List" menu now shows real generated text.
+  - Tests cover geometry path, fallback sample, no-fallback empty, and the constant.
 
 ### Next concrete tasks (Phase 4)
-1. Further toolpath polish: UI preview of generated G-code path, or spiral continuous single-path refinement / true Archimedean option.
+1. Toolpath UI preview: simple dialog showing generated G-code text + optional 2D path plot (QPainter).
+   (or spiral continuous single-path / Archimedean refinement).
 2. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 3. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 4. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
@@ -67,4 +66,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (nesting from live parts + Manufacturing menu)
+Last updated: 2026-11-23 (complete nesting-from-parts wiring + menu)

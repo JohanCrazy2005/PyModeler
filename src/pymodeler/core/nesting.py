@@ -23,6 +23,12 @@ with open(_NESTING_SCHEMA_PATH, encoding="utf-8") as f:
 
 _NESTING_VALIDATOR = Draft202012Validator(NESTING_JOB_SCHEMA)
 
+DEFAULT_SHEET_SIZES = [
+    {"name": "half", "width": 1220.0, "height": 1220.0},
+    {"name": "full", "width": 2440.0, "height": 1220.0},
+    {"name": "square", "width": 1220.0, "height": 1220.0},
+]
+
 
 class NestingValidationError(ValueError):
     """Raised when nesting job data fails schema validation or a part cannot be placed."""
@@ -412,4 +418,44 @@ def nesting_job_from_cutlist(
             part_id=item.get("part_id"),
             can_rotate=True,
         )
+    return job
+
+
+def nesting_job_from_parts(
+    parts: list,
+    sheet_width: float = 2440.0,
+    sheet_height: float = 1220.0,
+    kerf: float = 3.0,
+    name: str = "Nesting from Parts",
+    material_store=None,
+    use_fallback_sample: bool = True,
+) -> NestingJob:
+    """Convenience: generate cut list from Parts then build a NestingJob.
+
+    Returns an unpacked NestingJob (caller should call .pack()).
+    Parts without a bounding-box size are skipped.
+    If no usable parts and use_fallback_sample=True, returns a small demo job
+    so the UI always has something to show.
+    """
+    from .cutlist import generate_cut_list  # local import to avoid cycles
+
+    cutlist = generate_cut_list(parts, material_store=material_store, name=name)
+    job = nesting_job_from_cutlist(
+        cutlist,
+        sheet_width=sheet_width,
+        sheet_height=sheet_height,
+        kerf=kerf,
+        name=name,
+    )
+    job.sheet_sizes = list(DEFAULT_SHEET_SIZES)
+    if not job.parts and use_fallback_sample:
+        job = NestingJob(
+            sheet_width=sheet_width,
+            sheet_height=sheet_height,
+            kerf=kerf,
+            name=name + " (sample)",
+            sheet_sizes=list(DEFAULT_SHEET_SIZES),
+        )
+        job.add_part(width=400, height=300, quantity=2, name="Sample A")
+        job.add_part(width=200, height=150, quantity=3, name="Sample B")
     return job

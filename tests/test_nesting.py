@@ -6,8 +6,11 @@ from pymodeler.core.nesting import (
     NestingJob,
     NestingValidationError,
     nesting_job_from_cutlist,
+    nesting_job_from_parts,
+    DEFAULT_SHEET_SIZES,
     validate_nesting_job_data,
 )
+from pymodeler.core import ExtrudeFeature, FeatureHistory, Part, create_rectangle_sketch
 
 
 def test_schema_validation_minimal():
@@ -144,3 +147,44 @@ def test_multi_sheet_falls_back_to_primary():
     assert job.layouts[0]["sheet_width"] == 1000
     assert job.layouts[0]["sheet_height"] == 800
     assert "sheet_name" not in job.layouts[0]
+
+
+def _make_plate(name: str, width: float, height: float, thickness: float) -> Part:
+    sketch = create_rectangle_sketch(width=width, height=height, name=f"{name}_sk")
+    hist = FeatureHistory(name=f"{name} History")
+    hist.add_extrude(ExtrudeFeature(sketch_id=sketch.id, distance=thickness, name="Extrude"))
+    return Part(name=name, sketches={sketch.id: sketch}, feature_history=hist)
+
+
+def test_nesting_job_from_parts_with_geometry():
+    p1 = _make_plate("Shelf", 600.0, 400.0, 18.0)
+    p2 = _make_plate("Side", 700.0, 300.0, 18.0)
+    job = nesting_job_from_parts([p1, p2], use_fallback_sample=False)
+    assert len(job.parts) == 2
+    assert job.parts[0]["width"] == pytest.approx(600.0)
+    assert any(s["name"] == "half" for s in job.sheet_sizes)
+    job.pack()
+    assert job.sheets_used >= 1
+    assert job.total_yield > 0
+
+
+def test_nesting_job_from_parts_fallback_sample():
+    empty = Part(name="Empty")
+    job = nesting_job_from_parts([empty], use_fallback_sample=True)
+    assert len(job.parts) >= 1
+    assert "sample" in job.name.lower()
+    job.pack()
+    assert job.sheets_used >= 1
+
+
+def test_nesting_job_from_parts_no_fallback():
+    empty = Part(name="Empty")
+    job = nesting_job_from_parts([empty], use_fallback_sample=False)
+    assert len(job.parts) == 0
+    job.pack()
+    assert job.sheets_used == 0
+
+
+def test_default_sheet_sizes_constant():
+    assert len(DEFAULT_SHEET_SIZES) >= 2
+    assert all("width" in s and "height" in s for s in DEFAULT_SHEET_SIZES)

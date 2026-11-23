@@ -33,7 +33,7 @@
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
 - Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
 - Done: Early toolpath / G-code (ToolpathJob schema + rectangular pocket & contour + zig-zag + spiral + linear lead-in/out + corner_radius G03 arcs). Full implementation restored.
-- Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist + **multi-sheet-size selection preferring smallest fitting stock**).
+- Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist + from-parts helper + multi-sheet-size + UI preview wired to live parts with sample fallback).
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
 - Phase 3: Viewport polish (RGB axes, shading modes, standard views, orthographic toggle, keyboard frame/views, selection clear-on-miss, full transform paint path) complete. Selection outline (edge highlight) and richer gizmo visuals (arrowheads + rotation rings) added. Parametric-intent translation, scale, and rotate on gizmo commit are complete (sketch offset/scale/dimensions + plane axes + recompute). Gizmo hit-testing prefers tips/rings with drag highlight.
@@ -73,4 +73,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-23 (toolpath spiral strategy)
+Last updated: 2026-11-23 (nesting from parts complete)

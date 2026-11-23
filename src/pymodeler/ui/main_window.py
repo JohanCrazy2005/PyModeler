@@ -38,6 +38,8 @@ from pymodeler.core import (
     Transform,
     create_cube,
 )
+from pymodeler.core.cutlist import generate_cut_list, cut_list_to_text
+from pymodeler.core.nesting import NestingJob, nesting_job_from_parts
 from pymodeler.core.parametric_transform import (
     apply_rotation_to_part_sketch_planes,
     apply_scale_to_part_sketches,
@@ -45,6 +47,7 @@ from pymodeler.core.parametric_transform import (
 )
 from pymodeler.render import ViewportWidget
 from pymodeler.ui.feature_tree import FeatureTreeWidget, PropertyPanel
+from pymodeler.ui.nesting_preview import show_nesting_preview
 
 
 class ExtrudeDialog(QDialog):
@@ -161,8 +164,10 @@ class MainWindow(QMainWindow):
 
         # Manufacturing
         mfg_menu = menubar.addMenu("&Manufacturing")
-        mfg_menu.addAction("Cut List (stub)", self._show_cutlist_stub)
+        mfg_menu.addAction("Cut List", self._show_cutlist)
         mfg_menu.addAction("BOM (stub)", self._show_bom_stub)
+        mfg_menu.addSeparator()
+        mfg_menu.addAction("Nesting Preview…", self._show_nesting_preview)
 
         # View
         view_menu = menubar.addMenu("&View")
@@ -283,11 +288,35 @@ class MainWindow(QMainWindow):
             # Keep free transform if parametric update fails
             pass
 
-    def _show_cutlist_stub(self) -> None:
-        QMessageBox.information(self, "Cut List", "Cut-list generation available via core API.")
+    def _show_cutlist(self) -> None:
+        """Show real cut-list text generated from current parts."""
+        if not self.parts:
+            QMessageBox.information(self, "Cut List", "No parts available.")
+            return
+        try:
+            cl = generate_cut_list(self.parts, name="Current Parts")
+            text = cut_list_to_text(cl)
+            QMessageBox.information(self, "Cut List", text)
+        except Exception as exc:
+            QMessageBox.warning(self, "Cut List", f"Generation failed: {exc}")
 
     def _show_bom_stub(self) -> None:
         QMessageBox.information(self, "BOM", "BOM generation available via core API.")
+
+    def _show_nesting_preview(self) -> None:
+        """Build nesting job from current parts (with sample fallback) and show preview."""
+        if not self.parts:
+            QMessageBox.information(self, "Nesting", "No parts available.")
+            return
+        try:
+            job = nesting_job_from_parts(self.parts, name="Nesting from Parts")
+            if not job.parts:
+                QMessageBox.information(self, "Nesting", "No nestable parts found.")
+                return
+            job.pack()
+            show_nesting_preview(job, self)
+        except Exception as exc:
+            QMessageBox.warning(self, "Nesting", f"Could not prepare nesting: {exc}")
 
     def undo(self) -> None:
         self.history.undo()
