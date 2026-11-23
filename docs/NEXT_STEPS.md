@@ -13,19 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Toolpath spiral pocket strategy: continuous rectangular spiral inward by stepover. Schema enum extended, generator + tests (14 pass).
+- Simple UI preview of nesting layouts: `NestingPreviewWidget` + `NestingPreviewDialog` (PyQt6 QPainter) draws sheet borders, colored placements with labels, yield/remnant info. Integrated as "Nesting Preview (sample)" under Manufacturing menu. Supports multi-size sheets. Core nesting tests pass; UI widget construction tested where Qt/EGL available.
+- (prior) Toolpath spiral pocket strategy: continuous rectangular spiral inward by stepover.
 
 ### Next concrete tasks (Phase 4)
 1. Further toolpath polish: UI preview of generated G-code, or spiral continuous single-path refinement / true Archimedean option.
-2. Simple UI preview of nesting layouts (SVG or canvas from layouts).
+2. Wire nesting preview to real cut-list / current part data instead of only sample.
 3. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 6. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
 
 ## Recently Completed
+- Nesting multi-sheet-size selection (smallest fitting sheet preferred)
 - Toolpath spiral pocket strategy
-- Nesting multi-sheet-size selection
 - Circular arcs / corner radius for rectangular toolpaths (G03)
 - Linear lead-in / lead-out for toolpaths (optional lengths)
 - Trig / unit-aware functions in expression evaluator (sin/cos degrees, sqrt, pi, in_to_mm, ...)
@@ -58,4 +59,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-23 (toolpath spiral strategy)
+Last updated: 2026-11-23 (nesting UI preview)
