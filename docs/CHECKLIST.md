@@ -69,7 +69,7 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 ## Phase 4 – Advanced CAD + Path to CAM
 - [~] Fillet / Chamfer / Shell / Hole features (Hole through-all; Fillet/Chamfer basic mesh bevel via Mesh.bevel_edges + apply_to_mesh; Chamfer equal/two-distance/distance-angle modes; Hole direction vector orientation + property panel UI exposure; **Fillet/Chamfer/Shell property panel UI exposure (radius, mode, thickness, direction)**; Shell feature: schema + history + basic mesh shell approximation (normal offset + walls, optional openings) + **corner mitering via scale-adjusted vertex normals**; **UI edges/faces selection via property panel text field**; profile arcs + nested holes; true solid-of-revolution for Revolve; Extrude subtracts nested hole profiles; **Improved bevel: normal-based offsets, corner fans, optional cleanup**)
 - [~] Sheet metal / panel basics (**SheetMetalRule schema + store + bend_allowance helper + research notes done**; flange / flat-pattern / nesting still todo)
-- [x] Simple nesting concepts (NestingJob schema + shelf packer + from-cutlist helper + research + **multi-sheet-size selection**)
+- [x] Simple nesting concepts (NestingJob schema + shelf packer + from-cutlist helper + research + **multi-sheet-size selection** + **UI preview + live parts via nesting_job_from_parts**)
 - [x] Early toolpath / G-code generation stubs (ToolpathJob schema + rectangular pocket & contour G-code generator + research)
 - [x] Toolpath zig-zag pocket strategy (schema + generator + tests)
 - [x] Toolpath linear lead-in / lead-out (optional lengths, schema + generator + tests)
@@ -83,4 +83,4 @@ Status legend: [ ] Todo  [~] In progress  [x] Done  [-] Deferred
 - [ ] Update PLAN.md and NEXT_STEPS.md after every significant run
 - [ ] Maintain research docs as the product evolves
 
-Last updated: 2026-11-23 (toolpath spiral strategy)
+Last updated: 2026-11-23 (nesting from live parts + Manufacturing menu)
