@@ -13,15 +13,13 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Circular arcs (G02/G03) for toolpaths via optional `corner_radius`:
-  - When >0, concentric pocket and contour emit rounded rectangles (G01 + G03 R-format quarter arcs).
-  - Entry shifts to start of bottom straight; estimated length includes arc lengths.
-  - Zigzag remains linear. Schema, generator, tests, and research note updated.
+- Restored complete ToolpathJob implementation (was a broken placeholder on main). All existing tests pass including corner_radius G03 arcs, lead-in/out, zigzag, concentric.
+- Added per-sheet remnant_area tracking to NestingJob (layout remnant + summary).
 
 ### Next concrete tasks (Phase 4)
-1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
-2. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
-3. Further toolpath polish: UI preview of generated G-code or more strategies (e.g. spiral).
+1. Nesting polish: multi-sheet-size selection or simple UI preview of layouts (remnant tracking now done).
+2. Further toolpath polish: UI preview of generated G-code or more strategies (e.g. spiral).
+3. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 6. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
@@ -59,4 +57,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (toolpath corner radius / circular arcs)
+Last updated: 2026-11-22 (toolpath implementation restored; nesting remnant tracking)
