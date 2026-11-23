@@ -13,23 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Trig / unit-aware functions in the expression evaluator:
-  - Added `**` power operator.
-  - Safe functions: `sin`/`cos`/`tan` (degrees), inverses, `sqrt`, `abs`, `min`/`max`, `floor`/`ceil`/`round`, `exp`, `log`/`log10`, `hypot`, `pow`.
-  - Constants `pi` / `e`.
-  - Unit helpers: `in_to_mm`, `mm_to_in`, `deg_to_rad`, `rad_to_deg` + radians trig variants.
-  - Research notes in `docs/research/expression-functions.md`.
-  - Tests for functions, power, constants, and unit conversions.
+- Linear lead-in / lead-out for toolpaths:
+  - Optional `lead_in_length` / `lead_out_length` (default 0) on ToolpathJob.
+  - Linear approach from left of entry (plunge outside) + extension past exit in +X.
+  - Applied on each Z-level entry for pocket (concentric & zigzag) and contour.
+  - Schema, generator, tests, and research note updated.
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 2. Nesting polish: multi-sheet-size selection, remnant tracking, or simple UI preview of layouts.
-3. Further toolpath polish: lead-in/out, circular arcs (G02/G03), or UI preview of generated G-code.
+3. Further toolpath polish: circular arcs (G02/G03) or UI preview of generated G-code.
 4. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 5. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 6. Full unit system with suffixes in expressions (e.g. `2 in + 10 mm`) or more conversion helpers.
 
 ## Recently Completed
+- Linear lead-in / lead-out for toolpaths (optional lengths)
 - Trig / unit-aware functions in expression evaluator (sin/cos degrees, sqrt, pi, in_to_mm, ...)
 - Full arithmetic expression evaluation for dimension values in constraint solver
 - Parameter evaluation for dimension values (string parameter name refs) in constraint solver
@@ -60,4 +59,4 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 
-Last updated: 2026-11-22 (trig / unit-aware functions)
+Last updated: 2026-11-22 (toolpath linear lead-in/out)
