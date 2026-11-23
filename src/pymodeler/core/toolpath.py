@@ -63,6 +63,8 @@ class ToolpathJob:
         origin_x: float = 0.0,
         origin_y: float = 0.0,
         unit: str = "mm",
+        lead_in_length: float = 0.0,
+        lead_out_length: float = 0.0,
         id: Optional[str] = None,
         metadata: Optional[dict] = None,
     ):
@@ -92,6 +94,10 @@ class ToolpathJob:
         self.origin_x = float(origin_x)
         self.origin_y = float(origin_y)
         self.unit = unit
+        self.lead_in_length = float(lead_in_length)
+        self.lead_out_length = float(lead_out_length)
+        if self.lead_in_length < 0 or self.lead_out_length < 0:
+            raise ToolpathValidationError("Lead lengths must be >= 0")
         self.gcode: str = ""
         self.estimated_length: float = 0.0
         self.generated_at: Optional[str] = None
@@ -117,6 +123,8 @@ class ToolpathJob:
             "origin_x": self.origin_x,
             "origin_y": self.origin_y,
             "unit": self.unit,
+            "lead_in_length": self.lead_in_length,
+            "lead_out_length": self.lead_out_length,
             "gcode": self.gcode,
             "estimated_length": self.estimated_length,
         }
@@ -149,6 +157,8 @@ class ToolpathJob:
             origin_x=data.get("origin_x", 0.0),
             origin_y=data.get("origin_y", 0.0),
             unit=data.get("unit", "mm"),
+            lead_in_length=data.get("lead_in_length", 0.0),
+            lead_out_length=data.get("lead_out_length", 0.0),
             id=data.get("id"),
             metadata=data.get("metadata"),
         )
@@ -198,6 +208,29 @@ class ToolpathJob:
         self.validate()
         return self
 
+
+    def _entry_with_lead_in(self, lines: List[str], entry_x: float, entry_y: float, z: float) -> float:
+        """Rapid/plunge with optional linear lead-in from the left. Returns added cut length."""
+        added = 0.0
+        if self.lead_in_length > 0.0:
+            approach_x = entry_x - self.lead_in_length
+            lines.append(f"G00 X{approach_x:.3f} Y{entry_y:.3f}")
+            lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+            lines.append(f"G01 X{entry_x:.3f} Y{entry_y:.3f} F{self.feed:.0f}")
+            added += self.lead_in_length
+        else:
+            lines.append(f"G00 X{entry_x:.3f} Y{entry_y:.3f}")
+            lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+        return added
+
+    def _add_lead_out(self, lines: List[str], from_x: float, from_y: float) -> float:
+        """Optional linear lead-out in +X. Returns added length."""
+        if self.lead_out_length > 0.0:
+            exit_x = from_x + self.lead_out_length
+            lines.append(f"G01 X{exit_x:.3f} Y{from_y:.3f} F{self.feed:.0f}")
+            return self.lead_out_length
+        return 0.0
+
     def _generate_pocket(
         self, lines: List[str], radius: float, stepover: float, z_levels: List[float]
     ) -> float:
@@ -235,9 +268,8 @@ class ToolpathJob:
                 y0 = self.origin_y + inset
                 x1 = x0 + w
                 y1 = y0 + h
-                # Rapid to start at safe, then plunge
-                lines.append(f"G00 X{x0:.3f} Y{y0:.3f}")
-                lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+                # Entry with optional lead-in
+                total += self._entry_with_lead_in(lines, x0, y0, z)
                 # Trace rectangle
                 path = [
                     (x1, y0),
@@ -250,6 +282,8 @@ class ToolpathJob:
                     lines.append(f"G01 X{px:.3f} Y{py:.3f} F{self.feed:.0f}")
                     total += math.hypot(px - prev[0], py - prev[1])
                     prev = (px, py)
+                # Optional lead-out
+                total += self._add_lead_out(lines, prev[0], prev[1])
                 # Retract slightly between passes if desired; for stub stay at depth until next
         return total
 
@@ -284,8 +318,7 @@ class ToolpathJob:
                 else:
                     x_start, x_end = x_max, x_min
                 if first:
-                    lines.append(f"G00 X{x_start:.3f} Y{y:.3f}")
-                    lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+                    total += self._entry_with_lead_in(lines, x_start, y, z)
                     first = False
                     prev = (x_start, y)
                 else:
@@ -297,6 +330,8 @@ class ToolpathJob:
                 total += abs(x_end - x_start)
                 prev = (x_end, y)
                 direction *= -1
+            # lead-out after last pass of this Z
+            total += self._add_lead_out(lines, prev[0], prev[1])
         return total
 
     def _generate_contour(
@@ -311,14 +346,14 @@ class ToolpathJob:
 
         total = 0.0
         for z in z_levels:
-            lines.append(f"G00 X{x0:.3f} Y{y0:.3f}")
-            lines.append(f"G01 Z{z:.3f} F{self.plunge_feed:.0f}")
+            total += self._entry_with_lead_in(lines, x0, y0, z)
             path = [(x1, y0), (x1, y1), (x0, y1), (x0, y0)]
             prev = (x0, y0)
             for px, py in path:
                 lines.append(f"G01 X{px:.3f} Y{py:.3f} F{self.feed:.0f}")
                 total += math.hypot(px - prev[0], py - prev[1])
                 prev = (px, py)
+            total += self._add_lead_out(lines, prev[0], prev[1])
         return total
 
     def summary(self) -> str:
