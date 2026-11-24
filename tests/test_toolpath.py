@@ -266,3 +266,27 @@ def test_spiral_schema_accepts():
         "strategy": "spiral",
     }
     validate_toolpath_data(data)
+
+
+def test_spiral_with_corner_radius():
+    job = ToolpathJob(
+        operation="pocket",
+        width=50,
+        height=30,
+        depth=2,
+        tool_diameter=6,
+        strategy="spiral",
+        stepover_fraction=0.5,
+        corner_radius=2.0,
+    )
+    job.generate()
+    assert job.gcode
+    assert "G03" in job.gcode  # arcs on spiral corners
+    assert "R2.000" in job.gcode or "R2" in job.gcode
+    assert job.estimated_length > 0
+    # Still continuous: limited rapids
+    assert job.gcode.count("G00") <= 8
+    job.validate()
+    data = job.to_dict()
+    assert data["strategy"] == "spiral"
+    assert data["corner_radius"] == 2.0
