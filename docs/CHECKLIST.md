@@ -48,7 +48,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Concentric + zigzag + continuous rectangular spiral strategies
 - [x] Linear lead-in/out + corner-radius G03 arcs
 - [x] Toolpath preview dialog wired to Manufacturing menu
-- [x] Full unit system with suffixes in expressions
+- [x] Full unit system with suffixes in expressions (length + angle)
 - [ ] Viewport-based edge/face picking
 - [ ] Robust manifold/Boolean repair when manifold3d available
 - [ ] Better shell openings / Boolean offset
@@ -61,4 +61,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-23
+Last updated: 2026-11-23 (angle suffixes)
