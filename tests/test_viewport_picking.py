@@ -53,3 +53,31 @@ def test_hit_nearest_face_miss():
     ray_d = np.array([0.0, 1.0, 0.0], dtype=np.float32)  # pointing away
     idx = hit_test_nearest_face(verts, mesh.faces, ray_o, ray_d)
     assert idx is None
+
+
+def test_hit_edges_along_ray_multiple():
+    mesh = create_cube()
+    edges = extract_unique_edges(mesh.faces)
+    verts = np.asarray(mesh.vertices, dtype=np.float32)
+    # Ray that can graze a couple of edges near the bottom
+    ray_o = np.array([0.0, -1.2, 3.0], dtype=np.float32)
+    ray_d = np.array([0.0, 0.0, -1.0], dtype=np.float32)
+    from pymodeler.render.viewport import hit_test_edges_along_ray
+    hits = hit_test_edges_along_ray(verts, edges, ray_o, ray_d, tolerance=0.6)
+    assert len(hits) >= 1
+    # Sorted by distance
+    if len(hits) > 1:
+        assert hits[0][1] <= hits[1][1]
+
+
+def test_hit_faces_along_ray_sorted():
+    mesh = create_cube()
+    verts = np.asarray(mesh.vertices, dtype=np.float32)
+    ray_o = np.array([0.0, 0.0, 5.0], dtype=np.float32)
+    ray_d = np.array([0.0, 0.0, -1.0], dtype=np.float32)
+    from pymodeler.render.viewport import hit_test_faces_along_ray
+    hits = hit_test_faces_along_ray(verts, mesh.faces, ray_o, ray_d)
+    assert len(hits) >= 1
+    assert hits[0][1] > 0
+    if len(hits) > 1:
+        assert hits[0][1] <= hits[1][1]
