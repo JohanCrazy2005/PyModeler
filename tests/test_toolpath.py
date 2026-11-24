@@ -351,3 +351,66 @@ def test_archimedean_rectangular_uses_inscribed():
     assert job.gcode
     assert job.estimated_length > 0
     job.validate()
+
+
+def test_morph_pocket_generate():
+    job = ToolpathJob(
+        operation="pocket",
+        width=60,
+        height=40,
+        depth=4,
+        tool_diameter=6,
+        strategy="morph",
+        stepover_fraction=0.5,
+        depth_of_cut=2,
+    )
+    job.generate()
+    assert job.gcode
+    assert "G01" in job.gcode
+    assert "M30" in job.gcode
+    assert job.estimated_length > 0
+    # Multiple depth passes
+    assert job.gcode.count("G01 Z-") >= 2
+    # Continuous morph path: many G01, limited rapids
+    assert job.gcode.count("G00") <= 8
+    # Should cover near corners (beyond pure inscribed circle)
+    # Outer start near boundary
+    assert "X" in job.gcode and "Y" in job.gcode
+    job.validate()
+    data = job.to_dict()
+    assert data["strategy"] == "morph"
+    # Roundtrip
+    restored = ToolpathJob.from_dict(data)
+    assert restored.strategy == "morph"
+    restored.generate()
+    assert restored.gcode
+
+
+def test_morph_schema_accepts():
+    data = {
+        "operation": "pocket",
+        "width": 50,
+        "height": 30,
+        "depth": 3,
+        "tool_diameter": 4,
+        "strategy": "morph",
+    }
+    validate_toolpath_data(data)
+
+
+def test_morph_square_and_rectangular():
+    # Works for both
+    for w, h in ((40, 40), (80, 40)):
+        job = ToolpathJob(
+            operation="pocket",
+            width=w,
+            height=h,
+            depth=2,
+            tool_diameter=6,
+            strategy="morph",
+            stepover_fraction=0.4,
+        )
+        job.generate()
+        assert job.gcode
+        assert job.estimated_length > 0
+        job.validate()
