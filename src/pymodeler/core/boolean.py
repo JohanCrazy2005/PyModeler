@@ -3,6 +3,10 @@
 Uses trimesh + optional manifold3d when available (robust, cross-platform).
 Falls back to simple concatenation for Join; raises a clear error for Cut/Intersect
 if no Boolean engine is present.
+
+When a Boolean engine is available, input meshes are lightly repaired
+(merge vertices, remove degenerates, fix winding/normals, fill simple holes)
+before the operation to improve success rates on slightly non-manifold inputs.
 """
 
 from __future__ import annotations
@@ -16,6 +20,37 @@ BooleanOp = Literal["join", "cut", "intersect"]
 
 class BooleanError(RuntimeError):
     """Raised when a Boolean operation cannot be performed."""
+
+
+def repair_mesh(mesh: Mesh, merge_tol: float = 1e-6) -> Mesh:
+    """Attempt a lightweight repair of a Mesh using trimesh.
+
+    Merges near-coincident vertices, drops degenerate/duplicate faces,
+    fixes winding and normals, and fills simple (tri/quad) holes.
+    Returns a new Mesh (original is left unchanged). Falls back to the
+    original mesh if repair fails or trimesh is unavailable.
+    """
+    try:
+        import trimesh
+        import numpy as np
+    except ImportError:
+        return mesh
+
+    try:
+        tm = _to_trimesh(mesh)
+        # Merge close vertices
+        tm.merge_vertices(digits_vertex=None, digits_norm=None, merge_tex=False, merge_norm=False)
+        # Or use the simpler path
+        tm.update_faces(tm.unique_faces())
+        tm.update_faces(tm.nondegenerate_faces())
+        tm.remove_unreferenced_vertices()
+        trimesh.repair.fix_winding(tm)
+        trimesh.repair.fix_normals(tm)
+        if not tm.is_watertight:
+            trimesh.repair.fill_holes(tm)
+        return _from_trimesh(tm, name=mesh.name)
+    except Exception:
+        return mesh
 
 
 def _to_trimesh(mesh: Mesh):
@@ -84,9 +119,10 @@ def mesh_boolean(target: Mesh, tool: Mesh, operation: BooleanOp, name: Optional[
         except ImportError:
             engine = None
 
-        if engine is None:
-            # Try default (may raise)
-            engine = None
+        # Light repair before Boolean when we have an engine
+        if engine is not None or True:  # always try repair; cheap
+            target = repair_mesh(target)
+            tool = repair_mesh(tool)
 
         a = _to_trimesh(target)
         b = _to_trimesh(tool)
