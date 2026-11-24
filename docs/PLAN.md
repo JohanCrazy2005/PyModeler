@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-24)
+- Done: Lightweight manifold/Boolean repair (`repair_mesh` using trimesh.repair before engine Boolean; research in docs/research/manifold-repair.md).
 - Done: Toolpath preview strategy selector (QComboBox in ToolpathPreviewDialog; live switch + regenerate for concentric/zigzag/spiral/archimedean/morph).
 - Done: Morphing spiral pocket toolpath (strategy="morph": linear morph of Archimedean following rectangular boundary via ray-distance scaling; continuous G01; research updated in docs/research/toolpath-spiral.md).
 - Done: Viewport edge/face picking (ray hit helpers, selection modes O/E/F, property panel feed for Fillet/Chamfer/Shell); research in docs/research/viewport-edge-face-picking.md.
@@ -79,7 +80,8 @@
 26. (done) Viewport-based edge/face picking for Fillet/Chamfer/Shell.
 27. (done) Morphing spiral toolpath following rectangular boundary.
 28. (done) UI strategy selector for toolpath preview dialog.
+29. (done) Robust manifold/Boolean repair (light trimesh pipeline before engine).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-24 (toolpath preview strategy selector)
+Last updated: 2026-11-24 (manifold repair before Boolean)
