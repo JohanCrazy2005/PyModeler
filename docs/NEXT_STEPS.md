@@ -13,12 +13,13 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Full unit system with suffixes in expressions:
-  - Numeric literals followed by length unit suffixes (`2 in`, `10mm`, `1.5 ft`, `0.5 m`, `10cm`, ...) are expanded to millimeters before AST evaluation.
-  - Supported: mm/cm/m/in/inch/inches/ft/foot/feet (case-insensitive, optional space).
+- Angle unit suffixes in expressions:
+  - Numeric literals (and pi/e) followed by angle unit suffixes (`30 deg`, `45 degree`, `pi rad`, `1.57 radian`) are expanded to degrees before AST evaluation.
+  - Supported: deg/degree/degrees/rad/radian/radians (case-insensitive, optional space).
+  - `deg` stays numeric; `rad` converts via 180/π so that `sin(30deg)` and `cos(pi rad / 2)` work naturally with the existing degree-based trig.
   - Works in parameter expressions and free-form `evaluate_expression`.
-  - Research note in `docs/research/unit-suffixes.md`. Tests pass.
-  - Existing helpers (`in_to_mm`, etc.) and bare numbers remain unchanged.
+  - Research note updated in `docs/research/unit-suffixes.md`. Tests pass.
+  - Length suffixes and helpers remain unchanged.
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
@@ -26,10 +27,11 @@ This file is updated by every automation run.
 3. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
 4. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
 5. True Archimedean spiral (non-rectangular continuous curve) or spiral with corner-radius arcs.
-6. Angle unit suffixes (`deg`, `rad`) if desired beyond current degree-default trig.
+6. (done) Angle unit suffixes.
 
 ## Recently Completed
-- Unit suffixes in expressions (this run)
+- Angle unit suffixes in expressions (this run)
+- Length unit suffixes in expressions
 - Continuous rectangular spiral pocket toolpath
 - Restored full ToolpathJob generator + UI preview menu wiring
 - Nesting UI preview widget + dialog (QPainter sheet layouts)
@@ -69,4 +71,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (unit suffixes in expressions)
+Last updated: 2026-11-23 (angle unit suffixes in expressions)
