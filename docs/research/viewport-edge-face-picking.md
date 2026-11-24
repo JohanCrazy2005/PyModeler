@@ -34,3 +34,13 @@ Research notes for interactive selection of edges and faces in the 3D viewport (
 - Keep the existing text-entry path; viewport picking is an additional, faster way.
 
 This stays mesh-index based for now (same as the current property-panel text field). Stable topological IDs can come later.
+
+
+## Polish increment (2026-11-24)
+- Multi-select: Shift+click appends to edge/face selection (unique).
+- Highlight: selected edges and face boundaries drawn in bright green overlay.
+- Basic box select: drag in edge/face mode; entities whose projected center falls inside the screen rect are selected (additive with Shift).
+- Select other: ` / ~ key cycles among all entities hit by the last ray (closest first).
+- Mode keys: O (object), E (edge), T (face).
+- Pure helpers `hit_test_edges_along_ray` and `hit_test_faces_along_ray` return sorted (index, distance) lists for multi and cycling.
+- Tests added for the multi-hit helpers.
