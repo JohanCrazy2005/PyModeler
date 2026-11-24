@@ -54,10 +54,11 @@
         "concentric",
         "zigzag",
         "spiral",
-        "archimedean"
+        "archimedean",
+        "morph"
       ],
       "default": "concentric",
-      "description": "Pocket clearing pattern: concentric rectangles, parallel zig-zag lines, continuous rectangular spiral inward, or true Archimedean (polar) spiral on the inscribed circle"
+      "description": "Pocket clearing pattern: concentric rectangles, parallel zig-zag lines, continuous rectangular spiral inward, true Archimedean (polar) spiral on the inscribed circle, or morphing spiral that follows the rectangular boundary"
     },
     "stepover_fraction": {
       "type": "number",
