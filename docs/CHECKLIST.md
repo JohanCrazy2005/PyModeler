@@ -46,6 +46,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Rectangular NestingJob + shelf packer + multi-sheet + UI preview
 - [x] ToolpathJob schema + rectangular pocket/contour
 - [x] Concentric + zigzag + continuous rectangular spiral strategies
+- [x] Spiral strategy with optional corner-radius arcs (G03)
 - [x] Linear lead-in/out + corner-radius G03 arcs
 - [x] Toolpath preview dialog wired to Manufacturing menu
 - [x] Full unit system with suffixes in expressions (length + angle)
@@ -61,4 +62,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-23 (angle suffixes)
+Last updated: 2026-11-23 (spiral corner arcs)
