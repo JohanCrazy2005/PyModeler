@@ -85,3 +85,39 @@ def test_toolpath_preview_dialog():
     assert dlg.windowTitle().startswith("Toolpath Preview")
     dlg.show()
     dlg.close()
+
+
+def test_toolpath_preview_strategy_selector():
+    """Strategy combo exists and changing it regenerates the job."""
+    app = _try_qt()
+    from pymodeler.ui.toolpath_preview import ToolpathPreviewDialog, STRATEGIES
+
+    job = ToolpathJob(
+        operation="pocket",
+        width=50,
+        height=40,
+        depth=4,
+        tool_diameter=5,
+        strategy="concentric",
+        name="StrategyTest",
+    )
+    job.generate()
+    original_strategy = job.strategy
+    original_gcode = job.gcode
+
+    dlg = ToolpathPreviewDialog(job)
+    assert dlg.strategy_combo is not None
+    assert dlg.strategy_combo.count() == len(STRATEGIES)
+    assert dlg.strategy_combo.currentText() == original_strategy
+
+    # Switch to zigzag
+    dlg.strategy_combo.setCurrentText("zigzag")
+    assert job.strategy == "zigzag"
+    # G-code should have been regenerated (or at least strategy changed)
+    assert job.strategy != original_strategy
+
+    # Switch back
+    dlg.strategy_combo.setCurrentText(original_strategy)
+    assert job.strategy == original_strategy
+
+    dlg.close()

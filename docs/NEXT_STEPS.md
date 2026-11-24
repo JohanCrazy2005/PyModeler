@@ -13,22 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Implemented morphing spiral pocket strategy (strategy="morph").
-  - Linear morph of Archimedean: radius = scale(θ) × ray-distance to rectangular tool-center boundary.
-  - Continuous inward spiral covering full rectangle (including corners).
-  - Radial pitch from stepover_fraction; short G01 segments; one plunge per Z-level.
-  - Unit tests cover generation, continuity, schema, square/rectangular, roundtrip.
-  - Research note updated in docs/research/toolpath-spiral.md.
+- Added strategy selector combo to ToolpathPreviewDialog.
+  - Live switch between concentric / zigzag / spiral / archimedean / morph.
+  - Regenerates G-code and refreshes text + 2D preview on change.
+  - Unit test covers combo presence and strategy switch (headless-skipped when no display).
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 2. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 3. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
 4. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
-5. UI strategy selector for toolpath preview dialog.
+5. (done) UI strategy selector for toolpath preview dialog.
 
 ## Recently Completed
-- Morphing spiral pocket toolpath (this run)
+- Toolpath preview strategy selector (this run)
+- Morphing spiral pocket toolpath (strategy="morph")
 - True Archimedean spiral pocket toolpath
 - Viewport edge/face picking
 - Spiral with corner-radius arcs
@@ -73,4 +72,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-24 (morphing spiral toolpath)
+Last updated: 2026-11-24 (toolpath preview strategy selector)

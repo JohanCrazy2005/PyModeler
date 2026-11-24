@@ -2,6 +2,9 @@
 
 Shows generated G-code text and a 2D path plot (parsed from G00/G01/G03 lines)
 using PyQt6 QPainter. Cross-platform, no extra dependencies.
+
+Includes a strategy selector so the user can switch pocket clearing patterns
+and see the path regenerate live.
 """
 
 from __future__ import annotations
@@ -12,8 +15,10 @@ from typing import Optional
 from PyQt6.QtCore import Qt, QPointF, QRectF
 from PyQt6.QtGui import QColor, QPainter, QPen, QFont
 from PyQt6.QtWidgets import (
+    QComboBox,
     QDialog,
     QDialogButtonBox,
+    QHBoxLayout,
     QLabel,
     QPlainTextEdit,
     QScrollArea,
@@ -23,6 +28,9 @@ from PyQt6.QtWidgets import (
 )
 
 from pymodeler.core.toolpath import ToolpathJob, parse_gcode_paths
+
+
+STRATEGIES = ["concentric", "zigzag", "spiral", "archimedean", "morph"]
 
 
 class ToolpathPreviewWidget(QWidget):
@@ -124,37 +132,48 @@ class ToolpathPreviewWidget(QWidget):
 
 
 class ToolpathPreviewDialog(QDialog):
-    """Modal dialog showing G-code text + 2D path plot for a ToolpathJob."""
+    """Modal dialog showing G-code text + 2D path plot for a ToolpathJob.
+
+    Includes a strategy combo so the user can switch patterns and regenerate
+    the path live (pocket strategies only; contour ignores strategy).
+    """
 
     def __init__(self, job: ToolpathJob, parent=None) -> None:
         super().__init__(parent)
+        self.job = job
         self.setWindowTitle(f"Toolpath Preview – {job.name}")
         self.resize(900, 600)
 
         layout = QVBoxLayout(self)
 
-        summary = QLabel(
-            f"{job.operation} {job.strategy}  "
-            f"{job.width}×{job.height}×{job.depth}  "
-            f"tool {job.tool_diameter}  "
-            f"length≈{job.estimated_length:.1f}"
-        )
-        summary.setWordWrap(True)
-        summary.setStyleSheet("font-family: monospace; padding: 4px;")
-        layout.addWidget(summary)
+        # Strategy selector row
+        strategy_row = QHBoxLayout()
+        strategy_row.addWidget(QLabel("Strategy:"))
+        self.strategy_combo = QComboBox()
+        self.strategy_combo.addItems(STRATEGIES)
+        if job.strategy in STRATEGIES:
+            self.strategy_combo.setCurrentText(job.strategy)
+        self.strategy_combo.currentTextChanged.connect(self._on_strategy_changed)
+        strategy_row.addWidget(self.strategy_combo)
+        strategy_row.addStretch(1)
+        layout.addLayout(strategy_row)
+
+        self.summary = QLabel()
+        self.summary.setWordWrap(True)
+        self.summary.setStyleSheet("font-family: monospace; padding: 4px;")
+        layout.addWidget(self.summary)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
 
-        text = QPlainTextEdit()
-        text.setReadOnly(True)
-        text.setPlainText(job.gcode or "(not generated)")
-        text.setStyleSheet("font-family: monospace; font-size: 10pt;")
-        splitter.addWidget(text)
+        self.text = QPlainTextEdit()
+        self.text.setReadOnly(True)
+        self.text.setStyleSheet("font-family: monospace; font-size: 10pt;")
+        splitter.addWidget(self.text)
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        preview = ToolpathPreviewWidget(job)
-        scroll.setWidget(preview)
+        self.preview = ToolpathPreviewWidget(job)
+        scroll.setWidget(self.preview)
         splitter.addWidget(scroll)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 1)
@@ -164,6 +183,32 @@ class ToolpathPreviewDialog(QDialog):
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
+
+        self._refresh_display()
+
+    def _on_strategy_changed(self, strategy: str) -> None:
+        """Switch strategy, regenerate G-code, and refresh UI."""
+        if strategy == self.job.strategy:
+            return
+        self.job.strategy = strategy
+        try:
+            self.job.generate()
+        except Exception:
+            # Keep previous gcode if generation fails for this strategy
+            pass
+        self._refresh_display()
+
+    def _refresh_display(self) -> None:
+        job = self.job
+        self.summary.setText(
+            f"{job.operation} {job.strategy}  "
+            f"{job.width}×{job.height}×{job.depth}  "
+            f"tool {job.tool_diameter}  "
+            f"length≈{job.estimated_length:.1f}"
+        )
+        self.text.setPlainText(job.gcode or "(not generated)")
+        self.preview.set_job(job)
+        self.preview.update()
 
 
 def show_toolpath_preview(job: ToolpathJob, parent=None) -> None:
