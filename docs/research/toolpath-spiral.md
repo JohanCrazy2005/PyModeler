@@ -26,6 +26,15 @@
 - Best for square or near-circular pockets; rectangular pockets use the inscribed diameter so corners of the rectangle are left for a later contour or larger stepover.
 - References: same as above + Siemens/LinuxCNC Archimedean spiral examples.
 
+## Morphing spiral addition (2026-11-24)
+- Strategy="morph": continuous spiral that follows the rectangular boundary via linear morph of an Archimedean spiral.
+- At each angle θ the radius is scale(θ) × ray-distance from center to the tool-center rectangle boundary.
+- Scale decreases linearly with θ so radial pitch is controlled by stepover_fraction (using average outer radius).
+- Short G01 segments; one plunge per Z-level; covers the full rectangle including corners (unlike pure polar inscribed circle).
+- Practical approximation of the linear-morphing analytic construction described by Romero-Carrillo et al. (CAD 2015) and used in Fusion 360 “Morphed Spiral” / similar CAM strategies.
+- Falls back cleanly for tiny pockets. Lead-in/out supported (radial).
+
 References:
 - Romero-Carrillo et al., Analytic construction of spiral pocketing via linear morphing (CAD 2015).
-- Siemens Sinumerik documentation on Archimedean spiral via modified tool radius compensation.
+- Fusion 360 Manufacture: Morphed Spiral strategy (boundary-following spiral).
+- Abrahamsen, Spiral tool paths for high-speed machining of 2D pockets (2015/2018).
