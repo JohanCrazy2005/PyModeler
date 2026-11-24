@@ -13,23 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Implemented true Archimedean (polar) spiral pocket strategy.
-  - New strategy="archimedean" in schema and ToolpathJob.
-  - Continuous polar spiral on the inscribed circle (r = r_outer - b·θ, short G01 segments).
-  - One plunge per Z-level, radial pitch from stepover_fraction.
-  - Unit tests cover generation, continuity, schema, rectangular fallback, roundtrip.
+- Implemented morphing spiral pocket strategy (strategy="morph").
+  - Linear morph of Archimedean: radius = scale(θ) × ray-distance to rectangular tool-center boundary.
+  - Continuous inward spiral covering full rectangle (including corners).
+  - Radial pitch from stepover_fraction; short G01 segments; one plunge per Z-level.
+  - Unit tests cover generation, continuity, schema, square/rectangular, roundtrip.
   - Research note updated in docs/research/toolpath-spiral.md.
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 2. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
 3. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
-4. Morphing spiral that follows rectangular boundary (linear morph of Archimedean).
-5. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
-6. UI strategy selector for toolpath preview dialog.
+4. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
+5. UI strategy selector for toolpath preview dialog.
 
 ## Recently Completed
-- True Archimedean spiral pocket toolpath (this run)
+- Morphing spiral pocket toolpath (this run)
+- True Archimedean spiral pocket toolpath
 - Viewport edge/face picking
 - Spiral with corner-radius arcs
 - Angle unit suffixes in expressions
@@ -73,4 +73,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (Archimedean spiral toolpath)
+Last updated: 2026-11-24 (morphing spiral toolpath)
