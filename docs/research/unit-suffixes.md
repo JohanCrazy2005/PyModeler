@@ -18,10 +18,11 @@
 - Base length unit remains millimeters (consistent with existing `in_to_mm` helpers and toolpaths).
 - Preprocess expressions to expand numeric literals followed by unit suffixes into pure numeric mm values before AST evaluation.
 - Supported length suffixes (case-insensitive, optional space): `mm`, `cm`, `m`, `in`, `inch`, `inches`, `ft`, `foot`, `feet`.
-- Angle suffixes (`deg`, `rad`) can be added later if needed; current trig already takes degrees.
+- Angle suffixes (`deg`, `degree`, `degrees`, `rad`, `radian`, `radians`) are now supported.
+  They expand to degrees (trig base unit). `rad` is converted via 180/π.
 - Keep the existing function helpers (`in_to_mm`, etc.) for explicit conversion.
 - Invalid or unknown suffixes raise ParameterEvaluationError.
 - This enables user-friendly inputs like `2 in + 10 mm` while keeping the internal model in mm.
 
 Sources: Autodesk Fusion 360 Help (UserParameter.expression), Onshape Numeric Fields / FeatureScript docs, community examples.
-Last updated: 2026-11-23
+Last updated: 2026-11-23 (angle suffixes added)
