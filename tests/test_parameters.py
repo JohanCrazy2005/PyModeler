@@ -124,3 +124,22 @@ def test_unit_suffixes_in_expressions():
     # unknown function
     with pytest.raises(ParameterEvaluationError):
         store.evaluate_expression("unknown_func(1)")
+
+
+def test_angle_unit_suffixes_in_expressions():
+    store = ParameterStore()
+    # degrees stay as degrees
+    assert abs(store.evaluate_expression("30deg") - 30.0) < 1e-9
+    assert abs(store.evaluate_expression("45 degree") - 45.0) < 1e-9
+    assert abs(store.evaluate_expression("90 degrees") - 90.0) < 1e-9
+    # radians convert to degrees
+    assert abs(store.evaluate_expression("pi rad") - 180.0) < 1e-6
+    assert abs(store.evaluate_expression("1.5708 radian") - 90.0) < 1e-2  # approx pi/2
+    assert abs(store.evaluate_expression("3.14159 radians") - 180.0) < 1e-2
+    # mixed in expression and with trig
+    assert abs(store.evaluate_expression("sin(30 deg)") - 0.5) < 1e-9
+    assert abs(store.evaluate_expression("cos(pi rad / 2)") - 0.0) < 1e-6
+    # parameter expression
+    store.add("angle", expression="45 deg + 0.5 rad")
+    expected = 45.0 + 0.5 * (180.0 / 3.141592653589793)
+    assert abs(store.evaluate("angle") - expected) < 1e-6
