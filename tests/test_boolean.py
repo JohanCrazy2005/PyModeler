@@ -47,3 +47,25 @@ def test_feature_history_join_operation():
     # Second feature should be a result mesh (joined or fallback)
     assert isinstance(meshes[e2.id], Mesh)
     meshes[e2.id].validate()
+
+
+def test_repair_mesh_preserves_valid_cube():
+    from pymodeler.core.boolean import repair_mesh
+    cube = create_cube(size=2.0, name="Solid")
+    repaired = repair_mesh(cube)
+    assert isinstance(repaired, Mesh)
+    assert len(repaired.vertices) > 0
+    assert len(repaired.faces) > 0
+    repaired.validate()
+    # Name preserved
+    assert repaired.name == "Solid"
+
+
+def test_mesh_boolean_with_repaired_inputs():
+    a = create_cube(size=2.0, name="A")
+    b = create_cube(size=1.0, name="B")
+    b.vertices = [[v[0] + 0.8, v[1] + 0.2, v[2]] for v in b.vertices]
+    result = mesh_boolean(a, b, "join", name="RepairedJoin")
+    assert isinstance(result, Mesh)
+    assert len(result.faces) > 0
+    result.validate()
