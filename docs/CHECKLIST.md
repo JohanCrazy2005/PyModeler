@@ -52,6 +52,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Full unit system with suffixes in expressions (length + angle)
 - [x] Viewport-based edge/face picking (pure ray hit helpers + mode + property panel feed)
 - [x] True Archimedean spiral toolpath (polar, inscribed circle)
+- [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular boundary)
 - [ ] Robust manifold/Boolean repair when manifold3d available
 - [ ] Better shell openings / Boolean offset
 - [ ] Import/export improvements (STEP later)
@@ -62,4 +63,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-23 (Archimedean spiral toolpath)
+Last updated: 2026-11-24 (morphing spiral toolpath)
