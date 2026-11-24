@@ -45,3 +45,10 @@ Current mesh-based approach:
 5. Later: true Boolean offset (scale-from-centroid + cut), further corner improvements, manifold cleanup, or a robust geometry kernel.
 
 This continues Phase 4 advanced features after Hole / Fillet / Chamfer.
+
+## Update 2026-11-24 – Openings with rim walls + named faces
+
+- Opening faces (removed faces) now produce **explicit rim walls** on their boundary edges so the shell thickness is visible at the lip (matches Fusion/Onshape behavior of a clean open shell).
+- Face selection accepts integer indices, digit-strings, and named labels: `top`, `bottom`, `front`, `back`, `left`, `right` (resolved from dominant face-normal axis).
+- Wall-edge collection includes both kept-face edges and opening-boundary edges; outer/inner surfaces still omit the open faces.
+- Tests: `test_shell_opening_has_rim_walls`, `test_shell_named_face_opening`, `test_shell_string_index_face`.
