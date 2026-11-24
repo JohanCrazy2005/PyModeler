@@ -28,14 +28,15 @@
 - moderngl / PyOpenGL for viewport
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
-## Current Status (2026-11-23)
+## Current Status (2026-11-24)
+- Done: Morphing spiral pocket toolpath (strategy="morph": linear morph of Archimedean following rectangular boundary via ray-distance scaling; continuous G01; research updated in docs/research/toolpath-spiral.md).
 - Done: Viewport edge/face picking (ray hit helpers, selection modes O/E/F, property panel feed for Fillet/Chamfer/Shell); research in docs/research/viewport-edge-face-picking.md.
 - Done: Spiral toolpath supports corner-radius arcs (G03) when corner_radius > 0; research in docs/research/toolpath-spiral.md.
 - Done: Full unit system with suffixes in expressions (numeric literals + length units mm/cm/m/in/ft expanded to base mm; angle units deg/rad expanded to degrees; pi/e supported; research in docs/research/unit-suffixes.md).
 - Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + full arithmetic expression evaluation for dimension values + **trig / unit-aware functions (sin/cos in degrees, sqrt, pi, in_to_mm, ...)** + Sketch.solve()).
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
 - Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
-- Done: Early toolpath / G-code (ToolpathJob schema + rectangular pocket & contour + zig-zag + continuous rectangular spiral + linear lead-in/out + corner_radius G03 arcs + **true Archimedean polar spiral on inscribed circle**). Full implementation restored. **ToolpathPreviewDialog wired into Manufacturing menu.** Continuous spiral now emits single-plunge continuous inward path per Z level.
+- Done: Early toolpath / G-code (ToolpathJob schema + rectangular pocket & contour + zig-zag + continuous rectangular spiral + linear lead-in/out + corner_radius G03 arcs + **true Archimedean polar spiral on inscribed circle** + **morphing spiral following rectangular boundary**). Full implementation restored. **ToolpathPreviewDialog wired into Manufacturing menu.** Continuous spiral now emits single-plunge continuous inward path per Z level.
 - Done: Rectangular nesting (NestingJob + shelf packer + from-cutlist + from-parts helper + multi-sheet-size + UI preview wired to live parts with sample fallback).
 - Phase 0 + Phase 1 complete (Sketch, Parameters, Extrude, Revolve with real solid-of-revolution from profile points, FeatureHistory, canvas tools, DOF stub, Booleans).
 - Phase 2: Part model + Material/stock + Cut-list + Assembly mates + BOM + DXF + multi-part UI + UI exposure of mates/BOM/cut-list exports + **Configurations (independent inputs)** + **Assembly viewport visualization** + **Configuration selection UI** complete.
@@ -75,7 +76,8 @@
 24. (done) Toolpath spiral pocket strategy.
 25. (done) Spiral with corner-radius arcs.
 26. (done) Viewport-based edge/face picking for Fillet/Chamfer/Shell.
+27. (done) Morphing spiral toolpath following rectangular boundary.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-23 (Archimedean spiral toolpath)
+Last updated: 2026-11-24 (morphing spiral toolpath)
