@@ -117,3 +117,58 @@ def test_shell_mitered_corners():
     displacement = np.linalg.norm(orig - inner_corner)
     # Pure normal offset would be ~0.5 / sqrt(3) ≈ 0.289; mitered is ~0.5
     assert displacement > 0.4
+
+
+def test_shell_named_face_opening():
+    """String face labels (top/bottom/...) resolve and produce an opening."""
+    base = create_cube(size=4.0)
+    feat = ShellFeature(thickness=0.3, faces=["top"])
+    result = feat.apply_to_mesh(base)
+    result.validate()
+    closed = ShellFeature(thickness=0.3).apply_to_mesh(base)
+    # Opening omits one outer + one inner face relative to closed shell
+    assert len(result.faces) < len(closed.faces)
+    # Named opening should match integer index of top face
+    top_idx = None
+    import numpy as np
+    for i in range(len(base.faces)):
+        n = np.asarray(base.compute_face_normal(i), dtype=float)
+        if abs(n[2]) > 0.9 and n[2] > 0:
+            top_idx = i
+            break
+    assert top_idx is not None
+    feat_int = ShellFeature(thickness=0.3, faces=[top_idx])
+    result_int = feat_int.apply_to_mesh(base)
+    assert len(result.faces) == len(result_int.faces)
+
+
+def test_shell_opening_has_rim_walls():
+    """Openings must receive explicit rim walls (lip of thickness).
+
+    Closed shell walls = all unique edges of the solid.
+    With one open face, we still keep walls for the opening boundary (rim),
+    so the face count is only reduced by the two omitted surfaces (outer+inner),
+    not by the boundary walls.
+    """
+    base = create_cube(size=4.0)
+    closed = ShellFeature(thickness=0.4).apply_to_mesh(base)
+    open_shell = ShellFeature(thickness=0.4, faces=[1]).apply_to_mesh(base)
+    closed.validate()
+    open_shell.validate()
+    # Closed: 6 outer + 6 inner + walls on 12 edges = 12 + 12 = 24 faces (quads)
+    # Open one face: 5 outer + 5 inner + still walls on all 12 edges (rims included)
+    # => 10 + 12 = 22 faces. Without rims it would be 10 + 8 = 18.
+    assert len(closed.faces) == 24
+    assert len(open_shell.faces) == 22
+    # Rim presence: open shell has more faces than the no-rim estimate (18)
+    assert len(open_shell.faces) > 18
+
+
+def test_shell_string_index_face():
+    """Face ids given as digit-strings are accepted."""
+    base = create_cube(size=2.0)
+    feat = ShellFeature(thickness=0.2, faces=["1"])
+    result = feat.apply_to_mesh(base)
+    result.validate()
+    closed = ShellFeature(thickness=0.2).apply_to_mesh(base)
+    assert len(result.faces) < len(closed.faces)
