@@ -13,21 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Added lightweight mesh repair (`repair_mesh`) before Boolean operations.
-  - Uses trimesh: merge vertices, drop degenerates/duplicates, fix winding/normals, fill simple holes.
-  - Called automatically inside `mesh_boolean` when trimesh is present.
-  - Research note in docs/research/manifold-repair.md.
-  - Unit tests cover repair of a valid cube and join after repair.
+- Better shell openings:
+  - Explicit rim walls on opening boundaries (lip of wall thickness).
+  - Named face labels (`top`/`bottom`/`front`/`back`/`left`/`right`) resolved via face normals.
+  - Digit-string face indices also accepted.
+  - Unit tests cover named openings, rim face counts, and string indices.
 
 ### Next concrete tasks (Phase 4)
-1. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-2. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
-3. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
-4. (done) Robust manifold/Boolean repair (light trimesh pipeline).
-5. (done) UI strategy selector for toolpath preview dialog.
+1. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
+2. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
+3. Optional Boolean-based shell offset when a robust engine is available (further quality).
+4. (done) Better shell openings (explicit rim walls, non-integer face ids).
+5. (done) Robust manifold/Boolean repair (light trimesh pipeline).
+6. (done) UI strategy selector for toolpath preview dialog.
 
 ## Recently Completed
-- Lightweight manifold/Boolean repair (this run)
+- Better shell openings (rim walls + named face ids)
+- Lightweight manifold/Boolean repair
 - Toolpath preview strategy selector
 - Morphing spiral pocket toolpath (strategy="morph")
 - True Archimedean spiral pocket toolpath
@@ -74,4 +76,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-24 (manifold repair before Boolean)
+Last updated: 2026-11-24 (better shell openings – rim walls + named faces)
