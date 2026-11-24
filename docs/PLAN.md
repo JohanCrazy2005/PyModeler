@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-24)
+- Done: Basic DXF import (`import_dxf_to_sketch` for LINE/CIRCLE/ARC; research updated).
 - Done: Lightweight manifold/Boolean repair (`repair_mesh` using trimesh.repair before engine Boolean; research in docs/research/manifold-repair.md).
 - Done: Toolpath preview strategy selector (QComboBox in ToolpathPreviewDialog; live switch + regenerate for concentric/zigzag/spiral/archimedean/morph).
 - Done: Morphing spiral pocket toolpath (strategy="morph": linear morph of Archimedean following rectangular boundary via ray-distance scaling; continuous G01; research updated in docs/research/toolpath-spiral.md).
@@ -84,4 +85,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-24 (manifold repair before Boolean)
+Last updated: 2026-11-24 (basic DXF import) (manifold repair before Boolean)

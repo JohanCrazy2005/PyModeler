@@ -6,7 +6,7 @@ import ezdxf
 import pytest
 
 from pymodeler.core.sketch import Sketch, create_rectangle_sketch, extract_simple_profiles
-from pymodeler.io.dxf import export_profiles_to_dxf, export_sketch_to_dxf
+from pymodeler.io.dxf import export_profiles_to_dxf, export_sketch_to_dxf, import_dxf_to_sketch
 
 
 def test_export_rectangle_sketch(tmp_path: Path):
@@ -87,3 +87,32 @@ def test_no_construction_geometry(tmp_path: Path):
     doc = ezdxf.readfile(out)
     lines = list(doc.modelspace().query("LINE"))
     assert len(lines) == 0
+
+
+def test_import_dxf_roundtrip(tmp_path: Path):
+    """Export then import recovers basic line and circle geometry."""
+    sketch = Sketch(name="Roundtrip")
+    p1 = sketch.add_point(0.0, 0.0)
+    p2 = sketch.add_point(10.0, 0.0)
+    sketch.add_line(p1, p2)
+    c = sketch.add_point(5.0, 5.0)
+    sketch.add_circle(c, 2.0)
+
+    out = tmp_path / "rt.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False)
+
+    imported = import_dxf_to_sketch(out, name="Imported")
+    assert imported.name == "Imported"
+    # Should have points and the line + circle
+    lines = [e for e in imported.entities if e["type"] == "line"]
+    circles = [e for e in imported.entities if e["type"] == "circle"]
+    assert len(lines) == 1
+    assert len(circles) == 1
+    assert abs(circles[0]["radius"] - 2.0) < 1e-6
+    # Endpoints of the line should match approximately
+    pts = {e["id"]: (e["x"], e["y"]) for e in imported.entities if e["type"] == "point"}
+    line = lines[0]
+    start = pts[line["start_point"]]
+    end = pts[line["end_point"]]
+    assert abs(start[0] - 0.0) < 1e-4 or abs(start[0] - 10.0) < 1e-4
+    assert abs(end[0] - 0.0) < 1e-4 or abs(end[0] - 10.0) < 1e-4

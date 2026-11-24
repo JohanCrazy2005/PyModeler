@@ -56,7 +56,8 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] UI strategy selector for toolpath preview dialog (live regenerate)
 - [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)
 - [x] Better shell openings (explicit rim walls + named face ids)
-- [ ] Import/export improvements (STEP later)
+- [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)
+- [ ] Import/export improvements (STEP later, more DXF entities)
 - [ ] Optional Boolean-based shell offset when engine available
 
 ## Ongoing
@@ -65,4 +66,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-24 (better shell openings – rim walls + named faces)
+Last updated: 2026-11-24 (basic DXF import) (better shell openings – rim walls + named faces)

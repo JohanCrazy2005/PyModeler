@@ -146,3 +146,59 @@ def export_profiles_to_dxf(
     _add_profiles(msp, profiles, layer)
     doc.saveas(path)
     return path
+
+
+def import_dxf_to_sketch(
+    path: Union[str, Path],
+    *,
+    name: str = "Imported Sketch",
+) -> Sketch:
+    """Import simple LINE, CIRCLE, and ARC entities from a DXF file into a new Sketch.
+
+    Only modelspace entities of those types are considered. Points are created as needed
+    and entities reference them by id. Construction flag is not set. This is a basic
+    interchange helper for 2D geometry; full constraint/dimension recovery is deferred.
+    """
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"DXF file not found: {path}")
+
+    doc = ezdxf.readfile(str(path))
+    msp = doc.modelspace()
+
+    sketch = Sketch(name=name)
+    # Temporary point cache by rounded coordinate to avoid exact duplicates
+    point_cache: dict[tuple[float, float], str] = {}
+
+    def get_or_add_point(x: float, y: float) -> str:
+        key = (round(x, 6), round(y, 6))
+        if key in point_cache:
+            return point_cache[key]
+        pid = sketch.add_point(x, y)
+        point_cache[key] = pid
+        return pid
+
+    for entity in msp:
+        etype = entity.dxftype()
+        if etype == "LINE":
+            start = entity.dxf.start
+            end = entity.dxf.end
+            sp = get_or_add_point(float(start.x), float(start.y))
+            ep = get_or_add_point(float(end.x), float(end.y))
+            sketch.add_line(sp, ep)
+        elif etype == "CIRCLE":
+            center = entity.dxf.center
+            cp = get_or_add_point(float(center.x), float(center.y))
+            sketch.add_circle(cp, float(entity.dxf.radius))
+        elif etype == "ARC":
+            center = entity.dxf.center
+            cp = get_or_add_point(float(center.x), float(center.y))
+            sketch.add_arc(
+                cp,
+                float(entity.dxf.radius),
+                float(entity.dxf.start_angle),
+                float(entity.dxf.end_angle),
+            )
+        # Other entity types (LWPOLYLINE, etc.) deferred for later
+
+    return sketch
