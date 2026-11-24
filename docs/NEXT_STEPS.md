@@ -13,20 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Added strategy selector combo to ToolpathPreviewDialog.
-  - Live switch between concentric / zigzag / spiral / archimedean / morph.
-  - Regenerates G-code and refreshes text + 2D preview on change.
-  - Unit test covers combo presence and strategy switch (headless-skipped when no display).
+- Added lightweight mesh repair (`repair_mesh`) before Boolean operations.
+  - Uses trimesh: merge vertices, drop degenerates/duplicates, fix winding/normals, fill simple holes.
+  - Called automatically inside `mesh_boolean` when trimesh is present.
+  - Research note in docs/research/manifold-repair.md.
+  - Unit tests cover repair of a valid cube and join after repair.
 
 ### Next concrete tasks (Phase 4)
-1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
-2. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-3. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
-4. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
+1. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
+2. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
+3. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
+4. (done) Robust manifold/Boolean repair (light trimesh pipeline).
 5. (done) UI strategy selector for toolpath preview dialog.
 
 ## Recently Completed
-- Toolpath preview strategy selector (this run)
+- Lightweight manifold/Boolean repair (this run)
+- Toolpath preview strategy selector
 - Morphing spiral pocket toolpath (strategy="morph")
 - True Archimedean spiral pocket toolpath
 - Viewport edge/face picking
@@ -72,4 +74,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-24 (toolpath preview strategy selector)
+Last updated: 2026-11-24 (manifold repair before Boolean)
