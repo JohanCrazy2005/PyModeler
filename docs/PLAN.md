@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-23)
+- Done: Viewport edge/face picking (ray hit helpers, selection modes O/E/F, property panel feed for Fillet/Chamfer/Shell); research in docs/research/viewport-edge-face-picking.md.
 - Done: Spiral toolpath supports corner-radius arcs (G03) when corner_radius > 0; research in docs/research/toolpath-spiral.md.
 - Done: Full unit system with suffixes in expressions (numeric literals + length units mm/cm/m/in/ft expanded to base mm; angle units deg/rad expanded to degrees; pi/e supported; research in docs/research/unit-suffixes.md).
 - Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + full arithmetic expression evaluation for dimension values + **trig / unit-aware functions (sin/cos in degrees, sqrt, pi, in_to_mm, ...)** + Sketch.solve()).
@@ -73,7 +74,8 @@
 23. (done) Toolpath linear lead-in / lead-out.
 24. (done) Toolpath spiral pocket strategy.
 25. (done) Spiral with corner-radius arcs.
+26. (done) Viewport-based edge/face picking for Fillet/Chamfer/Shell.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-23 (spiral corner-radius arcs complete)
+Last updated: 2026-11-23 (viewport edge/face picking complete)

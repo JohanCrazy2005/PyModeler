@@ -371,3 +371,16 @@ class PropertyPanel(QWidget):
             except ValueError:
                 result.append(part)
         return result
+
+    def apply_viewport_selection(self, mode: str, indices: list) -> None:
+        """Fill the Edges/Faces field from a viewport pick (when a suitable feature is active)."""
+        if self.current_feature is None:
+            return
+        from pymodeler.core import FilletFeature, ChamferFeature, ShellFeature
+        if mode == "edge" and isinstance(self.current_feature, (FilletFeature, ChamferFeature)):
+            self.selection_edit.setText(",".join(str(i) for i in indices))
+            self.selection_edit.setEnabled(True)
+        elif mode == "face" and isinstance(self.current_feature, ShellFeature):
+            self.selection_edit.setText(",".join(str(i) for i in indices))
+            self.selection_edit.setEnabled(True)
+

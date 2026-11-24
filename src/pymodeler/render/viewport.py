@@ -178,6 +178,84 @@ def _ray_segment_distance(ray_o: np.ndarray, ray_d: np.ndarray, a: np.ndarray, b
     return _ray_point_distance(ray_o, ray_d, closest_on_seg)
 
 
+
+def hit_test_nearest_edge(
+    vertices: List,
+    edges: List[Tuple[int, int]],
+    ray_origin: np.ndarray,
+    ray_dir: np.ndarray,
+    tolerance: float = 0.25,
+) -> Optional[int]:
+    """Return index into `edges` of the nearest edge to the ray within tolerance.
+
+    Headless-safe. Edges are undirected pairs of vertex indices.
+    Returns None if nothing is close enough.
+    """
+    if len(edges) == 0 or len(vertices) == 0:
+        return None
+    ray_dir = ray_dir / (np.linalg.norm(ray_dir) + 1e-8)
+    verts = np.asarray(vertices, dtype=np.float32)
+    best_idx: Optional[int] = None
+    best_dist = float("inf")
+    for i, (a, b) in enumerate(edges):
+        if a >= len(verts) or b >= len(verts):
+            continue
+        dist = _ray_segment_distance(ray_origin, ray_dir, verts[a], verts[b])
+        if dist is not None and dist < tolerance and dist < best_dist:
+            best_dist = dist
+            best_idx = i
+    return best_idx
+
+
+def hit_test_nearest_face(
+    vertices: List,
+    faces: List[List[int]],
+    ray_origin: np.ndarray,
+    ray_dir: np.ndarray,
+    max_distance: float = 100.0,
+) -> Optional[int]:
+    """Return index of the first (nearest) face whose plane the ray hits inside the polygon.
+
+    Uses a simple plane intersection + point-in-triangle test on the first three vertices
+    of each face (sufficient for the current quad/tri meshes). Headless-safe.
+    """
+    if len(faces) == 0 or len(vertices) == 0:
+        return None
+    ray_dir = ray_dir / (np.linalg.norm(ray_dir) + 1e-8)
+    verts = np.asarray(vertices, dtype=np.float32)
+    best_idx: Optional[int] = None
+    best_t = float("inf")
+    for fi, face in enumerate(faces):
+        if len(face) < 3:
+            continue
+        try:
+            v0 = verts[face[0]]
+            v1 = verts[face[1]]
+            v2 = verts[face[2]]
+        except IndexError:
+            continue
+        edge1 = v1 - v0
+        edge2 = v2 - v0
+        h = np.cross(ray_dir, edge2)
+        a = np.dot(edge1, h)
+        if abs(a) < 1e-8:
+            continue
+        f = 1.0 / a
+        s = ray_origin - v0
+        u = f * np.dot(s, h)
+        if u < 0.0 or u > 1.0:
+            continue
+        q = np.cross(s, edge1)
+        v = f * np.dot(ray_dir, q)
+        if v < 0.0 or u + v > 1.0:
+            continue
+        t = f * np.dot(edge2, q)
+        if 1e-4 < t < best_t and t < max_distance:
+            best_t = t
+            best_idx = fi
+    return best_idx
+
+
 class Camera:
     """Simple orbit camera around a target point."""
 
@@ -830,6 +908,46 @@ class ViewportWidget(QOpenGLWidget if HAS_QT else object):  # type: ignore
         if self._scene is None:
             return
         ray_o, ray_d = self._screen_to_ray(pos.x(), pos.y())
+
+        # Edge / face picking on the currently selected object (or first visible)
+        if self.selection_mode in ("edge", "face"):
+            target = None
+            selected = self._scene.selected_objects()
+            if selected:
+                target = selected[0]
+            else:
+                for obj in self._scene.objects:
+                    if obj.visible and obj.mesh.vertices:
+                        target = obj
+                        break
+            if target is not None and target.mesh.vertices:
+                # Transform ray into object local space (approximate inverse of location/rotation/scale)
+                # For the common identity-transform case this is exact; otherwise we still work in world
+                # by transforming the mesh vertices to world and testing there.
+                world_verts = target.transform.transform_points(
+                    np.array(target.mesh.vertices, dtype=np.float32)
+                )
+                if self.selection_mode == "edge":
+                    edges = extract_unique_edges(target.mesh.faces)
+                    idx = hit_test_nearest_edge(world_verts, edges, ray_o, ray_d)
+                    if idx is not None:
+                        self.selected_edge_indices = [idx]
+                        self.selected_face_indices = []
+                        if HAS_QT:
+                            self.entity_selection_changed.emit("edge", self.selected_edge_indices)
+                        self.update()
+                        return
+                else:  # face
+                    idx = hit_test_nearest_face(world_verts, target.mesh.faces, ray_o, ray_d)
+                    if idx is not None:
+                        self.selected_face_indices = [idx]
+                        self.selected_edge_indices = []
+                        if HAS_QT:
+                            self.entity_selection_changed.emit("face", self.selected_face_indices)
+                        self.update()
+                        return
+
+        # Default object AABB pick
         best = None
         best_t = float("inf")
         for obj in self._scene.objects:
@@ -851,6 +969,14 @@ class ViewportWidget(QOpenGLWidget if HAS_QT else object):  # type: ignore
                 self._scene.clear_selection()
                 self.selection_changed.emit()
                 self.update()
+
+    def get_entity_selection_string(self) -> str:
+        """Comma-separated indices of the current edge or face selection."""
+        if self.selection_mode == "edge":
+            return ",".join(str(i) for i in self.selected_edge_indices)
+        if self.selection_mode == "face":
+            return ",".join(str(i) for i in self.selected_face_indices)
+        return ""
 
     # ------------------------------------------------------------------
     # Gizmo helpers (pure math, headless-safe)

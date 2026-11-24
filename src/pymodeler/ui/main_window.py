@@ -116,6 +116,8 @@ class MainWindow(QMainWindow):
         self.viewport.set_scene(self.scene)
         self.viewport.selection_changed.connect(self._on_selection_changed)
         self.viewport.transform_committed.connect(self._on_transform_committed)
+        if hasattr(self.viewport, "entity_selection_changed"):
+            self.viewport.entity_selection_changed.connect(self.property_panel.apply_viewport_selection)
 
         self.feature_tree = FeatureTreeWidget()
         self.feature_tree.set_history(self.current_part.feature_history)

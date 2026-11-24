@@ -50,7 +50,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Linear lead-in/out + corner-radius G03 arcs
 - [x] Toolpath preview dialog wired to Manufacturing menu
 - [x] Full unit system with suffixes in expressions (length + angle)
-- [ ] Viewport-based edge/face picking
+- [x] Viewport-based edge/face picking (pure ray hit helpers + mode + property panel feed)
 - [ ] Robust manifold/Boolean repair when manifold3d available
 - [ ] Better shell openings / Boolean offset
 - [ ] Import/export improvements (STEP later)
@@ -62,4 +62,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-23 (spiral corner arcs)
+Last updated: 2026-11-23 (viewport edge/face picking)

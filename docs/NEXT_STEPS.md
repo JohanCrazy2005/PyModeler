@@ -13,21 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Spiral toolpath now supports corner-radius arcs:
-  - When `corner_radius > 0`, rectangular spiral emits G03 R-format arcs at each corner (same style as concentric/contour).
-  - Falls back to sharp G01 corners if radius is zero or the inset rectangle is too small.
-  - Continuous single-plunge-per-Z-level behavior preserved.
-  - Research note added in `docs/research/toolpath-spiral.md`. Tests pass (including new spiral+arcs case).
+- Viewport-based edge/face picking (Phase 4):
+  - Pure helpers `hit_test_nearest_edge` and `hit_test_nearest_face` (ray vs unique edges / triangle faces).
+  - ViewportWidget selection modes `object` / `edge` / `face` (keys O / E / F).
+  - Click in edge/face mode picks nearest entity on the selected (or first visible) object and emits `entity_selection_changed`.
+  - PropertyPanel.apply_viewport_selection fills the Edges/Faces field for Fillet/Chamfer (edges) or Shell (faces).
+  - Research note in `docs/research/viewport-edge-face-picking.md`. Tests pass.
 
 ### Next concrete tasks (Phase 4)
 1. Optional: more robust manifold repair / Boolean bevel when manifold3d is present.
 2. Better shell openings (explicit rim walls, non-integer face ids) or Boolean-based offset when engine available.
-3. Viewport-based edge/face picking for Fillet/Chamfer/Shell (beyond text entry).
-4. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
-5. True Archimedean spiral (polar continuous curve for near-square pockets) or adaptive stepover.
+3. Import/Export improvements (DXF via ezdxf already present; STEP later if geometry kernel allows).
+4. True Archimedean spiral (polar continuous curve for near-square pockets) or adaptive stepover.
+5. Viewport picking polish: multi-select, highlight of picked edge/face, box select, “select other”.
 
 ## Recently Completed
-- Spiral with corner-radius arcs (this run)
+- Viewport edge/face picking (this run)
+- Spiral with corner-radius arcs
 - Angle unit suffixes in expressions
 - Length unit suffixes in expressions
 - Continuous rectangular spiral pocket toolpath
@@ -69,4 +71,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-23 (spiral corner-radius arcs)
+Last updated: 2026-11-23 (viewport edge/face picking)
