@@ -29,7 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-23)
-- Done: Full unit system with suffixes in expressions (numeric literals + length units mm/cm/m/in/ft expanded to base mm before evaluation; research in docs/research/unit-suffixes.md).
+- Done: Full unit system with suffixes in expressions (numeric literals + length units mm/cm/m/in/ft expanded to base mm; angle units deg/rad expanded to degrees; pi/e supported; research in docs/research/unit-suffixes.md).
 - Done: Lightweight 2D constraint solver stub (scipy.optimize.least_squares for basic geometric constraints + driving dimensions length/distance/radius/diameter/angle + free radii + parameter name evaluation for string dimension values + full arithmetic expression evaluation for dimension values + **trig / unit-aware functions (sin/cos in degrees, sqrt, pi, in_to_mm, ...)** + Sketch.solve()).
 - Done: Shell corner mitering (per-vertex miter scale so offset approximates constant thickness at sharp corners).
 - Done: UI exposure for edges/faces selection on Fillet/Chamfer/Shell (property panel text field parsing comma-separated indices/IDs).
@@ -74,4 +74,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-23 (unit suffixes in expressions complete)
+Last updated: 2026-11-23 (angle unit suffixes in expressions complete)
