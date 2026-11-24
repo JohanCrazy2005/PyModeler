@@ -54,7 +54,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] True Archimedean spiral toolpath (polar, inscribed circle)
 - [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular boundary)
 - [x] UI strategy selector for toolpath preview dialog (live regenerate)
-- [ ] Robust manifold/Boolean repair when manifold3d available
+- [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)
 - [ ] Better shell openings / Boolean offset
 - [ ] Import/export improvements (STEP later)
 
@@ -64,4 +64,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-24 (toolpath preview strategy selector)
+Last updated: 2026-11-24 (manifold repair before Boolean)
