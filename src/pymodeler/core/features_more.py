@@ -269,6 +269,58 @@ class ShellFeature:
     def resolved_thickness(self, parameters: Optional[ParameterStore] = None) -> float:
         return _resolve_value(self.thickness, parameters, 1.0)
 
+    def _resolve_open_faces(self, base: Mesh) -> set:
+        """Map self.faces (int indices and/or named labels) to a set of face indices.
+
+        Supported names (case-insensitive): top, bottom, front, back, left, right.
+        Mapping uses the dominant axis of each face normal.
+        """
+        import numpy as np
+        open_faces: set = set()
+        name_map: dict[str, int] = {}
+        # Build name -> best face index by normal
+        best: dict[str, tuple[float, int]] = {}
+        for fi, face in enumerate(base.faces):
+            try:
+                n = np.asarray(base.compute_face_normal(fi), dtype=float)
+            except Exception:
+                continue
+            length = float(np.linalg.norm(n))
+            if length < 1e-12:
+                continue
+            n = n / length
+            ax = int(np.argmax(np.abs(n)))
+            sign = 1.0 if n[ax] >= 0 else -1.0
+            score = abs(float(n[ax]))
+            if ax == 2:
+                label = "top" if sign > 0 else "bottom"
+            elif ax == 1:
+                label = "back" if sign > 0 else "front"
+            else:
+                label = "right" if sign > 0 else "left"
+            prev = best.get(label)
+            if prev is None or score > prev[0]:
+                best[label] = (score, fi)
+        name_map = {k: v[1] for k, v in best.items()}
+
+        for f in self.faces:
+            if isinstance(f, int):
+                if 0 <= f < len(base.faces):
+                    open_faces.add(f)
+            elif isinstance(f, str):
+                key = f.strip().lower()
+                if key in name_map:
+                    open_faces.add(name_map[key])
+                else:
+                    # Try integer-as-string
+                    try:
+                        idx = int(key)
+                        if 0 <= idx < len(base.faces):
+                            open_faces.add(idx)
+                    except ValueError:
+                        pass
+        return open_faces
+
     def generate_mesh(self, parameters: Optional[ParameterStore] = None) -> Mesh:
         """Placeholder mesh for timeline visibility when no base body is available."""
         t = self.resolved_thickness(parameters)
@@ -287,10 +339,11 @@ class ShellFeature:
         the original and offset surfaces. This produces a hollow solid with
         approximately constant wall thickness.
 
-        Faces listed in self.faces (when they are integer indices) are treated
-        as openings: they are omitted from the outer shell and their
-        corresponding inner faces are also omitted. Shared boundary edges still
-        receive wall faces.
+        Faces listed in self.faces (integer indices or named labels such as
+        "top"/"bottom"/"front"/"back"/"left"/"right") are treated as openings:
+        they are omitted from the outer and inner surfaces. Boundary edges of
+        openings receive explicit rim walls so the shell thickness is visible
+        at the lip.
 
         Direction:
           - inside  : offset inward (outer dimensions preserved)
@@ -312,11 +365,10 @@ class ShellFeature:
             return Mesh(vertices=list(base.vertices), faces=list(base.faces), name=f"{base.name}_shell")
 
         direction = self.direction
-        # Determine which faces to treat as openings (only integer indices are usable)
-        open_faces = set()
-        for f in self.faces:
-            if isinstance(f, int) and 0 <= f < len(base.faces):
-                open_faces.add(f)
+        # Resolve face identifiers (integer indices or named labels) into opening set.
+        # Named labels: "top"/"bottom"/"front"/"back"/"left"/"right" mapped by face
+        # normal direction (largest absolute component of the face normal).
+        open_faces = self._resolve_open_faces(base)
 
         # Compute per-vertex normal (average of adjacent face normals)
         # and a miter scale so the offset approximates constant wall thickness
@@ -390,17 +442,17 @@ class ShellFeature:
             reversed_face = [n_outer + vi for vi in reversed(face)]
             new_faces.append(reversed_face)
 
-        # Wall faces along every edge (connecting outer to inner)
-        # Build edge -> directed usage
+        # Wall faces along every edge (connecting outer to inner).
+        # Include edges from kept faces (side walls) AND edges of open faces
+        # so openings get explicit rim walls (lip of the shell thickness).
         edge_dir: dict[tuple[int, int], tuple[int, int]] = {}
         for fi, face in enumerate(base.faces):
-            if fi in open_faces:
-                continue  # openings do not contribute walls on their boundary for this simple version
             m = len(face)
             for i in range(m):
                 a, b = face[i], face[(i + 1) % m]
                 key = (min(a, b), max(a, b))
-                if key not in edge_dir:
+                # Prefer directed edge from a non-open face when both share the edge
+                if key not in edge_dir or fi not in open_faces:
                     edge_dir[key] = (a, b)
 
         for (a, b), (da, db) in edge_dir.items():
@@ -501,31 +553,23 @@ class FeatureHistory:
     def recompute_meshes(self, sketches, params=None):
         result = {}
         for fdict in self.active_features():
-            fid = fdict.get("id", "feat")
-            try:
-                if fdict.get("type") == "extrude":
-                    feat = ExtrudeFeature.from_dict(fdict)
-                    sk = sketches.get(feat.sketch_id) if sketches else None
-                    if sk is not None:
-                        result[fid] = feat.generate_mesh(sk, params)
-                elif fdict.get("type") == "revolve":
-                    feat = RevolveFeature.from_dict(fdict)
-                    sk = sketches.get(feat.sketch_id) if sketches else None
-                    if sk is not None:
-                        result[fid] = feat.generate_mesh(sk, params)
-                elif fdict.get("type") == "hole":
-                    feat = HoleFeature.from_dict(fdict)
-                    result[fid] = feat.generate_mesh(params)
-                elif fdict.get("type") == "fillet":
-                    feat = FilletFeature.from_dict(fdict)
-                    result[fid] = feat.generate_mesh(params)
-                elif fdict.get("type") == "chamfer":
-                    feat = ChamferFeature.from_dict(fdict)
-                    result[fid] = feat.generate_mesh(params)
-                elif fdict.get("type") == "shell":
-                    feat = ShellFeature.from_dict(fdict)
-                    result[fid] = feat.generate_mesh(params)
-            except Exception:
-                from .mesh import create_cube
-                result[fid] = create_cube(size=1.0, name=fid)
+            ftype = fdict.get("type")
+            if ftype == "extrude":
+                feat = ExtrudeFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(sketches, params)
+            elif ftype == "revolve":
+                feat = RevolveFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(sketches, params)
+            elif ftype == "hole":
+                feat = HoleFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(params)
+            elif ftype == "fillet":
+                feat = FilletFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(params)
+            elif ftype == "chamfer":
+                feat = ChamferFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(params)
+            elif ftype == "shell":
+                feat = ShellFeature.from_dict(fdict)
+                result[feat.id] = feat.generate_mesh(params)
         return result
