@@ -13,26 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Viewport picking polish:
-  - Multi-select (Shift+click additive for edges/faces).
-  - Highlight of picked edges/faces (green overlay).
-  - Basic box select (drag in edge/face mode projects centers and selects enclosed).
-  - “Select other” cycle via ` / ~ key (cycles among ray hits).
-  - Mode keys: O object, E edge, T face.
-  - Multi-hit helpers `hit_test_edges_along_ray` / `hit_test_faces_along_ray` (sorted by distance) + tests.
-  - Fixed missing init of selection_mode / selected_* and entity_selection_changed signal.
+- Further DXF import: LWPOLYLINE (closed or open) entities are now imported into Sketch as sequential lines (straight segments; bulge ignored for now). Closed polylines connect last vertex to first. Points are deduplicated by coordinate. Tests added for rectangle LWPOLYLINE.
 
 ### Next concrete tasks (Phase 4)
 1. Optional Boolean-based shell offset when a robust engine is available (further quality).
-2. Further DXF import (LWPOLYLINE closed profiles) or dimension export.
+2. (done) Further DXF import (LWPOLYLINE closed profiles).
 3. (done) Viewport picking polish.
-4. (done) Import/Export improvements (basic DXF import added).
+4. (done) Import/Export improvements (basic DXF import + LWPOLYLINE added).
 5. (done) Better shell openings (explicit rim walls, non-integer face ids).
 6. (done) Robust manifold/Boolean repair (light trimesh pipeline).
 7. (done) UI strategy selector for toolpath preview dialog.
 
 ## Recently Completed
-- Viewport picking polish (multi-select, highlight, box select, select-other) (this run)
+- Further DXF import: LWPOLYLINE to sequential lines (this run)
+- Viewport picking polish (multi-select, highlight, box select, select-other) (previous)
 - Basic DXF import (LINE/CIRCLE/ARC to Sketch)
 - Better shell openings (rim walls + named face ids)
 - Lightweight manifold/Boolean repair
@@ -82,4 +76,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-24 (viewport picking polish)
+Last updated: 2026-11-24 (LWPOLYLINE DXF import)
