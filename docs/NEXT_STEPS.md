@@ -13,20 +13,24 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- DXF diameter + angular dimension export (Phase 4):
-  - `export_sketch_to_dxf` now writes DIMENSION entities for diameter (add_diameter_dim) and angle (add_angular_dim_2l) sketch dimensions, in addition to length/radius.
-  - New helpers `Sketch.add_diameter_dimension` and `Sketch.add_angle_dimension`.
-  - Research updated in `docs/research/dxf-dimension-export.md`.
-  - Extended tests in `tests/test_dxf_dims.py` (4 passed).
+- Restored full `src/pymodeler/io/dxf.py` (was corrupted to a placeholder with literal `\\n`).
+- Fixed living docs and tests that had been stored with escaped newlines.
+- DXF dimension export extended:
+  - Diameter DIMENSION entities via `add_diameter_dim` (circles/arcs).
+  - Angular DIMENSION entities via `add_angular_dim_2l` (two lines).
+  - Sketch helpers `add_diameter_dimension` / `add_angle_dimension`.
+  - Research + tests updated (`tests/test_dxf_dims.py` — 5 passed).
 
 ### Next concrete tasks (Phase 4)
-1. Import/Export: basic STEP later if geometry kernel allows.
+1. Better dimension placement (user offset / side, value-driven offset).
 2. Viewport picking further polish or multi-object entity selection.
 3. Improve shell offset quality (true constant-thickness / openings via Boolean).
-4. Better DIMENSION placement (offset from value or user param); angular by 3 points.
+4. Import/Export: basic STEP later if geometry kernel allows.
+5. Optional: DIMENSION import back into sketch dimensions.
 
 ## Recently Completed
-- DXF DIMENSION export for length/radius/diameter/angle (this run)
+- DXF diameter + angular DIMENSION export (this run)
+- DXF DIMENSION export for length/radius
 - DXF SPLINE/ELLIPSE approximation + TEXT stub
 - Boolean-based shell offset for closed inside shells
 - DXF bulge-aware polyline import
@@ -44,5 +48,6 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
+- Watch for files stored with literal `\\n` sequences — restore via unicode_escape if discovered.
 
 Last updated: 2026-11-25 (DXF diameter + angular DIMENSION export)

@@ -52,9 +52,8 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Full unit system with suffixes in expressions (length + angle)
 - [x] Viewport-based edge/face picking (pure ray hit helpers + mode + property panel feed)
 - [x] True Archimedean spiral toolpath (polar, inscribed circle)
-- [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular boundary)
-- [x] UI strategy selector for toolpath preview dialog (live regenerate)
-- [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)
+- [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular bound)
+- [x] Robust manifold/Boolean repair when manifold3d available
 - [x] Better shell openings (explicit rim walls + named face ids)
 - [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)
 - [x] Viewport picking polish (multi-select Shift, highlight edges/faces, basic box select, select-other cycle via ~)
