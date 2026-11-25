@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import math
+
 import ezdxf
 import pytest
 
@@ -169,3 +171,66 @@ def test_import_polyline_legacy(tmp_path: Path):
     imported = import_dxf_to_sketch(dxf_path, name="LegacyPoly")
     lines = [e for e in imported.entities if e["type"] == "line"]
     assert len(lines) >= 2
+
+
+def test_import_spline(tmp_path: Path):
+    """SPLINE is approximated as connected LINE segments via flattening."""
+    doc = ezdxf.new(dxfversion="R2010")
+    msp = doc.modelspace()
+    fit_points = [(0, 0), (10, 5), (20, 0), (30, 10)]
+    msp.add_spline(fit_points)
+    dxf_path = tmp_path / "spline.dxf"
+    doc.saveas(dxf_path)
+
+    imported = import_dxf_to_sketch(dxf_path, name="SplineImport", approx_distance=0.5)
+    lines = [e for e in imported.entities if e["type"] == "line"]
+    points = [e for e in imported.entities if e["type"] == "point"]
+    assert len(points) >= 4
+    assert len(lines) >= 3  # approximated polyline
+    # Should roughly span the fit points
+    xs = [e["x"] for e in points]
+    assert min(xs) < 1.0 and max(xs) > 25.0
+
+
+def test_import_ellipse(tmp_path: Path):
+    """ELLIPSE is approximated as connected LINE segments."""
+    doc = ezdxf.new(dxfversion="R2010")
+    msp = doc.modelspace()
+    msp.add_ellipse(
+        center=(0, 0),
+        major_axis=(10, 0),
+        ratio=0.5,
+        start_param=0,
+        end_param=math.pi * 2,  # full ellipse
+    )
+    dxf_path = tmp_path / "ellipse.dxf"
+    doc.saveas(dxf_path)
+
+    imported = import_dxf_to_sketch(dxf_path, name="EllipseImport", approx_distance=0.5)
+    lines = [e for e in imported.entities if e["type"] == "line"]
+    points = [e for e in imported.entities if e["type"] == "point"]
+    assert len(points) >= 8
+    assert len(lines) >= 7
+    # Roughly covers the major axis extent
+    xs = [e["x"] for e in points]
+    assert max(xs) - min(xs) > 15.0
+
+
+def test_import_text(tmp_path: Path):
+    """TEXT creates a point and stores content in metadata."""
+    doc = ezdxf.new(dxfversion="R2010")
+    msp = doc.modelspace()
+    msp.add_text("Hello PyModeler", height=2.5).set_placement((5.0, 10.0))
+    dxf_path = tmp_path / "text.dxf"
+    doc.saveas(dxf_path)
+
+    imported = import_dxf_to_sketch(dxf_path, name="TextImport")
+    points = [e for e in imported.entities if e["type"] == "point"]
+    assert len(points) == 1
+    assert abs(points[0]["x"] - 5.0) < 1e-4
+    assert abs(points[0]["y"] - 10.0) < 1e-4
+    texts = imported.metadata.get("imported_texts", [])
+    assert len(texts) == 1
+    assert texts[0]["text"] == "Hello PyModeler"
+    assert abs(texts[0]["height"] - 2.5) < 1e-4
+    assert texts[0]["point_id"] == points[0]["id"]
