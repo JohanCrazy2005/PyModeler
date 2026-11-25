@@ -56,9 +56,9 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] UI strategy selector for toolpath preview dialog (live regenerate)
 - [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)
 - [x] Better shell openings (explicit rim walls + named face ids)
-- [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)
+- [x] Basic DXF import (LINE/CIRCLE/ARC + LWPOLYLINE to Sketch)
 - [x] Viewport picking polish (multi-select Shift, highlight edges/faces, basic box select, select-other cycle via ~)
-- [ ] Import/export improvements (STEP later, more DXF entities)
+- [ ] Import/export improvements (STEP later, more DXF entities / dimensions)
 - [ ] Optional Boolean-based shell offset when engine available
 
 ## Ongoing
@@ -67,4 +67,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-24 (viewport picking polish: multi-select, highlight, box, select-other)
+Last updated: 2026-11-24 (LWPOLYLINE DXF import)
