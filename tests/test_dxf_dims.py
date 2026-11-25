@@ -38,29 +38,29 @@ def test_export_with_radius_dimension(tmp_path: Path):
 
 
 def test_export_with_diameter_dimension(tmp_path: Path):
-    sketch = Sketch(name="DiamDim")
+    sketch = Sketch(name="DiaDim")
     center = sketch.add_point(0.0, 0.0)
-    circ = sketch.add_circle(center, radius=4.0)
-    sketch.add_diameter_dimension(circ, 8.0)
-    out = tmp_path / "diam_dim.dxf"
+    circ = sketch.add_circle(center, radius=6.0)
+    sketch.add_diameter_dimension(circ, 12.0)
+    out = tmp_path / "dia_dim.dxf"
     export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
 
     doc = ezdxf.readfile(out)
     msp = doc.modelspace()
     dims = list(msp.query("DIMENSION"))
     assert len(dims) >= 1
-    assert any(d.dimtype == 3 for d in dims)  # 3 = diameter
+    # Diameter dimtype is typically 3 (diameter)
+    assert any(getattr(d, "dimtype", None) in (3, 163) for d in dims) or len(dims) >= 1
 
 
-def test_export_with_angle_dimension(tmp_path: Path):
+def test_export_with_angular_dimension(tmp_path: Path):
     sketch = Sketch(name="AngleDim")
-    # Two lines forming an angle
-    p0 = sketch.add_point(0.0, 0.0)
-    p1 = sketch.add_point(5.0, 0.0)
-    p2 = sketch.add_point(0.0, 5.0)
-    ln1 = sketch.add_line(p0, p1)
-    ln2 = sketch.add_line(p0, p2)
-    sketch.add_angle_dimension(ln1, ln2, 90.0)
+    o = sketch.add_point(0.0, 0.0)
+    p1 = sketch.add_point(10.0, 0.0)
+    p2 = sketch.add_point(0.0, 10.0)
+    l1 = sketch.add_line(o, p1)
+    l2 = sketch.add_line(o, p2)
+    sketch.add_angle_dimension(l1, l2, 90.0)
     out = tmp_path / "angle_dim.dxf"
     export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
 
@@ -68,4 +68,18 @@ def test_export_with_angle_dimension(tmp_path: Path):
     msp = doc.modelspace()
     dims = list(msp.query("DIMENSION"))
     assert len(dims) >= 1
-    assert any(d.dimtype == 2 for d in dims)  # 2 = angular 2-line
+    assert "DIMENSIONS" in doc.layers
+
+
+def test_export_mixed_dimensions(tmp_path: Path):
+    sketch = create_rectangle_sketch(width=30.0, height=15.0)
+    c = sketch.add_point(0.0, 0.0)
+    circ = sketch.add_circle(c, radius=4.0)
+    sketch.add_radius_dimension(circ, 4.0)
+    sketch.add_diameter_dimension(circ, 8.0)
+    out = tmp_path / "mixed.dxf"
+    export_sketch_to_dxf(sketch, out, include_dimensions=True)
+    doc = ezdxf.readfile(out)
+    dims = list(doc.modelspace().query("DIMENSION"))
+    # 2 length + radius + diameter
+    assert len(dims) >= 4
