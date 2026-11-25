@@ -30,3 +30,9 @@ Export 2D sketch geometry and closed profiles to DXF for:
 - DXF is a standard 2D interchange format used by virtually all CAD/CAM packages.
 
 Last updated: 2026-11-24 (LWPOLYLINE import added)
+
+## Import Improvements (2026-11-24)
+
+- `import_dxf_to_sketch` now supports both `LWPOLYLINE` and legacy `POLYLINE`.
+- Bulge values are no longer flattened to straight segments. `virtual_entities()` expands them into proper `ARC` entities (plus `LINE` for zero-bulge segments). Closed flags are respected automatically.
+- Research: ezdxf `virtual_entities()` and `bulge_to_arc` (angles in radians → degrees for Sketch). Keeps the importer simple while gaining curved geometry fidelity for manufacturing hand-off.
