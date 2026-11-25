@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-24)
+- Done: Further DXF import (LWPOLYLINE closed/open profiles imported as sequential lines into Sketch; bulge approximated straight).
 - Done: Viewport picking polish (multi-select Shift, green highlight for edges/faces, basic box select, select-other via ~, mode keys O/E/T; multi-hit ray helpers + tests).
 - Done: Lightweight manifold/Boolean repair (`repair_mesh` using trimesh.repair before engine Boolean; research in docs/research/manifold-repair.md).
 - Done: Toolpath preview strategy selector (QComboBox in ToolpathPreviewDialog; live switch + regenerate for concentric/zigzag/spiral/archimedean/morph).
@@ -83,7 +84,8 @@
 28. (done) UI strategy selector for toolpath preview dialog.
 29. (done) Robust manifold/Boolean repair (light trimesh pipeline before engine).
 30. (done) Viewport picking polish (multi-select, highlight, box select, select-other).
+31. (done) Further DXF import (LWPOLYLINE as sequential lines).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-24 (viewport picking polish)
+Last updated: 2026-11-24 (LWPOLYLINE DXF import)
