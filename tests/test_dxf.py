@@ -89,6 +89,26 @@ def test_no_construction_geometry(tmp_path: Path):
     assert len(lines) == 0
 
 
+def test_import_lwpolyline(tmp_path: Path):
+    """Import a closed LWPOLYLINE as sequential lines forming a polygon."""
+    # Create a simple DXF with a closed LWPOLYLINE rectangle
+    doc = ezdxf.new(dxfversion="R2010")
+    msp = doc.modelspace()
+    points = [(0, 0), (10, 0), (10, 5), (0, 5)]
+    msp.add_lwpolyline(points, close=True)
+    dxf_path = tmp_path / "poly.dxf"
+    doc.saveas(dxf_path)
+
+    imported = import_dxf_to_sketch(dxf_path, name="PolyImport")
+    lines = [e for e in imported.entities if e["type"] == "line"]
+    points_ent = [e for e in imported.entities if e["type"] == "point"]
+    assert len(points_ent) == 4
+    assert len(lines) == 4  # closed rectangle
+    # Verify the points roughly match
+    coords = sorted([(round(e["x"], 4), round(e["y"], 4)) for e in points_ent])
+    assert coords == [(0.0, 0.0), (0.0, 5.0), (10.0, 0.0), (10.0, 5.0)]
+
+
 def test_import_dxf_roundtrip(tmp_path: Path):
     """Export then import recovers basic line and circle geometry."""
     sketch = Sketch(name="Roundtrip")
