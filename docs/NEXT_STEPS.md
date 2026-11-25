@@ -13,19 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Optional Boolean-based shell offset (Phase 4):
-  - `ShellFeature.apply_to_mesh` now prefers a Boolean cut of an inward-offset solid for closed `direction="inside"` shells when a Boolean engine is available.
-  - Inner solid created by simple centroid-scale approximation; falls back to wall-stitching on any failure or missing engine.
-  - Research already in `docs/research/shell-boolean-offset.md`. New tests in `tests/test_shell.py` (Boolean path skipped if engine absent). Tests pass.
+- DXF import: SPLINE / ELLIPSE approximation + TEXT stub (Phase 4):
+  - `import_dxf_to_sketch` now accepts SPLINE and ELLIPSE (flattened to LINE polylines via `flattening(distance=0.1)` or path fallback).
+  - TEXT entities create a point at insert location; content stored in `sketch.metadata["imported_texts"]`.
+  - Research in `docs/research/dxf-additional-entities.md`. New tests in `tests/test_dxf.py` (all pass).
 
 ### Next concrete tasks (Phase 4)
-1. More DXF entities (SPLINE approximation, ELLIPSE, TEXT stubs) or dimension export.
-2. Import/Export: basic STEP later if geometry kernel allows.
-3. Viewport picking further polish or multi-object entity selection.
-4. Improve shell offset quality (true constant-thickness / openings via Boolean).
+1. Import/Export: basic STEP later if geometry kernel allows.
+2. Viewport picking further polish or multi-object entity selection.
+3. Improve shell offset quality (true constant-thickness / openings via Boolean).
+4. Dimension export (DIMENSION entities from sketch dimensions).
 
 ## Recently Completed
-- Boolean-based shell offset for closed inside shells (this run)
+- DXF SPLINE/ELLIPSE approximation + TEXT stub (this run)
+- Boolean-based shell offset for closed inside shells
 - DXF bulge-aware polyline import
 - Viewport picking polish (multi-select, highlight, box, select-other)
 - True Archimedean + morphing spiral toolpaths
@@ -42,4 +43,4 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 
-Last updated: 2026-11-24 (Boolean-based shell offset)
+Last updated: 2026-11-24 (DXF SPLINE/ELLIPSE/TEXT import)
