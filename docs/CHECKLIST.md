@@ -59,7 +59,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)
 - [x] Viewport picking polish (multi-select Shift, highlight edges/faces, basic box select, select-other cycle via ~)
 - [x] Import/export improvements – bulge-aware LWPOLYLINE + POLYLINE (virtual_entities → ARC/LINE); STEP later
-- [ ] Optional Boolean-based shell offset when engine available
+- [x] Optional Boolean-based shell offset when engine available
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated
@@ -67,4 +67,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-24 (DXF import: bulge-aware LWPOLYLINE + POLYLINE)
+Last updated: 2026-11-24 (Boolean-based shell offset)

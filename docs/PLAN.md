@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-24)
+- Done: Optional Boolean-based shell offset for closed inside shells (centroid-scale inner solid + mesh_boolean cut when engine available; fallback to wall-stitching). Research in docs/research/shell-boolean-offset.md.
 - Done: DXF import improved – bulge-aware LWPOLYLINE + POLYLINE via virtual_entities (ARC for curves); research in docs/research/dxf-export.md.
 - Done: Viewport edge/face picking + polish (ray hit helpers, selection modes, multi-select, highlight, box, select-other); research in docs/research/viewport-edge-face-picking.md.
 - Done: Spiral toolpath supports corner-radius arcs (G03) and true Archimedean / morphing variants; research in docs/research/toolpath-spiral.md.
@@ -84,4 +85,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-24 (DXF bulge-aware polyline import)
+Last updated: 2026-11-24 (Boolean-based shell offset)
