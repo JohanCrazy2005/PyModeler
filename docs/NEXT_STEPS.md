@@ -13,12 +13,11 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Better dimension placement for DXF export:
-  - Linear/distance dimensions honor `parameters.offset` and `parameters.side` (+1/-1).
-  - Radius/diameter honor `parameters.angle`.
-  - Defaults are value-driven (offset ≈ 20% of measured length or angle, min 5).
-  - Sketch helpers updated to accept optional placement kwargs.
-  - Tests extended (`tests/test_dxf_dims.py` — 6 passed).
+- Ordinate / aligned dimension variants for DXF export:
+  - Schema enum extended with "aligned" and "ordinate".
+  - Sketch helpers `add_aligned_dimension` and `add_ordinate_dimension`.
+  - Export uses ezdxf `add_aligned_dim` and `add_ordinate_x_dim` / `add_ordinate_y_dim`.
+  - Tests extended (`tests/test_dxf_dims.py` — 7 passed).
   - Research note updated.
 
 ### Next concrete tasks (Phase 4)
@@ -26,10 +25,11 @@ This file is updated by every automation run.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Optional: DIMENSION import back into sketch dimensions.
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Ordinate / aligned dimension variants for manufacturing drawings.
+5. Further manufacturing drawing polish (dimension groups, leaders, etc.).
 
 ## Recently Completed
-- Better dimension placement (offset/side/angle + value-driven) (this run)
+- Ordinate + aligned DIMENSION export (this run)
+- Better dimension placement (offset/side/angle + value-driven) 
 - DXF diameter + angular DIMENSION export
 - DXF DIMENSION export for length/radius
 - DXF SPLINE/ELLIPSE approximation + TEXT stub
@@ -49,6 +49,6 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
-- Watch for files stored with literal `\\n` sequences — restore via unicode_escape if discovered.
+- Watch for files stored with literal `\\\\n` sequences — restore via unicode_escape if discovered.
 
-Last updated: 2026-11-25 (better dimension placement)
+Last updated: 2026-11-25 (ordinate + aligned dimensions)

@@ -234,6 +234,29 @@ class Sketch:
     def add_angle_dimension(self, line_a: str, line_b: str, value: float | str) -> str:
         return self.add_dimension("angle", [line_a, line_b], value)
 
+    def add_aligned_dimension(self, line_id: str, value: float | str, distance: float = 5.0) -> str:
+        """Add an aligned dimension (parallel to the entity)."""
+        return self.add_dimension("aligned", [line_id], value, parameters={"distance": distance})
+
+    def add_ordinate_dimension(
+        self,
+        point_id: str,
+        value: float | str,
+        axis: str = "x",
+        origin: Optional[Sequence[float]] = None,
+        offset: float = 10.0,
+    ) -> str:
+        """Add an ordinate dimension from a point relative to an origin.
+
+        axis: 'x' or 'y'
+        origin: [x, y] or None (defaults to (0,0))
+        offset: leader length
+        """
+        params = {"axis": axis, "offset": offset}
+        if origin is not None:
+            params["origin"] = list(origin)
+        return self.add_dimension("ordinate", [point_id], value, parameters=params)
+
     # --- Query helpers ---
 
     def update_point(self, eid: str, x: float, y: float) -> None:

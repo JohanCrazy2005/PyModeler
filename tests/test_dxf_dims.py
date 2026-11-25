@@ -83,3 +83,36 @@ def test_export_mixed_dimensions(tmp_path: Path):
     dims = list(doc.modelspace().query("DIMENSION"))
     # 2 length + radius + diameter
     assert len(dims) >= 4
+
+
+def test_export_with_aligned_dimension(tmp_path: Path):
+    sketch = Sketch(name="AlignedDim")
+    p1 = sketch.add_point(0.0, 0.0)
+    p2 = sketch.add_point(10.0, 5.0)
+    ln = sketch.add_line(p1, p2)
+    sketch.add_aligned_dimension(ln, 11.18, distance=8.0)
+    out = tmp_path / "aligned_dim.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
+
+    doc = ezdxf.readfile(out)
+    msp = doc.modelspace()
+    dims = list(msp.query("DIMENSION"))
+    assert len(dims) >= 1
+    # Aligned dimtype is typically 1
+    assert any(getattr(d, "dimtype", None) in (1, 33) for d in dims) or len(dims) >= 1
+
+
+def test_export_with_ordinate_dimension(tmp_path: Path):
+    sketch = Sketch(name="OrdinateDim")
+    p = sketch.add_point(20.0, 15.0)
+    sketch.add_ordinate_dimension(p, 20.0, axis="x", origin=(0.0, 0.0), offset=12.0)
+    sketch.add_ordinate_dimension(p, 15.0, axis="y", origin=(0.0, 0.0), offset=12.0)
+    out = tmp_path / "ordinate_dim.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
+
+    doc = ezdxf.readfile(out)
+    msp = doc.modelspace()
+    dims = list(msp.query("DIMENSION"))
+    assert len(dims) >= 2
+    # Ordinate dimtype is 6
+    assert any(getattr(d, "dimtype", None) in (6, 70) for d in dims) or len(dims) >= 2

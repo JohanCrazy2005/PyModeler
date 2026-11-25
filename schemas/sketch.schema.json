@@ -163,7 +163,7 @@
         "id": { "type": "string", "minLength": 1 },
         "type": {
           "type": "string",
-          "enum": ["length", "distance", "radius", "diameter", "angle"]
+          "enum": ["length", "distance", "radius", "diameter", "angle", "aligned", "ordinate"]
         },
         "value": {
           "oneOf": [

@@ -148,6 +148,8 @@ def _add_dimensions(
     - radius on circle or arc (user angle or default)
     - diameter on circle or arc (user angle or default)
     - angle between two lines (2-line angular, user or value-driven offset)
+    - aligned on a line (parallel dimension line, distance parameter)
+    - ordinate on a point (x or y type relative to origin, offset parameter)
 
     Placement parameters are read from dim["parameters"]:
     - offset: float (absolute distance for the dimension line)
@@ -263,7 +265,56 @@ def _add_dimensions(
                             dxfattribs={"layer": layer},
                         )
                         dim_ent.render()
-            # future: ordinate, aligned, 3-point angular, etc.
+            elif dtype == "aligned" and len(ents) >= 1:
+                eid = ents[0]
+                ent = entity_by_id.get(eid)
+                if ent and ent["type"] == "line":
+                    start = point_map.get(ent["start_point"])
+                    end = point_map.get(ent["end_point"])
+                    if start and end:
+                        distance = float(params.get("distance", params.get("offset", 5.0)))
+                        dim_ent = msp.add_aligned_dim(
+                            p1=start,
+                            p2=end,
+                            distance=distance,
+                            dimstyle="EZDXF",
+                            dxfattribs={"layer": layer},
+                        )
+                        dim_ent.render()
+            elif dtype == "ordinate" and len(ents) >= 1:
+                eid = ents[0]
+                ent = entity_by_id.get(eid)
+                if ent and ent["type"] == "point":
+                    feature = point_map.get(eid)
+                    if feature:
+                        origin = params.get("origin", [0.0, 0.0])
+                        if isinstance(origin, (list, tuple)) and len(origin) >= 2:
+                            origin_pt = (float(origin[0]), float(origin[1]))
+                        else:
+                            origin_pt = (0.0, 0.0)
+                        axis = str(params.get("axis", "x")).lower()
+                        offset_val = float(params.get("offset", 10.0))
+                        # offset relative to feature
+                        if axis == "y":
+                            offset = (offset_val, 0.0)
+                            dim_ent = msp.add_ordinate_y_dim(
+                                feature_location=feature,
+                                offset=offset,
+                                origin=origin_pt,
+                                dimstyle="EZDXF",
+                                dxfattribs={"layer": layer},
+                            )
+                        else:
+                            offset = (0.0, -offset_val if feature[1] >= origin_pt[1] else offset_val)
+                            dim_ent = msp.add_ordinate_x_dim(
+                                feature_location=feature,
+                                offset=offset,
+                                origin=origin_pt,
+                                dimstyle="EZDXF",
+                                dxfattribs={"layer": layer},
+                            )
+                        dim_ent.render()
+            # future: 3-point angular, etc.
         except Exception:
             # Skip dimensions that fail to render (robustness)
             continue

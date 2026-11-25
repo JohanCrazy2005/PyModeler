@@ -84,8 +84,8 @@
 27. (done) Viewport picking polish.
 28. (done) True Archimedean + morphing spiral toolpaths.
 29. (done) DXF bulge-aware polyline import.
-30. (done) DXF DIMENSION export (length + radius + diameter + angular).
+30. (done) DXF DIMENSION export (length + radius + diameter + angular + aligned + ordinate).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-25 (DXF diameter + angular DIMENSION export)
+Last updated: 2026-11-25 (ordinate + aligned DIMENSION export)
