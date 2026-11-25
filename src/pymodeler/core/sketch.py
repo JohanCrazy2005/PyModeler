@@ -228,6 +228,12 @@ class Sketch:
     def add_radius_dimension(self, circle_or_arc_id: str, value: float | str) -> str:
         return self.add_dimension("radius", [circle_or_arc_id], value)
 
+    def add_diameter_dimension(self, circle_or_arc_id: str, value: float | str) -> str:
+        return self.add_dimension("diameter", [circle_or_arc_id], value)
+
+    def add_angle_dimension(self, line_a: str, line_b: str, value: float | str) -> str:
+        return self.add_dimension("angle", [line_a, line_b], value)
+
     # --- Query helpers ---
 
     def update_point(self, eid: str, x: float, y: float) -> None:

@@ -1,1 +1,72 @@
-# PyModeler Checklist\n\nLiving checklist synchronized with PLAN.md and NEXT_STEPS.md.\nMark completed items. Prefer Phase 1 → Phase 2 → etc.\n\n## Phase 0 – Foundation\n- [x] Project structure, schemas/, src layout, PyQt6 skeleton\n- [x] JSON Schema validation infrastructure\n- [x] Basic Mesh / Scene / Part data models\n- [x] FeatureHistory core\n\n## Phase 1 – Sketch + Basic Features\n- [x] 2D Sketch (points, lines, arcs, constraints schema)\n- [x] Parameters / expression evaluator (arithmetic + trig/units)\n- [x] Lightweight 2D constraint solver stub (scipy least_squares)\n- [x] Extrude feature (profile-based mesh, holes, symmetric)\n- [x] Revolve feature (solid of revolution, arbitrary axis)\n- [x] Feature tree UI + rollback\n- [x] Sketch editor canvas tools\n\n## Phase 2 – Part / Assembly / Manufacturing Data\n- [x] Part model + material/stock\n- [x] Cut list generation + exports\n- [x] Assembly mates (rigid/fastened + revolute/slider stubs)\n- [x] BOM\n- [x] DXF import/export (ezdxf)\n- [x] Configurations\n- [x] Multi-part UI\n- [x] Assembly viewport visualization\n- [x] Configuration selection UI\n\n## Phase 3 – Viewport Polish\n- [x] RGB axes, shading modes, standard views, orthographic\n- [x] Keyboard shortcuts for views/frame\n- [x] Selection outline + gizmo visuals (arrowheads, rings)\n- [x] Gizmo hit-testing + drag feedback\n- [x] Parametric-intent transforms (translate/scale/rotate update sketch/params)\n- [x] Constraint-aware transforms\n\n## Phase 4 – Advanced Features + Early CAM\n- [x] HoleFeature (parametric, direction, Boolean cut)\n- [x] Fillet / Chamfer stubs + basic mesh bevel\n- [x] Shell feature (normal offset + walls + corner mitering)\n- [x] UI property panel exposure for Fillet/Chamfer/Shell/Hole params\n- [x] Sheet-metal rule schema + bend allowance helper\n- [x] Rectangular NestingJob + shelf packer + multi-sheet + UI preview\n- [x] ToolpathJob schema + rectangular pocket/contour\n- [x] Concentric + zigzag + continuous rectangular spiral strategies\n- [x] Spiral strategy with optional corner-radius arcs (G03)\n- [x] Linear lead-in/out + corner-radius G03 arcs\n- [x] Toolpath preview dialog wired to Manufacturing menu\n- [x] Full unit system with suffixes in expressions (length + angle)\n- [x] Viewport-based edge/face picking (pure ray hit helpers + mode + property panel feed)\n- [x] True Archimedean spiral toolpath (polar, inscribed circle)\n- [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular boundary)\n- [x] UI strategy selector for toolpath preview dialog (live regenerate)\n- [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)\n- [x] Better shell openings (explicit rim walls + named face ids)\n- [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)\n- [x] Viewport picking polish (multi-select Shift, highlight edges/faces, basic box select, select-other cycle via ~)\n- [x] Import/export improvements – bulge-aware LWPOLYLINE + POLYLINE (virtual_entities → ARC/LINE); STEP later\n- [x] Optional Boolean-based shell offset when engine available\n- [x] DXF import: SPLINE/ELLIPSE approximation + TEXT stub\n- [x] DXF dimension export (length + radius DIMENSION entities)\n\n## Ongoing\n- [ ] Keep all major modules schema-validated\n- [ ] Tests pass before push (headless UI tests guarded)\n- [ ] Research notes under docs/research/ for new areas\n- [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run\n\nLast updated: 2026-11-25 (DXF DIMENSION export)\n
+# PyModeler Checklist
+
+Living checklist synchronized with PLAN.md and NEXT_STEPS.md.
+Mark completed items. Prefer Phase 1 → Phase 2 → etc.
+
+## Phase 0 – Foundation
+- [x] Project structure, schemas/, src layout, PyQt6 skeleton
+- [x] JSON Schema validation infrastructure
+- [x] Basic Mesh / Scene / Part data models
+- [x] FeatureHistory core
+
+## Phase 1 – Sketch + Basic Features
+- [x] 2D Sketch (points, lines, arcs, constraints schema)
+- [x] Parameters / expression evaluator (arithmetic + trig/units)
+- [x] Lightweight 2D constraint solver stub (scipy least_squares)
+- [x] Extrude feature (profile-based mesh, holes, symmetric)
+- [x] Revolve feature (solid of revolution, arbitrary axis)
+- [x] Feature tree UI + rollback
+- [x] Sketch editor canvas tools
+
+## Phase 2 – Part / Assembly / Manufacturing Data
+- [x] Part model + material/stock
+- [x] Cut list generation + exports
+- [x] Assembly mates (rigid/fastened + revolute/slider stubs)
+- [x] BOM
+- [x] DXF import/export (ezdxf)
+- [x] Configurations
+- [x] Multi-part UI
+- [x] Assembly viewport visualization
+- [x] Configuration selection UI
+
+## Phase 3 – Viewport Polish
+- [x] RGB axes, shading modes, standard views, orthographic
+- [x] Keyboard shortcuts for views/frame
+- [x] Selection outline + gizmo visuals (arrowheads, rings)
+- [x] Gizmo hit-testing + drag feedback
+- [x] Parametric-intent transforms (translate/scale/rotate update sketch/params)
+- [x] Constraint-aware transforms
+
+## Phase 4 – Advanced Features + Early CAM
+- [x] HoleFeature (parametric, direction, Boolean cut)
+- [x] Fillet / Chamfer stubs + basic mesh bevel
+- [x] Shell feature (normal offset + walls + corner mitering)
+- [x] UI property panel exposure for Fillet/Chamfer/Shell/Hole params
+- [x] Sheet-metal rule schema + bend allowance helper
+- [x] Rectangular NestingJob + shelf packer + multi-sheet + UI preview
+- [x] ToolpathJob schema + rectangular pocket/contour
+- [x] Concentric + zigzag + continuous rectangular spiral strategies
+- [x] Spiral strategy with optional corner-radius arcs (G03)
+- [x] Linear lead-in/out + corner-radius G03 arcs
+- [x] Toolpath preview dialog wired to Manufacturing menu
+- [x] Full unit system with suffixes in expressions (length + angle)
+- [x] Viewport-based edge/face picking (pure ray hit helpers + mode + property panel feed)
+- [x] True Archimedean spiral toolpath (polar, inscribed circle)
+- [x] Morphing spiral toolpath (linear morph of Archimedean following rectangular boundary)
+- [x] UI strategy selector for toolpath preview dialog (live regenerate)
+- [x] Robust manifold/Boolean repair when manifold3d available (light trimesh.repair pipeline before engine Boolean)
+- [x] Better shell openings (explicit rim walls + named face ids)
+- [x] Basic DXF import (LINE/CIRCLE/ARC to Sketch)
+- [x] Viewport picking polish (multi-select Shift, highlight edges/faces, basic box select, select-other cycle via ~)
+- [x] Import/export improvements – bulge-aware LWPOLYLINE + POLYLINE (virtual_entities → ARC/LINE); STEP later
+- [x] Optional Boolean-based shell offset when engine available
+- [x] DXF import: SPLINE/ELLIPSE approximation + TEXT stub
+- [x] DXF dimension export (length + radius + diameter + angular DIMENSION entities)
+
+## Ongoing
+- [ ] Keep all major modules schema-validated
+- [ ] Tests pass before push (headless UI tests guarded)
+- [ ] Research notes under docs/research/ for new areas
+- [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
+
+Last updated: 2026-11-25 (DXF diameter + angular DIMENSION export)
