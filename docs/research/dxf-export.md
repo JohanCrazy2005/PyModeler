@@ -21,7 +21,7 @@ Export 2D sketch geometry and closed profiles to DXF for:
 ## Future Enhancements
 - Full dimensioned drawings (linear, radial, angular dimensions from sketch dimensions).
 - Multi-sketch / part-level export (projected views later).
-- Import of DXF into sketches (basic LINE/CIRCLE/ARC import implemented).
+- Import of DXF into sketches (basic LINE/CIRCLE/ARC + LWPOLYLINE closed/open profiles as sequential lines).
 - Layer conventions matching common manufacturing workflows.
 - Export of cut-list related outlines.
 
@@ -29,4 +29,4 @@ Export 2D sketch geometry and closed profiles to DXF for:
 - ezdxf documentation: https://ezdxf.readthedocs.io/
 - DXF is a standard 2D interchange format used by virtually all CAD/CAM packages.
 
-Last updated: 2026-11-24 (basic DXF import added)
+Last updated: 2026-11-24 (LWPOLYLINE import added)
