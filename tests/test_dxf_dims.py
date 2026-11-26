@@ -179,3 +179,50 @@ def test_ordinate_group_export(tmp_path: Path):
     dims = list(doc.modelspace().query("DIMENSION"))
     assert len(dims) >= 3
     assert any(getattr(d, "dimtype", None) in (6, 70) for d in dims)
+
+
+def test_leader_style_on_ordinate_and_aligned(tmp_path: Path):
+    """leader_style is stored and influences export offset geometry."""
+    sketch = Sketch(name="LeaderStyle")
+    p = sketch.add_point(15.0, 8.0)
+    sketch.add_ordinate_dimension(p, 15.0, axis="x", origin=(0.0, 0.0), offset=10.0, leader_style="angled")
+    sketch.add_ordinate_dimension(p, 8.0, axis="y", origin=(0.0, 0.0), offset=10.0, leader_style="none")
+
+    p1 = sketch.add_point(0.0, 0.0)
+    p2 = sketch.add_point(12.0, 4.0)
+    ln = sketch.add_line(p1, p2)
+    sketch.add_aligned_dimension(ln, 12.65, distance=6.0, leader_style="angled")
+
+    # Verify parameters stamped
+    ord_dims = [d for d in sketch.dimensions if d["type"] == "ordinate"]
+    assert len(ord_dims) == 2
+    styles = {d["parameters"]["leader_style"] for d in ord_dims}
+    assert styles == {"angled", "none"}
+
+    aligned = next(d for d in sketch.dimensions if d["type"] == "aligned")
+    assert aligned["parameters"]["leader_style"] == "angled"
+
+    out = tmp_path / "leader_style.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
+    doc = ezdxf.readfile(out)
+    dims = list(doc.modelspace().query("DIMENSION"))
+    assert len(dims) >= 3
+    # At least the ordinate types are present
+    assert any(getattr(d, "dimtype", None) in (6, 70) for d in dims)
+
+
+def test_ordinate_group_stamps_group_id_and_style():
+    from pymodeler.io.dxf import add_ordinate_group
+
+    sketch = Sketch(name="GroupStyle")
+    pts = [sketch.add_point(float(i * 10), 0.0) for i in range(1, 4)]
+    ids = add_ordinate_group(
+        sketch,
+        [(pts[0], 10.0), (pts[1], 20.0), (pts[2], 30.0)],
+        axis="x",
+        leader_style="angled",
+    )
+    assert len(ids) == 3
+    gids = {d["parameters"].get("group_id") for d in sketch.dimensions}
+    assert len(gids) == 1
+    assert all(d["parameters"].get("leader_style") == "angled" for d in sketch.dimensions)

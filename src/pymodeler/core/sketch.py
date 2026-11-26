@@ -234,9 +234,23 @@ class Sketch:
     def add_angle_dimension(self, line_a: str, line_b: str, value: float | str) -> str:
         return self.add_dimension("angle", [line_a, line_b], value)
 
-    def add_aligned_dimension(self, line_id: str, value: float | str, distance: float = 5.0) -> str:
-        """Add an aligned dimension (parallel to the entity)."""
-        return self.add_dimension("aligned", [line_id], value, parameters={"distance": distance})
+    def add_aligned_dimension(
+        self,
+        line_id: str,
+        value: float | str,
+        distance: float = 5.0,
+        leader_style: str = "straight",
+    ) -> str:
+        """Add an aligned dimension (parallel to the entity).
+
+        leader_style: 'straight' | 'angled' | 'none'
+        """
+        return self.add_dimension(
+            "aligned",
+            [line_id],
+            value,
+            parameters={"distance": distance, "leader_style": leader_style},
+        )
 
     def add_ordinate_dimension(
         self,
@@ -245,16 +259,22 @@ class Sketch:
         axis: str = "x",
         origin: Optional[Sequence[float]] = None,
         offset: float = 10.0,
+        leader_style: str = "straight",
+        group_id: Optional[str] = None,
     ) -> str:
         """Add an ordinate dimension from a point relative to an origin.
 
         axis: 'x' or 'y'
         origin: [x, y] or None (defaults to (0,0))
         offset: leader length
+        leader_style: 'straight' | 'angled' | 'none'
+        group_id: optional shared group for multi-feature ordinate sets
         """
-        params = {"axis": axis, "offset": offset}
+        params: dict = {"axis": axis, "offset": offset, "leader_style": leader_style}
         if origin is not None:
             params["origin"] = list(origin)
+        if group_id is not None:
+            params["group_id"] = group_id
         return self.add_dimension("ordinate", [point_id], value, parameters=params)
 
     # --- Query helpers ---

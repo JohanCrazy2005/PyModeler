@@ -57,7 +57,7 @@ class SketchEditorWidget(QWidget):
         self.tabs = QTabWidget()
         self.entities_table = self._make_entities_table()
         self.constraints_table = self._make_simple_table(["ID", "Type", "Entities"])
-        self.dimensions_table = self._make_simple_table(["ID", "Type", "Value", "Entities", "Driven"])
+        self.dimensions_table = self._make_simple_table(["ID", "Type", "Value", "Entities", "Driven", "Params"])
 
         self.tabs.addTab(self.entities_table, "Entities")
         self.tabs.addTab(self.constraints_table, "Constraints")
@@ -98,11 +98,17 @@ class SketchEditorWidget(QWidget):
         # Dimension add
         dim_layout = QHBoxLayout()
         self.dim_type = QComboBox()
-        self.dim_type.addItems(["length", "radius", "distance"])
+        self.dim_type.addItems(["length", "distance", "radius", "diameter", "angle", "aligned", "ordinate"])
+        self.dim_type.currentTextChanged.connect(self._on_dim_type_changed)
         dim_layout.addWidget(self.dim_type)
         self.dim_value = QLineEdit()
         self.dim_value.setPlaceholderText("value or param")
         dim_layout.addWidget(self.dim_value)
+        self.leader_style = QComboBox()
+        self.leader_style.addItems(["straight", "angled", "none"])
+        self.leader_style.setEnabled(False)
+        dim_layout.addWidget(QLabel("Leader:"))
+        dim_layout.addWidget(self.leader_style)
         self.add_dim_btn = QPushButton("Add Dimension")
         self.add_dim_btn.clicked.connect(self._add_dimension)
         dim_layout.addWidget(self.add_dim_btn)
@@ -230,6 +236,16 @@ class SketchEditorWidget(QWidget):
                 driven_item = QTableWidgetItem(str(dim.get("driven", False)))
                 driven_item.setFlags(driven_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 self.dimensions_table.setItem(row, 4, driven_item)
+
+                # Params summary (leader_style, group_id, axis, offset, ...)
+                params = dim.get("parameters") or {}
+                parts = []
+                for k in ("leader_style", "group_id", "axis", "offset", "origin", "distance"):
+                    if k in params:
+                        parts.append(f"{k}={params[k]}")
+                params_item = QTableWidgetItem(", ".join(parts) if parts else "")
+                params_item.setFlags(params_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+                self.dimensions_table.setItem(row, 5, params_item)
         finally:
             self._updating = False
         # Always refresh canvas after tables
@@ -358,6 +374,9 @@ class SketchEditorWidget(QWidget):
         self.refresh()
         self.sketch_changed.emit()
 
+    def _on_dim_type_changed(self, text: str) -> None:
+        self.leader_style.setEnabled(text in ("aligned", "ordinate"))
+
     def _add_dimension(self) -> None:
         if self.sketch is None:
             return
@@ -367,6 +386,7 @@ class SketchEditorWidget(QWidget):
             value: float | str = float(val_text)
         except ValueError:
             value = val_text
+        style = self.leader_style.currentText() if self.leader_style.isEnabled() else "straight"
 
         if dtype == "length":
             selected_lines = self._selected_entity_ids("line")
@@ -390,7 +410,51 @@ class SketchEditorWidget(QWidget):
                     return
                 target = circles[0]
             self.sketch.add_radius_dimension(target, value)
-        else:
+        elif dtype == "diameter":
+            selected = self._selected_entity_ids("circle") or self._selected_entity_ids("arc")
+            if selected:
+                target = selected[0]
+            else:
+                circles = self.sketch.entity_ids_by_type("circle")
+                if not circles:
+                    QMessageBox.warning(self, "Need Circle", "Add or select a circle first.")
+                    return
+                target = circles[0]
+            self.sketch.add_diameter_dimension(target, value)
+        elif dtype == "angle":
+            selected_lines = self._selected_entity_ids("line")
+            if len(selected_lines) >= 2:
+                a, b = selected_lines[0], selected_lines[1]
+            else:
+                lines = self.sketch.entity_ids_by_type("line")
+                if len(lines) < 2:
+                    QMessageBox.warning(self, "Need Lines", "Need two lines for angle.")
+                    return
+                a, b = lines[0], lines[1]
+            self.sketch.add_angle_dimension(a, b, value)
+        elif dtype == "aligned":
+            selected_lines = self._selected_entity_ids("line")
+            if selected_lines:
+                target = selected_lines[0]
+            else:
+                lines = self.sketch.entity_ids_by_type("line")
+                if not lines:
+                    QMessageBox.warning(self, "Need Line", "Add or select a line first.")
+                    return
+                target = lines[0]
+            self.sketch.add_aligned_dimension(target, value, leader_style=style)
+        elif dtype == "ordinate":
+            selected_points = self._selected_entity_ids("point")
+            if selected_points:
+                target = selected_points[0]
+            else:
+                points = self.sketch.entity_ids_by_type("point")
+                if not points:
+                    QMessageBox.warning(self, "Need Point", "Add or select a point first.")
+                    return
+                target = points[0]
+            self.sketch.add_ordinate_dimension(target, value, leader_style=style)
+        else:  # distance
             selected_points = self._selected_entity_ids("point")
             if len(selected_points) >= 2:
                 a, b = selected_points[0], selected_points[1]

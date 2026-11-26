@@ -42,3 +42,13 @@ Export sketch dimensions as proper DXF DIMENSION entities so shop drawings and m
 - Leaders / dimension groups.
 
 Last updated: 2026-11-25 (ordinate group helper + restored full DXF I/O)
+
+## Leader style (2026-11-26)
+- Ordinate and aligned dimensions accept `leader_style`: `straight` (axis-aligned leader), `angled` (diagonal offset), `none` (minimal leader).
+- Stored in dimension `parameters`.
+- DXF export (`_export_dimensions`) adjusts the offset vector accordingly.
+- Sketch editor exposes a dropdown (enabled only for aligned/ordinate) and shows params in the table.
+- `add_ordinate_group` stamps a shared `group_id` + the chosen style.
+
+Last updated: 2026-11-26 (leader style)
+

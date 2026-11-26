@@ -178,6 +178,11 @@ def _export_dimensions(sketch: Sketch, msp, point_map: dict) -> None:
                     ep = point_map.get(line.get("end_point"))
                     if sp and ep:
                         dist = float(params.get("distance", 5.0))
+                        style = params.get("leader_style", "straight")
+                        if style == "none":
+                            dist = 0.0
+                        elif style == "angled":
+                            dist = dist * 1.15  # slight extra offset for angled look
                         dim_ent = msp.add_aligned_dim(
                             p1=sp, p2=ep, distance=dist, dxfattribs={"layer": "DIMENSIONS"}
                         )
@@ -227,17 +232,25 @@ def _export_dimensions(sketch: Sketch, msp, point_map: dict) -> None:
                     origin = tuple(params.get("origin", (0.0, 0.0)))
                     offset = float(params.get("offset", 10.0))
                     axis = params.get("axis", "x")
+                    style = params.get("leader_style", "straight")
+                    # Respect leader_style: none → minimal leader, angled → diagonal offset
+                    if style == "none":
+                        ox, oy = (0.1, 0.0) if axis == "x" else (0.0, 0.1)
+                    elif style == "angled":
+                        ox, oy = (offset * 0.7, offset * 0.5) if axis == "x" else (offset * 0.5, offset * 0.7)
+                    else:  # straight
+                        ox, oy = (offset, 0.0) if axis == "x" else (0.0, offset)
                     if axis == "x":
                         dim_ent = msp.add_ordinate_x_dim(
                             feature_location=feat,
-                            offset=(offset, 0.0),
+                            offset=(ox, oy),
                             origin=origin,
                             dxfattribs={"layer": "DIMENSIONS"},
                         )
                     else:
                         dim_ent = msp.add_ordinate_y_dim(
                             feature_location=feat,
-                            offset=(0.0, offset),
+                            offset=(ox, oy),
                             origin=origin,
                             dxfattribs={"layer": "DIMENSIONS"},
                         )
@@ -363,16 +376,24 @@ def add_ordinate_group(
     axis: str = "x",
     origin: Sequence[float] = (0.0, 0.0),
     offset: float = 12.0,
+    leader_style: str = "straight",
+    group_id: Optional[str] = None,
 ) -> list[str]:
     """Create a multi-feature ordinate set sharing the same origin.
 
     points: sequence of (point_id, value) pairs.
     Returns list of dimension ids. Useful for manufacturing drawings
     that need stacked ordinates from a common datum.
+    Stamps a shared group_id and leader_style on each dimension.
     """
+    import uuid
+    gid = group_id or f"ordgrp_{uuid.uuid4().hex[:6]}"
     ids = []
     for pid, val in points:
-        did = sketch.add_ordinate_dimension(pid, val, axis=axis, origin=origin, offset=offset)
+        did = sketch.add_ordinate_dimension(
+            pid, val, axis=axis, origin=origin, offset=offset,
+            leader_style=leader_style, group_id=gid,
+        )
         ids.append(did)
     return ids
 

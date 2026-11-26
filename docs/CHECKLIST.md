@@ -71,6 +71,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Dimensions table Params column (axis/origin/offset/group/leader)
 - [x] Restored sketch_canvas.py from last good revision (was empty on main) — actually written as minimal QGraphicsView stub this run
 - [x] Sketch canvas: visual drawing of points/lines/circles/arcs + modes + snapping + selection highlight
+- [x] Leader style UI control (dropdown) + export respect for leader_style on ordinate/aligned dims
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated
@@ -78,4 +79,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-26 (sketch canvas drawing + interactivity)
+Last updated: 2026-11-26 (leader style UI + export respect)

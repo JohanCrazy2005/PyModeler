@@ -13,17 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Expanded SketchCanvasWidget from minimal stub to interactive visual canvas: draws points, lines, circles, and arcs with selection highlighting, basic snapping, preview while drawing, and modes (select/point/line/circle/rectangle). Wheel zoom. Matches existing test expectations for scene items and modes.
+- Added leader_style support (`straight` / `angled` / `none`) on ordinate and aligned dimensions.
+- Sketch editor: dropdown for leader style (enabled for aligned/ordinate), expanded dimension type combo, Params column in dimensions table.
+- DXF export respects leader_style (adjusts offset geometry for angled/none).
+- `add_ordinate_group` now stamps shared `group_id` + `leader_style`.
+- Tests cover storage and export of leader styles + group stamping.
 
 ### Next concrete tasks (Phase 4)
-1. Leader style UI control (dropdown) + export respect for leader_style on ordinate/aligned dims.
-2. Wire canvas modes into SketchEditor toolbar / buttons and improve snapping / dimension drawing on canvas.
-3. Viewport picking further polish or multi-object entity selection.
-4. Improve shell offset quality (true constant-thickness / openings via Boolean).
-5. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
-6. Import/Export: basic STEP later if geometry kernel allows.
+1. Wire canvas modes into SketchEditor toolbar / buttons and improve snapping / dimension drawing on canvas.
+2. Viewport picking further polish or multi-object entity selection.
+3. Improve shell offset quality (true constant-thickness / openings via Boolean).
+4. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
+5. Import/Export: basic STEP later if geometry kernel allows.
 
 ## Recently Completed
+- Leader style UI control + export respect for ordinate/aligned
 - Expanded sketch canvas drawing + basic interactivity
 - Ordinate groups UI exposure + group_id/leader_style (prior)
 - Restored full DXF I/O module
@@ -53,4 +57,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (canvas drawing expanded)
+Last updated: 2026-11-26 (leader style UI + DXF export respect)

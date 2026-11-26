@@ -93,4 +93,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (sketch canvas expanded to visual + interactive)
+Last updated: 2026-11-26 (leader style UI + export respect for ordinate/aligned dimensions)
