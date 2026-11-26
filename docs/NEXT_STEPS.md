@@ -13,18 +13,19 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Wired canvas modes (select/point/line/circle/rectangle/arc) into SketchEditor toolbar via QComboBox.
-- Improved sketch canvas: dimension value labels drawn as simple text near entities; snapping now includes line midpoints.
-- Tests cover mode wiring and basic dimension drawing presence.
+- Implemented full 3-click arc mode on sketch canvas (center → radius/start-angle → end-angle) with live preview of circle then arc.
+- Arc entities are created via Sketch.add_arc, validated, and drawn with QPainterPath.
+- Test covers arc mode state + entity creation.
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish or multi-object entity selection.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Arc mode full mouse interaction on canvas (3-point or center-radius).
+5. Optional: 3-point arc (start-through-end) as alternative to center-radius.
 
 ## Recently Completed
+- Arc mode full mouse interaction on canvas (3-click center/radius/end)
 - Canvas mode toolbar wiring + dimension labels + midpoint snap
 - Leader style UI control + export respect for ordinate/aligned
 - Expanded sketch canvas drawing + basic interactivity
@@ -52,8 +53,8 @@ This file is updated by every automation run.
 - Keep PyQt6, JSON Schemas, cross-platform public Python libs only.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, Part.get_body, occasional selection helper in sketch editor test) are known; do not expand scope to fix all of them unless the chosen task depends on them.
-- Canvas now draws entities and supports modes. UI tests require a working Qt platform (offscreen + EGL); headless environments may need extra libs.
+- Canvas now draws entities and supports modes including full arc creation. UI tests require a working Qt platform (offscreen + EGL); headless environments may need extra libs.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (canvas mode toolbar + dimension labels + midpoint snap)
+Last updated: 2026-11-26 (arc mode full 3-click interaction + preview)

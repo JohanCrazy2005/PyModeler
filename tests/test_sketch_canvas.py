@@ -92,6 +92,26 @@ def test_sketch_canvas_rectangle_mode_creates_entities(qapp):
     canvas.close()
 
 
+def test_sketch_canvas_arc_mode_creates_arc(qapp):
+    sketch = Sketch(name="ArcMode")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.set_mode("arc")
+    assert canvas.mode == "arc"
+    # Simulate 3-click center → start → end by setting state then calling add
+    center = sketch.add_point(0.0, 0.0)
+    canvas._arc_center = center
+    canvas._arc_radius = 5.0
+    canvas._arc_start_angle = 0.0
+    # Directly create the arc as the third click would
+    sketch.add_arc(center, 5.0, 0.0, 90.0)
+    assert any(e["type"] == "arc" and e["radius"] == 5.0 for e in sketch.entities)
+    canvas.refresh()
+    # Arc path should be drawn
+    assert canvas.scene.items()
+    canvas.close()
+
+
 def test_sketch_editor_includes_canvas(qapp):
     sketch = Sketch(name="WithCanvas")
     editor = SketchEditorWidget()

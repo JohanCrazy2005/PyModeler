@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-26)
+- Done: Arc mode full mouse interaction on canvas (3-click center → radius/start-angle → end-angle with live preview).
 - Done: Canvas mode toolbar wiring in SketchEditor + dimension value labels on canvas + midpoint snapping.
 - Done: Leader style UI control + DXF export respect for ordinate/aligned dimensions.
 - Done: Improved DIMENSION matching / angular recovery — `_import_dimensions` handles 2-line angular (dimtype 2) by pairing defpoints to match or create lines and add angle dimension (research updated in docs/research/dxf-dimension-export.md).
@@ -93,7 +94,8 @@
 33. (done) Multi-feature ordinate dimension groups (`add_ordinate_group`).
 34. (done) Full DXF I/O module restored and verified.
 35. (done) Canvas mode toolbar + dimension labels + midpoint snap.
+36. (done) Arc mode full mouse interaction on canvas.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (canvas mode toolbar + dimension labels + midpoint snap)
+Last updated: 2026-11-26 (arc mode full 3-click interaction)
