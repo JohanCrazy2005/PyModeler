@@ -69,7 +69,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Sketch editor: full dimension types (length/distance/radius/diameter/angle/aligned/ordinate)
 - [x] Ordinate group UI ("Add Ordinate Group") + group_id / leader_style on dimensions
 - [x] Dimensions table Params column (axis/origin/offset/group/leader)
-- [x] Restored sketch_canvas.py from last good revision (was empty on main)
+- [x] Restored sketch_canvas.py from last good revision (was empty on main) — actually written as minimal QGraphicsView stub this run
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated

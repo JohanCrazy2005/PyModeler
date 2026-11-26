@@ -13,20 +13,16 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Restored empty `sketch_canvas.py` from last good commit (pre-existing breakage).
-- Sketch editor UI: full dimension type support (length, distance, radius, diameter, angle, aligned, ordinate).
-- "Add Ordinate Group" button — creates multi-feature ordinate set for selected/all points.
-- `add_ordinate_group` now stamps shared `group_id` + `leader_style` on each dimension.
-- Dimensions table shows Params column (axis/origin/offset/group/leader).
-- Tests: new editor tests for ordinate/diameter/aligned/angle/group + strengthened DXF group test (20 relevant tests green; 1 pre-existing selection helper flake).
+- Actually restored minimal SketchCanvasWidget (QGraphicsView stub) so SketchEditor imports and remains runnable (previous "restore" left the file empty).
+- Confirmed ordinate group UI and full dimension types are present from prior commit.
 
 ### Next concrete tasks (Phase 4)
 1. Leader style UI control (dropdown) + export respect for leader_style on ordinate/aligned dims.
-2. Viewport picking further polish or multi-object entity selection.
-3. Improve shell offset quality (true constant-thickness / openings via Boolean).
-4. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
-5. Import/Export: basic STEP later if geometry kernel allows.
-6. Optional: y-axis ordinate group toggle + custom origin picker in UI.
+2. Expand canvas drawing (points/lines/circles visual) now that the widget exists.
+3. Viewport picking further polish or multi-object entity selection.
+4. Improve shell offset quality (true constant-thickness / openings via Boolean).
+5. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
+6. Import/Export: basic STEP later if geometry kernel allows.
 
 ## Recently Completed
 - Ordinate groups UI exposure + group_id/leader_style (this run)
@@ -57,4 +53,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (ordinate groups UI + full dim types in sketch editor)
+Last updated: 2026-11-25 (canvas actually restored)
