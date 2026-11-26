@@ -10,25 +10,32 @@ This file is updated by every automation run.
 
 ## Immediate Priority
 
-**Phase 4 polish + early manufacturing helpers. Next priorities below.**
+**Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Restored full DXF I/O module (export/import of entities, profiles, dimensions with point-to-segment matching, 2-line + 3-point angular recovery, bulge/SPLINE/ELLIPSE/TEXT).
-- Added `add_ordinate_group` helper for multi-feature ordinate sets sharing a common origin (manufacturing drawings).
-- Tests: 22 DXF tests pass (including new ordinate-group export).
+- Restored empty `sketch_canvas.py` from last good commit (pre-existing breakage).
+- Sketch editor UI: full dimension type support (length, distance, radius, diameter, angle, aligned, ordinate).
+- "Add Ordinate Group" button — creates multi-feature ordinate set for selected/all points.
+- `add_ordinate_group` now stamps shared `group_id` + `leader_style` on each dimension.
+- Dimensions table shows Params column (axis/origin/offset/group/leader).
+- Tests: new editor tests for ordinate/diameter/aligned/angle/group + strengthened DXF group test (20 relevant tests green; 1 pre-existing selection helper flake).
 
 ### Next concrete tasks (Phase 4)
-1. Viewport picking further polish or multi-object entity selection.
-2. Improve shell offset quality (true constant-thickness / openings via Boolean).
-3. Further manufacturing drawing polish (dimension groups UI, leaders, exact handle association).
-4. Import/Export: basic STEP later if geometry kernel allows.
-5. Dimension groups / multi-feature ordinate sets — basic helper done; next: UI exposure + leader style.
+1. Leader style UI control (dropdown) + export respect for leader_style on ordinate/aligned dims.
+2. Viewport picking further polish or multi-object entity selection.
+3. Improve shell offset quality (true constant-thickness / openings via Boolean).
+4. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
+5. Import/Export: basic STEP later if geometry kernel allows.
+6. Optional: y-axis ordinate group toggle + custom origin picker in UI.
 
 ## Recently Completed
-- Improved DIMENSION matching / angular recovery (this run)
+- Ordinate groups UI exposure + group_id/leader_style (this run)
+- Restored full DXF I/O module
+- Multi-feature ordinate dimension groups (`add_ordinate_group`)
+- Improved DIMENSION matching / angular recovery
 - Basic DIMENSION import recovery
 - Ordinate + aligned DIMENSION export
-- Better dimension placement (offset/side/angle + value-driven) 
+- Better dimension placement (offset/side/angle + value-driven)
 - DXF diameter + angular DIMENSION export
 - DXF DIMENSION export for length/radius
 - DXF SPLINE/ELLIPSE approximation + TEXT stub
@@ -39,15 +46,15 @@ This file is updated by every automation run.
 - Robust manifold repair
 - Better shell openings
 - Full unit system with suffixes
-- ... (prior items retained in history)
 
 ## Notes for next agent
 - Prefer small, complete, tested increments. Never break main.
 - Always validate against JSON schemas in schemas/.
 - Keep PyQt6, JSON Schemas, cross-platform public Python libs only.
 - Put generated artifacts under output/ when appropriate.
-- Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, SketchCanvasWidget import, Part.get_body) are unrelated; do not expand scope unless fixing them is the chosen task.
-- Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
-- Watch for files stored with literal `\\\\n` sequences — restore via unicode_escape if discovered.
+- Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, Part.get_body, occasional selection helper in sketch editor test) are known; do not expand scope to fix all of them unless the chosen task depends on them.
+- `sketch_canvas.py` was empty on main; restored from eefbc97. Watch for empty-file regressions on push.
 
-Last updated: 2026-11-25 (ordinate groups + full DXF I/O restored)
+Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
+
+Last updated: 2026-11-26 (ordinate groups UI + full dim types in sketch editor)
