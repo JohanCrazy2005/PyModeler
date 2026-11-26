@@ -433,7 +433,36 @@ def _import_dimensions(sketch: Sketch, msp, get_or_add_point) -> None:
                     # axis from dimtype bits or default x
                     axis = "y" if (entity.dxf.get("dimtype", 0) & 64) else "x"
                     sketch.add_ordinate_dimension(pid, value, axis=axis)
-            # angular (2) deferred — harder to match two lines
+            elif dimtype == 2:  # angular (2-line)
+                # Typical defpoints for angular_dim_2l:
+                # defpoint2/defpoint3 = first line endpoints
+                # defpoint4 / another = second line
+                # Fall back to creating lines from available points.
+                try:
+                    pts = []
+                    for attr in ("defpoint2", "defpoint3", "defpoint4", "defpoint5", "defpoint"):
+                        p = getattr(entity.dxf, attr, None)
+                        if p is not None:
+                            pts.append((float(p.x), float(p.y)))
+                    if len(pts) >= 4:
+                        # Pair first two and next two as lines (common pattern)
+                        l1_mid = ((pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2)
+                        l2_mid = ((pts[2][0] + pts[3][0]) / 2, (pts[2][1] + pts[3][1]) / 2)
+                        lid1 = nearest_entity(l1_mid[0], l1_mid[1], ("line",), tol=1.0)
+                        lid2 = nearest_entity(l2_mid[0], l2_mid[1], ("line",), tol=1.0)
+                        if not lid1:
+                            sp = get_or_add_point(pts[0][0], pts[0][1])
+                            ep = get_or_add_point(pts[1][0], pts[1][1])
+                            lid1 = sketch.add_line(sp, ep)
+                        if not lid2:
+                            sp = get_or_add_point(pts[2][0], pts[2][1])
+                            ep = get_or_add_point(pts[3][0], pts[3][1])
+                            lid2 = sketch.add_line(sp, ep)
+                        if lid1 and lid2 and lid1 != lid2:
+                            sketch.add_angle_dimension(lid1, lid2, value)
+                except Exception:
+                    pass
+            # future: 3-point angular, etc.
         except Exception:
             continue
 

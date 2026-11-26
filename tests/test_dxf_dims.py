@@ -140,15 +140,20 @@ def test_import_dimensions_roundtrip(tmp_path: Path):
     assert any(abs(v - 20.0) < 1.0 or abs(v - 10.0) < 1.0 for v in values)
 
 
-def test_import_radius_dimension(tmp_path: Path):
-    sketch = Sketch(name="RadImport")
-    c = sketch.add_point(0.0, 0.0)
-    circ = sketch.add_circle(c, 5.0)
-    sketch.add_radius_dimension(circ, 5.0)
-    out = tmp_path / "rad.dxf"
+def test_import_angular_dimension(tmp_path: Path):
+    """Export angular dimension then import recovers it as sketch angle dimension."""
+    sketch = Sketch(name="AngleImport")
+    o = sketch.add_point(0.0, 0.0)
+    p1 = sketch.add_point(10.0, 0.0)
+    p2 = sketch.add_point(0.0, 10.0)
+    l1 = sketch.add_line(o, p1)
+    l2 = sketch.add_line(o, p2)
+    sketch.add_angle_dimension(l1, l2, 90.0)
+    out = tmp_path / "angle.dxf"
     export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
 
     imported = import_dxf_to_sketch(out, import_dimensions=True)
-    rad_dims = [d for d in imported.dimensions if d["type"] == "radius"]
-    assert len(rad_dims) >= 1
-    assert abs(float(rad_dims[0]["value"]) - 5.0) < 0.5
+    angle_dims = [d for d in imported.dimensions if d["type"] == "angle"]
+    assert len(angle_dims) >= 1
+    assert abs(float(angle_dims[0]["value"]) - 90.0) < 1.0
+    assert len(angle_dims[0]["entities"]) == 2

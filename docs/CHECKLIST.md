@@ -64,6 +64,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Better dimension placement (user offset / side / angle + value-driven defaults)
 - [x] Ordinate / aligned dimension variants for manufacturing drawings
 - [x] Basic DIMENSION import recovery into sketch dimensions (length/aligned/radius/diameter/ordinate)
+- [x] Improved DIMENSION matching / angular recovery (2-line angular via defpoint pairing)
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated
@@ -71,4 +72,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-25 (DIMENSION import recovery)
+Last updated: 2026-11-25 (angular DIMENSION import recovery)

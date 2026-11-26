@@ -31,13 +31,13 @@ Export sketch dimensions as proper DXF DIMENSION entities so shop drawings and m
 ## Import (basic recovery)
 - `import_dxf_to_sketch(..., import_dimensions=True)` now recovers DIMENSION entities.
 - Uses `entity.get_measurement()` and definition points (`defpoint2`/`defpoint3` for linear/aligned, centers for radial/diameter, feature for ordinate).
-- Matches to nearest existing line/circle/point (tolerance ~0.5) or creates the supporting geometry.
-- Supports length/aligned, radius, diameter, ordinate. Angular deferred.
+- Matches to nearest existing line/circle/point (tolerance ~0.5–1.0) or creates the supporting geometry.
+- Supports length/aligned, radius, diameter, ordinate, and angular (2-line via defpoint pairing).
 - Failures skipped for robustness.
 
 ## Next
 - Better placement (use dimension value or user offset / leader side) — partially done.
-- Improved matching (exact entity association, angular recovery).
+- Improved matching (exact entity association).
 - Further ordinate group handling / multi-feature sets.
 - Leaders / dimension groups.
 

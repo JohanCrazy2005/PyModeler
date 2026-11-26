@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-25)
+- Done: Improved DIMENSION matching / angular recovery — `_import_dimensions` handles 2-line angular (dimtype 2) by pairing defpoints to match or create lines and add angle dimension (research updated in docs/research/dxf-dimension-export.md).
 - Done: Basic DIMENSION import recovery — `import_dxf_to_sketch` recovers length/aligned/radius/diameter/ordinate dimensions from DXF via get_measurement() + definition-point matching (research updated in docs/research/dxf-dimension-export.md).
 - Done: DXF import of SPLINE/ELLIPSE (polyline approx) + TEXT stub (metadata).
 - Done: Optional Boolean-based shell offset for closed inside shells (centroid-scale inner solid + mesh_boolean cut when engine available; fallback to wall-stitching). Research in docs/research/shell-boolean-offset.md.
@@ -86,7 +87,8 @@
 29. (done) DXF bulge-aware polyline import.
 30. (done) DXF DIMENSION export (length + radius + diameter + angular + aligned + ordinate).
 31. (done) Basic DIMENSION import recovery into sketch dimensions.
+32. (done) Improved DIMENSION matching / angular recovery.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-25 (DIMENSION import recovery)
+Last updated: 2026-11-25 (angular DIMENSION import recovery)

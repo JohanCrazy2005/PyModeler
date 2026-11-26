@@ -13,21 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Basic DIMENSION import recovery into sketch dimensions:
-  - `import_dxf_to_sketch(..., import_dimensions=True)` (default).
-  - Recovers length/aligned, radius, diameter, ordinate via `get_measurement()` + definition-point matching (or creates supporting geometry).
-  - Tests extended (`tests/test_dxf_dims.py` — roundtrip + radius).
+- Improved DIMENSION matching / angular recovery:
+  - `_import_dimensions` now handles dimtype == 2 (2-line angular).
+  - Pairs defpoint2/3 and defpoint4/5 (or available points) to match or create supporting lines.
+  - Creates angle dimension with recovered measurement.
+  - Tests extended (`tests/test_dxf_dims.py` — angular roundtrip).
   - Research note updated.
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish or multi-object entity selection.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
-3. Improved DIMENSION matching / angular recovery.
+3. Further manufacturing drawing polish (dimension groups, leaders, etc.).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Further manufacturing drawing polish (dimension groups, leaders, etc.).
+5. Improved matching for other dimension variants / exact entity association.
 
 ## Recently Completed
-- Basic DIMENSION import recovery (this run)
+- Improved DIMENSION matching / angular recovery (this run)
+- Basic DIMENSION import recovery
 - Ordinate + aligned DIMENSION export
 - Better dimension placement (offset/side/angle + value-driven) 
 - DXF diameter + angular DIMENSION export
@@ -51,4 +53,4 @@ This file is updated by every automation run.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 - Watch for files stored with literal `\\\\n` sequences — restore via unicode_escape if discovered.
 
-Last updated: 2026-11-25 (DIMENSION import recovery)
+Last updated: 2026-11-25 (angular DIMENSION import recovery)
