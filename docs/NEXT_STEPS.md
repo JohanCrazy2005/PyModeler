@@ -13,18 +13,16 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Improved dimension matching + 3-point angular recovery:
-  - Line entity matching now uses true point-to-segment distance (`_point_to_segment_dist`) for better association.
-  - Added dimtype == 5 (angular 3-point) recovery stub that creates supporting lines from defpoints and an angle dimension.
-  - Tests extended (`tests/test_dxf_dims.py` — 3-point stub).
-  - Research note updated.
+- Restored full DXF I/O module (export/import of entities, profiles, dimensions with point-to-segment matching, 2-line + 3-point angular recovery, bulge/SPLINE/ELLIPSE/TEXT).
+- Added `add_ordinate_group` helper for multi-feature ordinate sets sharing a common origin (manufacturing drawings).
+- Tests: 22 DXF tests pass (including new ordinate-group export).
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish or multi-object entity selection.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
-3. Further manufacturing drawing polish (dimension groups, leaders, exact handle association).
+3. Further manufacturing drawing polish (dimension groups UI, leaders, exact handle association).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Dimension groups / multi-feature ordinate sets.
+5. Dimension groups / multi-feature ordinate sets — basic helper done; next: UI exposure + leader style.
 
 ## Recently Completed
 - Improved DIMENSION matching / angular recovery (this run)
@@ -52,4 +50,4 @@ This file is updated by every automation run.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 - Watch for files stored with literal `\\\\n` sequences — restore via unicode_escape if discovered.
 
-Last updated: 2026-11-25 (improved matching + 3-point angular recovery)
+Last updated: 2026-11-25 (ordinate groups + full DXF I/O restored)

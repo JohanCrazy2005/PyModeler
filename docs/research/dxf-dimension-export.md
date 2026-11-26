@@ -37,8 +37,8 @@ Export sketch dimensions as proper DXF DIMENSION entities so shop drawings and m
 
 ## Next
 - Better placement (use dimension value or user offset / leader side) — partially done.
-- Improved matching (exact entity association).
-- Further ordinate group handling / multi-feature sets.
+- Improved matching (exact entity association) — point-to-segment matching done.
+- Further ordinate group handling / multi-feature sets — basic `add_ordinate_group` helper added (shared origin, stacked leaders).
 - Leaders / dimension groups.
 
-Last updated: 2026-11-25 (DIMENSION import recovery)
+Last updated: 2026-11-25 (ordinate group helper + restored full DXF I/O)

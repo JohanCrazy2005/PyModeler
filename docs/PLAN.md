@@ -88,7 +88,9 @@
 30. (done) DXF DIMENSION export (length + radius + diameter + angular + aligned + ordinate).
 31. (done) Basic DIMENSION import recovery into sketch dimensions.
 32. (done) Improved DIMENSION matching / angular recovery.
+33. (done) Multi-feature ordinate dimension groups (`add_ordinate_group`).
+34. (done) Full DXF I/O module restored and verified.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-25 (angular DIMENSION import recovery)
+Last updated: 2026-11-25 (ordinate groups + full DXF I/O restored)

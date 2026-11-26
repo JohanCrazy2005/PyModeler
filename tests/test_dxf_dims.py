@@ -157,3 +157,30 @@ def test_import_angular_dimension(tmp_path: Path):
     assert len(angle_dims) >= 1
     assert abs(float(angle_dims[0]["value"]) - 90.0) < 1.0
     assert len(angle_dims[0]["entities"]) == 2
+
+
+def test_ordinate_group_export(tmp_path: Path):
+    """Multi-feature ordinate set shares origin and exports as ordinate DIMENSIONS."""
+    from pymodeler.io.dxf import add_ordinate_group
+
+    sketch = Sketch(name="OrdGroup")
+    p1 = sketch.add_point(10.0, 0.0)
+    p2 = sketch.add_point(25.0, 0.0)
+    p3 = sketch.add_point(40.0, 0.0)
+    ids = add_ordinate_group(
+        sketch,
+        [(p1, 10.0), (p2, 25.0), (p3, 40.0)],
+        axis="x",
+        origin=(0.0, 0.0),
+        offset=15.0,
+    )
+    assert len(ids) == 3
+    assert all(d["type"] == "ordinate" for d in sketch.dimensions)
+    assert all(d.get("parameters", {}).get("origin") == [0.0, 0.0] for d in sketch.dimensions)
+
+    out = tmp_path / "ord_group.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
+    doc = ezdxf.readfile(out)
+    dims = list(doc.modelspace().query("DIMENSION"))
+    assert len(dims) >= 3
+    assert any(getattr(d, "dimtype", None) in (6, 70) for d in dims)
