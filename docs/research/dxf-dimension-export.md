@@ -28,9 +28,17 @@ Export sketch dimensions as proper DXF DIMENSION entities so shop drawings and m
 - Sketch helpers: `add_diameter_dimension`, `add_angle_dimension`, `add_aligned_dimension`, `add_ordinate_dimension`.
 - Schema enum extended with "aligned" and "ordinate".
 
+## Import (basic recovery)
+- `import_dxf_to_sketch(..., import_dimensions=True)` now recovers DIMENSION entities.
+- Uses `entity.get_measurement()` and definition points (`defpoint2`/`defpoint3` for linear/aligned, centers for radial/diameter, feature for ordinate).
+- Matches to nearest existing line/circle/point (tolerance ~0.5) or creates the supporting geometry.
+- Supports length/aligned, radius, diameter, ordinate. Angular deferred.
+- Failures skipped for robustness.
+
 ## Next
 - Better placement (use dimension value or user offset / leader side) — partially done.
-- Import of DIMENSION entities back into sketch dimensions (harder).
+- Improved matching (exact entity association, angular recovery).
 - Further ordinate group handling / multi-feature sets.
+- Leaders / dimension groups.
 
-Last updated: 2026-11-25 (ordinate + aligned)
+Last updated: 2026-11-25 (DIMENSION import recovery)

@@ -6,7 +6,7 @@ import ezdxf
 import pytest
 
 from pymodeler.core.sketch import Sketch, create_rectangle_sketch
-from pymodeler.io.dxf import export_sketch_to_dxf
+from pymodeler.io.dxf import export_sketch_to_dxf, import_dxf_to_sketch
 
 
 def test_export_with_length_dimensions(tmp_path: Path):
@@ -116,3 +116,39 @@ def test_export_with_ordinate_dimension(tmp_path: Path):
     assert len(dims) >= 2
     # Ordinate dimtype is 6
     assert any(getattr(d, "dimtype", None) in (6, 70) for d in dims) or len(dims) >= 2
+
+
+def test_import_dimensions_roundtrip(tmp_path: Path):
+    """Export dimensions then import recovers them as sketch dimensions."""
+    sketch = create_rectangle_sketch(width=20.0, height=10.0)
+    out = tmp_path / "rt_dims.dxf"
+    export_sketch_to_dxf(sketch, out, include_dimensions=True)
+
+    imported = import_dxf_to_sketch(out, name="ImportedDims", import_dimensions=True)
+    dims = imported.dimensions
+    # At least the two length dimensions should be recovered
+    assert len(dims) >= 2
+    types = {d["type"] for d in dims}
+    assert "length" in types or "aligned" in types
+    # Values should be approximately the original
+    values = []
+    for d in dims:
+        try:
+            values.append(float(d["value"]))
+        except (TypeError, ValueError):
+            pass
+    assert any(abs(v - 20.0) < 1.0 or abs(v - 10.0) < 1.0 for v in values)
+
+
+def test_import_radius_dimension(tmp_path: Path):
+    sketch = Sketch(name="RadImport")
+    c = sketch.add_point(0.0, 0.0)
+    circ = sketch.add_circle(c, 5.0)
+    sketch.add_radius_dimension(circ, 5.0)
+    out = tmp_path / "rad.dxf"
+    export_sketch_to_dxf(sketch, out, include_profiles=False, include_dimensions=True)
+
+    imported = import_dxf_to_sketch(out, import_dimensions=True)
+    rad_dims = [d for d in imported.dimensions if d["type"] == "radius"]
+    assert len(rad_dims) >= 1
+    assert abs(float(rad_dims[0]["value"]) - 5.0) < 0.5

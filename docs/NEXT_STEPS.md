@@ -13,22 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers. Next priorities below.**
 
 ### Done this run
-- Ordinate / aligned dimension variants for DXF export:
-  - Schema enum extended with "aligned" and "ordinate".
-  - Sketch helpers `add_aligned_dimension` and `add_ordinate_dimension`.
-  - Export uses ezdxf `add_aligned_dim` and `add_ordinate_x_dim` / `add_ordinate_y_dim`.
-  - Tests extended (`tests/test_dxf_dims.py` — 7 passed).
+- Basic DIMENSION import recovery into sketch dimensions:
+  - `import_dxf_to_sketch(..., import_dimensions=True)` (default).
+  - Recovers length/aligned, radius, diameter, ordinate via `get_measurement()` + definition-point matching (or creates supporting geometry).
+  - Tests extended (`tests/test_dxf_dims.py` — roundtrip + radius).
   - Research note updated.
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish or multi-object entity selection.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
-3. Optional: DIMENSION import back into sketch dimensions.
+3. Improved DIMENSION matching / angular recovery.
 4. Import/Export: basic STEP later if geometry kernel allows.
 5. Further manufacturing drawing polish (dimension groups, leaders, etc.).
 
 ## Recently Completed
-- Ordinate + aligned DIMENSION export (this run)
+- Basic DIMENSION import recovery (this run)
+- Ordinate + aligned DIMENSION export
 - Better dimension placement (offset/side/angle + value-driven) 
 - DXF diameter + angular DIMENSION export
 - DXF DIMENSION export for length/radius
@@ -51,4 +51,4 @@ This file is updated by every automation run.
 - Headless environments may lack libEGL; UI widget tests that need a display can be skipped or guarded.
 - Watch for files stored with literal `\\\\n` sequences — restore via unicode_escape if discovered.
 
-Last updated: 2026-11-25 (ordinate + aligned dimensions)
+Last updated: 2026-11-25 (DIMENSION import recovery)

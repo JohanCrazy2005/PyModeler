@@ -343,17 +343,113 @@ def export_profiles_to_dxf(
     return path
 
 
+def _import_dimensions(sketch: Sketch, msp, get_or_add_point) -> None:
+    """Recover basic DIMENSION entities into sketch dimensions.
+
+    Matches definition points to nearby existing entities (or creates points/lines)
+    and uses get_measurement() for the value. Skips on any failure.
+    """
+    # Build simple spatial index of existing entities by points
+    point_map = {e["id"]: (float(e["x"]), float(e["y"])) for e in sketch.entities if e["type"] == "point"}
+
+    def nearest_entity(x: float, y: float, etypes: tuple, tol: float = 0.5) -> Optional[str]:
+        best_id = None
+        best_d = tol
+        for e in sketch.entities:
+            if e["type"] not in etypes:
+                continue
+            if e["type"] == "line":
+                sp = point_map.get(e["start_point"])
+                ep = point_map.get(e["end_point"])
+                if sp and ep:
+                    # distance to segment midpoint as proxy
+                    mx, my = (sp[0] + ep[0]) / 2, (sp[1] + ep[1]) / 2
+                    d = math.hypot(mx - x, my - y)
+                    if d < best_d:
+                        best_d = d
+                        best_id = e["id"]
+            elif e["type"] in ("circle", "arc"):
+                cp = point_map.get(e["center"])
+                if cp:
+                    d = math.hypot(cp[0] - x, cp[1] - y)
+                    if d < best_d:
+                        best_d = d
+                        best_id = e["id"]
+            elif e["type"] == "point":
+                d = math.hypot(e["x"] - x, e["y"] - y)
+                if d < best_d:
+                    best_d = d
+                    best_id = e["id"]
+        return best_id
+
+    for entity in msp.query("DIMENSION"):
+        try:
+            dimtype = entity.dimtype
+            meas = entity.get_measurement()
+            if not isinstance(meas, (int, float)):
+                continue
+            value = float(meas)
+
+            if dimtype in (0, 1):  # linear / aligned
+                p1 = entity.dxf.defpoint2
+                p2 = entity.dxf.defpoint3
+                x1, y1 = float(p1.x), float(p1.y)
+                x2, y2 = float(p2.x), float(p2.y)
+                # Prefer existing line, else create
+                lid = nearest_entity((x1 + x2) / 2, (y1 + y2) / 2, ("line",))
+                if not lid:
+                    sp = get_or_add_point(x1, y1)
+                    ep = get_or_add_point(x2, y2)
+                    lid = sketch.add_line(sp, ep)
+                dtype = "aligned" if dimtype == 1 else "length"
+                sketch.add_dimension(dtype, [lid], value)
+            elif dimtype == 4:  # radius
+                # center is usually defpoint or defpoint4
+                center = getattr(entity.dxf, "defpoint", None) or entity.dxf.defpoint4
+                if center:
+                    cx, cy = float(center.x), float(center.y)
+                    cid = nearest_entity(cx, cy, ("circle", "arc"))
+                    if not cid:
+                        cpid = get_or_add_point(cx, cy)
+                        cid = sketch.add_circle(cpid, max(value, 0.1))
+                    sketch.add_radius_dimension(cid, value)
+            elif dimtype == 3:  # diameter
+                center = getattr(entity.dxf, "defpoint", None) or entity.dxf.defpoint4
+                if center:
+                    cx, cy = float(center.x), float(center.y)
+                    cid = nearest_entity(cx, cy, ("circle", "arc"))
+                    if not cid:
+                        cpid = get_or_add_point(cx, cy)
+                        cid = sketch.add_circle(cpid, max(value / 2, 0.1))
+                    sketch.add_diameter_dimension(cid, value)
+            elif dimtype == 6:  # ordinate
+                # feature location typically defpoint2 or similar
+                feat = entity.dxf.defpoint2
+                if feat:
+                    fx, fy = float(feat.x), float(feat.y)
+                    pid = nearest_entity(fx, fy, ("point",))
+                    if not pid:
+                        pid = get_or_add_point(fx, fy)
+                    # axis from dimtype bits or default x
+                    axis = "y" if (entity.dxf.get("dimtype", 0) & 64) else "x"
+                    sketch.add_ordinate_dimension(pid, value, axis=axis)
+            # angular (2) deferred — harder to match two lines
+        except Exception:
+            continue
+
+
 def import_dxf_to_sketch(
     path: Union[str, Path],
     *,
     name: str = "Imported Sketch",
     approx_distance: float = 0.1,
+    import_dimensions: bool = True,
 ) -> Sketch:
-    """Import LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE, SPLINE, ELLIPSE, and TEXT entities from a DXF file into a new Sketch.
+    """Import LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE, SPLINE, ELLIPSE, TEXT, and DIMENSION entities from a DXF file into a new Sketch.
 
     Only modelspace entities of those types are considered. Points are created as needed
     and entities reference them by id. Construction flag is not set. This is a basic
-    interchange helper for 2D geometry; full constraint/dimension recovery is deferred.
+    interchange helper for 2D geometry; full constraint recovery is deferred.
 
     - LWPOLYLINE / POLYLINE: uses ``virtual_entities()`` so bulge values are converted
       to proper ARC entities (straight segments remain LINE). Closed polylines are handled
@@ -361,6 +457,9 @@ def import_dxf_to_sketch(
     - SPLINE / ELLIPSE: approximated as connected LINE segments via ``flattening(distance=approx_distance)``.
     - TEXT: creates a point at the insert location; text content is stored in
       ``sketch.metadata["imported_texts"]`` as a list of dicts.
+    - DIMENSION (when ``import_dimensions=True``): recovers basic length/aligned, radius,
+      diameter, and ordinate dimensions by matching definition points to nearby entities
+      (or creating them) and using ``get_measurement()``. Failures are skipped.
     """
     path = Path(path)
     if not path.exists():
@@ -476,6 +575,10 @@ def import_dxf_to_sketch(
                 "rotation": float(getattr(entity.dxf, "rotation", 0.0) or 0.0),
                 "point_id": pid,
             })
+
+    # DIMENSION import (after geometry so entities exist for matching)
+    if import_dimensions:
+        _import_dimensions(sketch, msp, get_or_add_point)
 
     if imported_texts:
         sketch.metadata["imported_texts"] = imported_texts
