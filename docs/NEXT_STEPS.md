@@ -13,18 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Implemented full 3-click arc mode on sketch canvas (center → radius/start-angle → end-angle) with live preview of circle then arc.
-- Arc entities are created via Sketch.add_arc, validated, and drawn with QPainterPath.
-- Test covers arc mode state + entity creation.
+- Fixed SketchCanvasWidget RenderHint bug (`QPainter.RenderHint.Antialiasing`) so canvas tests pass under PyQt6.
+- Implemented optional 3-point arc mode (`arc3`): start → through → end, circle fit via perpendicular-bisector formula, CCW arc ordered through the middle point, live preview.
+- Helpers `_circle_from_3_points` and `_arc_angles_through`; wired mode into SketchEditor mode combo.
+- Tests: unit geometry + canvas arc3 path (9/9 sketch_canvas tests pass).
 
 ### Next concrete tasks (Phase 4)
-1. Viewport picking further polish or multi-object entity selection.
+1. Viewport picking further polish or multi-object entity selection on canvas.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Optional: 3-point arc (start-through-end) as alternative to center-radius.
+5. Canvas multi-select / box select for sketch entities (parity with viewport).
 
 ## Recently Completed
+- 3-point arc mode (arc3) + RenderHint fix
 - Arc mode full mouse interaction on canvas (3-click center/radius/end)
 - Canvas mode toolbar wiring + dimension labels + midpoint snap
 - Leader style UI control + export respect for ordinate/aligned
@@ -53,8 +55,9 @@ This file is updated by every automation run.
 - Keep PyQt6, JSON Schemas, cross-platform public Python libs only.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, Part.get_body, occasional selection helper in sketch editor test) are known; do not expand scope to fix all of them unless the chosen task depends on them.
-- Canvas now draws entities and supports modes including full arc creation. UI tests require a working Qt platform (offscreen + EGL); headless environments may need extra libs.
+- Canvas UI tests: use `QT_QPA_PLATFORM=offscreen` and ensure libEGL/libGL present on Linux CI.
+- Known broad test failures outside sketch_canvas are pre-existing; this run only required green sketch_canvas + no new breakage in touched modules.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (arc mode full 3-click interaction + preview)
+Last updated: 2026-11-27 (arc3 3-point arc + RenderHint fix)
