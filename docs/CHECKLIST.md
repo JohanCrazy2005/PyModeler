@@ -74,6 +74,8 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Leader style UI control (dropdown) + export respect for leader_style on ordinate/aligned dims
 - [x] Canvas mode toolbar in SketchEditor + dimension labels on canvas + midpoint snapping
 - [x] Arc mode full mouse interaction on canvas (3-click center → start/radius → end angle + live preview)
+- [x] Fixed SketchCanvas QPainter.RenderHint.Antialiasing (PyQt6 compatibility)
+- [x] 3-point arc mode (arc3): start → through → end, circle fit, CCW ordering, live preview, editor combo
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated
@@ -81,4 +83,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-26 (arc mode full 3-click interaction)
+Last updated: 2026-11-27 (arc3 3-point arc + RenderHint fix)
