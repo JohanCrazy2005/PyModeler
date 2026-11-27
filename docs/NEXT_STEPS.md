@@ -13,19 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Fixed SketchCanvasWidget RenderHint bug (`QPainter.RenderHint.Antialiasing`) so canvas tests pass under PyQt6.
-- Implemented optional 3-point arc mode (`arc3`): start → through → end, circle fit via perpendicular-bisector formula, CCW arc ordered through the middle point, live preview.
-- Helpers `_circle_from_3_points` and `_arc_angles_through`; wired mode into SketchEditor mode combo.
-- Tests: unit geometry + canvas arc3 path (9/9 sketch_canvas tests pass).
+- Restored full SketchCanvasWidget (was placeholder on main) with drawing modes, snapping, live preview, Antialiasing.
+- Implemented canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport picking).
+- Helpers for hit-testing, entity-in-rect, and selection highlighting via item.data(0).
+- Tests: all 10 sketch_canvas tests pass (including new multi/box select).
 
 ### Next concrete tasks (Phase 4)
-1. Viewport picking further polish or multi-object entity selection on canvas.
+1. Viewport picking further polish.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Canvas multi-select / box select for sketch entities (parity with viewport).
+5. Canvas constraint badges / dimension visual editing.
 
 ## Recently Completed
+- Canvas multi-select + box select + restored working canvas
 - 3-point arc mode (arc3) + RenderHint fix
 - Arc mode full mouse interaction on canvas (3-click center/radius/end)
 - Canvas mode toolbar wiring + dimension labels + midpoint snap
@@ -60,4 +61,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (arc3 3-point arc + RenderHint fix)
+Last updated: 2026-11-27 (canvas multi-select + box select, restored canvas)
