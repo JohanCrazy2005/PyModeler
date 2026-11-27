@@ -28,7 +28,8 @@
 - moderngl / PyOpenGL for viewport
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
-## Current Status (2026-11-26)
+## Current Status (2026-11-27)
+- Done: Canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport).
 - Done: Arc mode full mouse interaction on canvas (3-click center → radius/start-angle → end-angle with live preview).
 - Done: Canvas mode toolbar wiring in SketchEditor + dimension value labels on canvas + midpoint snapping.
 - Done: Leader style UI control + DXF export respect for ordinate/aligned dimensions.
@@ -95,7 +96,8 @@
 34. (done) Full DXF I/O module restored and verified.
 35. (done) Canvas mode toolbar + dimension labels + midpoint snap.
 36. (done) Arc mode full mouse interaction on canvas.
+37. (done) Canvas multi-select (Shift) + box select for sketch entities.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-26 (arc mode full 3-click interaction)
+Last updated: 2026-11-27 (canvas multi-select + box select)
