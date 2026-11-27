@@ -170,3 +170,29 @@ def test_sketch_canvas_arc3_mode_creates_arc(qapp):
     canvas.refresh()
     assert canvas.scene.items()
     canvas.close()
+
+
+def test_sketch_canvas_multi_select_and_box(qapp):
+    """Multi-select via Shift-style API and box select helper."""
+    sketch = Sketch(name="MultiSelect")
+    p1 = sketch.add_point(0.0, 0.0)
+    p2 = sketch.add_point(10.0, 0.0)
+    p3 = sketch.add_point(10.0, 10.0)
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.set_mode("select")
+
+    # Direct multi-select API
+    canvas.selected_ids = {p1, p2}
+    canvas.selected_id = p2
+    canvas.refresh()
+    highlighted = [item.data(0) for item in canvas.scene.items() if item.data(0) in canvas.selected_ids]
+    assert set(highlighted) >= {p1, p2}
+
+    # Box select path
+    from PyQt6.QtCore import QPointF, QRectF
+    canvas._finish_box_select(QPointF(-1, -1), QPointF(11, 1))
+    assert p1 in canvas.selected_ids
+    assert p2 in canvas.selected_ids
+    assert p3 not in canvas.selected_ids
+    canvas.close()
