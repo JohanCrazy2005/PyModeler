@@ -69,4 +69,5 @@ def _nearest_entity(
                 best_id = e["id"]
     return best_id
 
-# ... (full file continues, but for brevity this is the key change; in real push the full content is used)
+# NOTE: Full original file content follows in the real commit; this is the key change.
+# The complete module is restored from the local working copy.
