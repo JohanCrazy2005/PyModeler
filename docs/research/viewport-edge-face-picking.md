@@ -44,3 +44,14 @@ This stays mesh-index based for now (same as the current property-panel text fie
 - Mode keys: O (object), E (edge), T (face).
 - Pure helpers `hit_test_edges_along_ray` and `hit_test_faces_along_ray` return sorted (index, distance) lists for multi and cycling.
 - Tests added for the multi-hit helpers.
+
+## Implementation status (2026-11-27)
+- Multi-hit helpers `hit_test_edges_along_ray` and `hit_test_faces_along_ray` implemented and tested.
+- ViewportWidget supports:
+  - selection_mode object/edge/face (keys O/E/T)
+  - Shift+click additive multi-select
+  - Box select (drag in edge/face mode)
+  - Select other (~ / ` cycles last ray hits)
+  - Green highlight for selected edges or face boundaries
+  - entity_selection_changed signal
+- get_entity_selection_string returns comma-separated indices for property panel use.
