@@ -242,9 +242,14 @@ class ShellFeature:
             return None
 
     def _offset_mesh_inward(self, mesh: Mesh, thickness: float) -> Optional[Mesh]:
-        """Simple inward offset: scale vertices toward centroid by thickness.
+        """Create an inward-offset solid using mitered vertex normals.
 
-        This is an approximation; true constant-thickness offset requires a better kernel.
+        Uses per-vertex average normals scaled by a miter factor
+        (thickness / max(dot(avg_n, face_n), eps)) so that faces move
+        approximately by the requested thickness. Much better constant-
+        thickness approximation than centroid scaling, especially on boxes
+        and polyhedra with sharp corners. Still an approximation on high-
+        curvature or non-convex shapes.
         """
         try:
             import numpy as np
@@ -252,20 +257,85 @@ class ShellFeature:
             return None
 
         verts = np.asarray(mesh.vertices, dtype=float)
-        if len(verts) < 4:
+        if len(verts) < 4 or not mesh.faces:
             return None
-        centroid = verts.mean(axis=0)
-        # Compute average distance from centroid for scale factor
-        dists = np.linalg.norm(verts - centroid, axis=1)
-        avg_dist = float(dists.mean()) if len(dists) else 1.0
-        if avg_dist < 1e-8:
+
+        new_verts = self._mitered_offset_vertices(verts, mesh.faces, thickness, inward=True)
+        if new_verts is None:
             return None
-        # Scale so that surfaces move inward by approximately thickness
-        scale = max(0.1, (avg_dist - thickness) / avg_dist)
-        new_verts = centroid + (verts - centroid) * scale
-        # Reverse winding for inner solid (or keep and let Boolean handle)
         faces = [list(f) for f in mesh.faces]
         return Mesh(vertices=new_verts.tolist(), faces=faces, name=f"{mesh.name}_inner")
+
+    def _mitered_offset_vertices(
+        self,
+        verts,
+        faces: List[List[int]],
+        thickness: float,
+        inward: bool = True,
+    ):
+        """Return new vertex positions offset by thickness along mitered normals.
+
+        For each vertex, average the adjacent face normals, then scale the
+        offset distance by the maximum 1/cos(theta) relative to those faces
+        so the perpendicular distance to each adjacent face is ~thickness.
+        """
+        try:
+            import numpy as np
+        except ImportError:
+            return None
+
+        n_verts = len(verts)
+        # Face normals
+        face_normals = []
+        for f in faces:
+            if len(f) < 3:
+                face_normals.append(np.zeros(3))
+                continue
+            v0, v1, v2 = verts[f[0]], verts[f[1]], verts[f[2]]
+            n = np.cross(v1 - v0, v2 - v0)
+            norm = np.linalg.norm(n)
+            face_normals.append(n / norm if norm > 1e-12 else np.zeros(3))
+        face_normals = np.asarray(face_normals)
+
+        # Per-vertex: collect adjacent face indices and average normal
+        vert_face_idxs: List[List[int]] = [[] for _ in range(n_verts)]
+        for fi, f in enumerate(faces):
+            for vi in f:
+                if 0 <= vi < n_verts:
+                    vert_face_idxs[vi].append(fi)
+
+        new_verts = verts.copy()
+        sign = -1.0 if inward else 1.0
+        eps = 0.1  # avoid extreme miters on near-parallel or inverted
+
+        for vi in range(n_verts):
+            idxs = vert_face_idxs[vi]
+            if not idxs:
+                continue
+            adj_ns = face_normals[idxs]
+            # Area-weighted would be nicer but equal weight is fine for CAD meshes
+            avg_n = adj_ns.mean(axis=0)
+            anorm = np.linalg.norm(avg_n)
+            if anorm < 1e-8:
+                continue
+            avg_n /= anorm
+
+            # Miter scale: max required expansion so each face moves by thickness
+            scales = []
+            for fn in adj_ns:
+                cos_theta = float(np.dot(avg_n, fn))
+                if cos_theta > eps:
+                    scales.append(1.0 / cos_theta)
+            if not scales:
+                miter = 1.0
+            else:
+                miter = max(scales)  # conservative: ensure all faces reach thickness
+                miter = min(miter, 4.0)  # clamp extreme miters
+
+            offset = sign * thickness * miter * avg_n
+            new_verts[vi] = verts[vi] + offset
+
+        return new_verts
 
     def _wall_stitch_shell(self, mesh: Mesh, thickness: float) -> Mesh:
         """Fallback wall-stitching approximation: outer + offset inner + walls.
@@ -286,35 +356,45 @@ class ShellFeature:
         # Resolve opening faces
         open_indices = self._resolve_face_indices(faces, verts)
 
-        # Compute per-face normals
-        normals = []
-        for f in faces:
-            if len(f) < 3:
-                normals.append(np.zeros(3))
-                continue
-            v0, v1, v2 = verts[f[0]], verts[f[1]], verts[f[2]]
-            n = np.cross(v1 - v0, v2 - v0)
-            norm = np.linalg.norm(n)
-            normals.append(n / norm if norm > 1e-12 else np.zeros(3))
-        normals = np.asarray(normals)
-
-        # Vertex normals (area-weighted average of adjacent faces)
-        v_normals = np.zeros_like(verts)
-        for i, f in enumerate(faces):
-            for vi in f:
-                if 0 <= vi < len(verts):
-                    v_normals[vi] += normals[i]
-        v_norms = np.linalg.norm(v_normals, axis=1, keepdims=True)
-        v_norms[v_norms < 1e-12] = 1.0
-        v_normals /= v_norms
-
-        # Offset direction
+        # Use mitered offset for better constant-thickness approximation
         sign = -1.0 if self.direction == "inside" else 1.0
         if self.direction == "both":
-            sign = 0.0  # handled specially below; for simplicity use half
+            # For both, we currently approximate with half inside; full both
+            # would require outer + inner offsets.
+            sign = -1.0
+            offset_thickness = thickness / 2.0
+        else:
+            offset_thickness = thickness
 
-        offset_dist = thickness if self.direction != "both" else thickness / 2.0
-        inner_verts = verts + sign * offset_dist * v_normals
+        inner_verts_arr = self._mitered_offset_vertices(
+            verts, faces, offset_thickness, inward=(sign < 0)
+        )
+        if inner_verts_arr is None:
+            # Fallback to simple normal offset
+            # Compute per-face normals
+            normals = []
+            for f in faces:
+                if len(f) < 3:
+                    normals.append(np.zeros(3))
+                    continue
+                v0, v1, v2 = verts[f[0]], verts[f[1]], verts[f[2]]
+                n = np.cross(v1 - v0, v2 - v0)
+                norm = np.linalg.norm(n)
+                normals.append(n / norm if norm > 1e-12 else np.zeros(3))
+            normals = np.asarray(normals)
+
+            # Vertex normals
+            v_normals = np.zeros_like(verts)
+            for i, f in enumerate(faces):
+                for vi in f:
+                    if 0 <= vi < len(verts):
+                        v_normals[vi] += normals[i]
+            v_norms = np.linalg.norm(v_normals, axis=1, keepdims=True)
+            v_norms[v_norms < 1e-12] = 1.0
+            v_normals /= v_norms
+            inner_verts = verts + sign * offset_thickness * v_normals
+        else:
+            inner_verts = inner_verts_arr
 
         # Build result: outer faces (skip openings) + inner faces (reversed, skip openings) + walls
         result_verts = verts.tolist() + inner_verts.tolist()

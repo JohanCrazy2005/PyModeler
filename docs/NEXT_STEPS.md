@@ -13,23 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Viewport picking further polish:
-  - Multi-hit helpers `hit_test_edges_along_ray` / `hit_test_faces_along_ray` (sorted by distance).
-  - Shift+click additive multi-select for edges/faces.
-  - Basic box select (entities whose projected center is inside drag rect).
-  - Select other: ` / ~ key cycles among last ray hits.
-  - Mode keys: O (object), E (edge), T (face).
-  - Green highlight overlay for selected edges / face boundaries.
-  - Entity selection attributes properly initialized; signal `entity_selection_changed`.
-- Tests for multi-hit helpers already present and now pass.
+- Shell offset quality improvement:
+  - Replaced centroid-scale inward offset with mitered vertex-normal offset (scale by max 1/cos(θ) so faces move by requested thickness).
+  - Both Boolean path and wall-stitch fallback now use the mitered offset.
+  - Verified near-constant thickness on cubes (inner extent = outer − thickness).
+  - Fixed `create_cube` face winding so all normals point outward.
+  - Research note updated in `docs/research/shell-boolean-offset.md`.
+  - Tests added/updated; shell tests green (Boolean test skipped without manifold3d).
 
 ### Next concrete tasks (Phase 4)
-1. Improve shell offset quality (true constant-thickness / openings via Boolean).
-2. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
-3. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
+1. Manufacturing drawing polish (dimension groups UI grouping, exact handle association).
+2. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
+3. Openings via Boolean (still deferred; wall path handles them).
 4. Import/Export: basic STEP later if geometry kernel allows.
 
 ## Recently Completed
+- Shell offset quality (mitered vertex-normal offset for near-constant thickness on polyhedra; used by Boolean + wall paths; cube winding fixed)
 - Viewport picking further polish (multi-select, box, select-other, mode keys, highlight)
 - Canvas badge related selection + hover highlight + dimension edit + full canvas restore
 - Canvas badge polish (toggle, hover, double-click dimension edit)
@@ -69,4 +68,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (viewport picking further polish)
+Last updated: 2026-11-27 (shell offset quality – mitered vertex normals)

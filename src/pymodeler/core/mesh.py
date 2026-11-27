@@ -589,12 +589,12 @@ def create_cube(size: float = 2.0, name: str = "Cube") -> Mesh:
     ]
     # 6 faces, each a quad (order matters for winding)
     faces = [
-        [0, 1, 2, 3],  # bottom
-        [4, 5, 6, 7],  # top
-        [0, 1, 5, 4],  # front
-        [2, 3, 7, 6],  # back
-        [0, 3, 7, 4],  # left
-        [1, 2, 6, 5],  # right
+        [0, 3, 2, 1],  # bottom (z=-s) outward -Z
+        [4, 5, 6, 7],  # top (z=+s) outward +Z
+        [0, 1, 5, 4],  # front (y=-s) outward -Y
+        [2, 3, 7, 6],  # back (y=+s) outward +Y
+        [0, 4, 7, 3],  # left (x=-s) outward -X
+        [1, 2, 6, 5],  # right (x=+s) outward +X
     ]
     return Mesh(vertices=vertices, faces=faces, name=name)
 

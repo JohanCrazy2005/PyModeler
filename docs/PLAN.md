@@ -29,7 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
-- Done: Viewport picking further polish (multi-select Shift, box select via projected centers, select-other cycling with ~, mode keys O/E/T, green entity highlight, multi-hit ray helpers).
+- Done: Shell offset quality improvement (mitered vertex-normal offset replacing centroid scale; both Boolean and wall paths use it; near-constant thickness on boxes; create_cube winding corrected for outward normals). Research updated in docs/research/shell-boolean-offset.md.
 - Done: Canvas constraint and dimension badges (simple text labels H/V/C/= etc. and type:value near midpoints/centers, tooltips, data(1) marker).
 - Done: Canvas badge polish (toggle, hover related highlight, click select related, double-click dimension edit). Full SketchCanvasWidget restored.
 - Done: Canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport).
@@ -105,4 +105,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (viewport picking further polish)
+Last updated: 2026-11-27 (shell offset quality – mitered vertex normals)

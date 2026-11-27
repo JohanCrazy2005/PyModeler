@@ -59,13 +59,41 @@ def test_shell_boolean_path_preferred_when_available():
         pass
 
 
-def test_shell_opening_produces_rim():
+def test_shell_mitered_offset_constant_thickness_on_cube():
+    """Mitered offset should produce near-constant wall thickness on a cube.
+
+    On a cube the miter factor for corners is sqrt(3) ≈ 1.732, so faces move
+    by exactly the requested thickness. We verify the inner bounding box is
+    reduced by ~2*thickness in each dimension.
+    """
+    import numpy as np
     cube = create_cube(size=10.0)
-    # Open the top face (index 0 is usually +Y for create_cube; we use named)
-    shell = ShellFeature(thickness=1.0, faces=["top"], direction="inside")
+    thickness = 1.5
+    shell = ShellFeature(thickness=thickness, direction="inside", faces=[])
+    # Force wall path by temporarily disabling Boolean preference for measurement
+    # (or just call the offset helper)
+    verts = np.asarray(cube.vertices, dtype=float)
+    inner = shell._mitered_offset_vertices(verts, cube.faces, thickness, inward=True)
+    assert inner is not None
+    # Outer half-extent is 5.0; inner should be ~5.0 - thickness
+    outer_extent = np.max(np.abs(verts), axis=0)
+    inner_extent = np.max(np.abs(inner), axis=0)
+    expected = outer_extent - thickness
+    # Allow small numerical tolerance
+    assert np.allclose(inner_extent, expected, atol=0.05), (
+        f"inner extent {inner_extent} != expected {expected}"
+    )
+
+
+def test_shell_wall_path_uses_mitered_offset():
+    """Wall-stitch path should also produce reasonable thickness."""
+    cube = create_cube(size=10.0)
+    shell = ShellFeature(thickness=1.0, direction="inside", faces=["top"])
     result = shell.apply_to_mesh(cube)
     assert result is not None
-    assert len(result.faces) > len(cube.faces)  # walls added
+    assert len(result.faces) > len(cube.faces)
+    # Basic sanity: result has both outer and inner vertices
+    assert len(result.vertices) > len(cube.vertices)
 
 
 def test_shell_invalid_thickness_on_apply():
