@@ -19,7 +19,7 @@ def test_circle_from_3points_semicircle():
 
 def test_circle_from_3points_collinear():
     assert circle_from_3points(0.0, 0.0, 1.0, 0.0, 2.0, 0.0) is None
-    assert circle_from_3points(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2.0) is None
+    assert circle_from_3points(0.0, 0.0, 0.0, 1.0, 0.0, 2.0) is None
 
 
 def test_circle_from_3points_quarter():
