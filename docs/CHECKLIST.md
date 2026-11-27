@@ -36,7 +36,7 @@ Living checklist. Mark [x] when complete and tested.
 - [x] Canvas badge polish: visibility toggle, hover highlight, double-click dimension edit, related-entity selection on badge click
 - [x] Viewport picking further polish (multi-select Shift, box select, select-other ~, mode keys O/E/T, green entity highlight, multi-hit helpers)
 - [x] Improve shell offset quality (true constant-thickness / openings via Boolean)
-- [ ] Manufacturing drawing polish (dimension groups UI, handle association)
+- [x] Manufacturing drawing polish (dimension groups UI, handle association)
 - [ ] Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges
 - [ ] Basic STEP import/export (when geometry kernel allows)
 
@@ -46,4 +46,4 @@ Living checklist. Mark [x] when complete and tested.
 - [ ] CAM toolpaths beyond stubs
 - [ ] Assemblies with more mate types
 
-Last updated: 2026-11-27 (shell constant-thickness Boolean offset)
+Last updated: 2026-11-27 (manufacturing drawing polish – ordinate groups UI)

@@ -13,21 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Shell offset quality improved (true constant-thickness + openings via Boolean):
-  - Miter-corrected vertex-normal offset (`_offset_mesh`) replaces centroid scaling.
-  - Boolean path for `inside` / `outside` / `both` directions.
-  - Openings: selected faces removed from outer surface after Boolean (`_remove_opening_faces`).
-  - Wall-stitch fallback uses the same miter-corrected normals.
-  - Volume accuracy on unit cube: inside t=1 → 488, outside t=1 → 728, both t=2 → 1216.
-  - Expanded `tests/test_shell.py` (10 tests, all green when manifold3d present).
+- Manufacturing drawing polish (dimension groups UI grouping + exact handle association):
+  - Research note in `docs/research/manufacturing-drawings.md` (Fusion / Onshape / Inventor ordinate sets).
+  - Sketch Editor: new "Add Ordinate Group" button – select ≥2 points, creates shared-origin ordinate set via `add_ordinate_group` (group_id + leader_style stamped).
+  - Dimensions table: dedicated Group column; groups visible together.
+  - DXF import matching: tighter default tolerance (0.5) on `_nearest_entity` for exact handle association.
+  - Test: `test_sketch_editor_ordinate_group`.
 
 ### Next concrete tasks (Phase 4)
-1. Manufacturing drawing polish (dimension groups UI grouping, exact handle association).
-2. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
-3. Import/Export: basic STEP later if geometry kernel allows.
-4. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
+1. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
+2. Import/Export: basic STEP later if geometry kernel allows.
+3. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
+4. Further manufacturing drawing polish (group move-together behavior on canvas, origin indicator).
 
 ## Recently Completed
+- Manufacturing drawing polish (ordinate group UI + tighter entity association)
 - Shell constant-thickness Boolean offset + openings
 - Viewport picking further polish (multi-select, box, select-other, mode keys, highlight)
 - Canvas badge related selection + hover highlight + dimension edit + full canvas restore
@@ -68,4 +68,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (shell constant-thickness Boolean offset)
+Last updated: 2026-11-27 (manufacturing drawing polish – ordinate groups UI)
