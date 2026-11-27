@@ -123,3 +123,50 @@ def test_sketch_editor_includes_canvas(qapp):
     # Canvas should reflect the change
     assert editor.canvas.scene.items()
     editor.close()
+
+
+def test_circle_from_3_points_and_arc_angles():
+    from pymodeler.ui.sketch_canvas import _circle_from_3_points, _arc_angles_through
+    # Unit circle points: (1,0), (0,1), (-1,0) → center (0,0) r=1
+    c = _circle_from_3_points(1.0, 0.0, 0.0, 1.0, -1.0, 0.0)
+    assert c is not None
+    cx, cy, r = c
+    assert abs(cx) < 1e-9 and abs(cy) < 1e-9
+    assert abs(r - 1.0) < 1e-9
+    # Collinear → None
+    assert _circle_from_3_points(0.0, 0.0, 1.0, 0.0, 2.0, 0.0) is None
+    # Arc angles: start 0°, through 90°, end 180° → sweep 180
+    sa, ea = _arc_angles_through(0.0, 90.0, 180.0)
+    assert abs(sa - 0.0) < 1e-9
+    assert abs((ea - sa) % 360 - 180.0) < 1e-6
+
+
+def test_sketch_canvas_arc3_mode_creates_arc(qapp):
+    sketch = Sketch(name="Arc3Mode")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.set_mode("arc3")
+    assert canvas.mode == "arc3"
+    # Simulate 3 clicks via state + geometry helper path
+    from pymodeler.ui.sketch_canvas import _circle_from_3_points, _arc_angles_through
+    from PyQt6.QtCore import QPointF
+    p1 = sketch.add_point(1.0, 0.0)
+    p2 = sketch.add_point(0.0, 1.0)
+    canvas._arc3_p1 = p1
+    canvas._arc3_p2 = p2
+    # Third point (-1, 0) → semicircle upper
+    circle = _circle_from_3_points(1.0, 0.0, 0.0, 1.0, -1.0, 0.0)
+    assert circle is not None
+    cx, cy, r = circle
+    center_id = canvas._find_or_add_point(QPointF(cx, cy), tol=0.25)
+    a1 = 0.0
+    a2 = 90.0
+    a3 = 180.0
+    sa, ea = _arc_angles_through(a1, a2, a3)
+    sketch.add_arc(center_id, r, sa, ea)
+    arcs = [e for e in sketch.entities if e["type"] == "arc"]
+    assert len(arcs) == 1
+    assert abs(arcs[0]["radius"] - 1.0) < 1e-6
+    canvas.refresh()
+    assert canvas.scene.items()
+    canvas.close()
