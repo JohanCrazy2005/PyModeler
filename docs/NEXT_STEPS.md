@@ -13,22 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Shell offset quality improvement:
-  - Replaced centroid-scale inward offset with mitered vertex-normal offset (scale by max 1/cos(θ) so faces move by requested thickness).
-  - Both Boolean path and wall-stitch fallback now use the mitered offset.
-  - Verified near-constant thickness on cubes (inner extent = outer − thickness).
-  - Fixed `create_cube` face winding so all normals point outward.
-  - Research note updated in `docs/research/shell-boolean-offset.md`.
-  - Tests added/updated; shell tests green (Boolean test skipped without manifold3d).
+- Shell offset quality improved (true constant-thickness + openings via Boolean):
+  - Miter-corrected vertex-normal offset (`_offset_mesh`) replaces centroid scaling.
+  - Boolean path for `inside` / `outside` / `both` directions.
+  - Openings: selected faces removed from outer surface after Boolean (`_remove_opening_faces`).
+  - Wall-stitch fallback uses the same miter-corrected normals.
+  - Volume accuracy on unit cube: inside t=1 → 488, outside t=1 → 728, both t=2 → 1216.
+  - Expanded `tests/test_shell.py` (10 tests, all green when manifold3d present).
 
 ### Next concrete tasks (Phase 4)
 1. Manufacturing drawing polish (dimension groups UI grouping, exact handle association).
 2. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
-3. Openings via Boolean (still deferred; wall path handles them).
-4. Import/Export: basic STEP later if geometry kernel allows.
+3. Import/Export: basic STEP later if geometry kernel allows.
+4. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
 
 ## Recently Completed
-- Shell offset quality (mitered vertex-normal offset for near-constant thickness on polyhedra; used by Boolean + wall paths; cube winding fixed)
+- Shell constant-thickness Boolean offset + openings
 - Viewport picking further polish (multi-select, box, select-other, mode keys, highlight)
 - Canvas badge related selection + hover highlight + dimension edit + full canvas restore
 - Canvas badge polish (toggle, hover, double-click dimension edit)
@@ -49,7 +49,7 @@ This file is updated by every automation run.
 - DXF diameter + angular DIMENSION export
 - DXF DIMENSION export for length/radius
 - DXF SPLINE/ELLIPSE approximation + TEXT stub
-- Boolean-based shell offset for closed inside shells
+- Boolean-based shell offset for closed inside shells (centroid scale — superseded)
 - DXF bulge-aware polyline import
 - True Archimedean + morphing spiral toolpaths
 - Robust manifold repair
@@ -63,9 +63,9 @@ This file is updated by every automation run.
 - Put generated artifacts under output/ when appropriate.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, Part.get_body, occasional selection helper in sketch editor test) are known; do not expand scope to fix all of them unless the chosen task depends on them.
 - Canvas UI tests: use `QT_QPA_PLATFORM=offscreen` and ensure libEGL/libGL present on Linux CI.
-- Known broad test failures outside sketch_canvas are pre-existing; this run only required green sketch_canvas + no new breakage in touched modules.
-- Current HEAD previously had a truncated sketch_canvas.py; full implementation is restored.
+- Known broad test failures outside the touched modules are pre-existing.
+- Shell Boolean path requires `trimesh` + `manifold3d`; without them wall-stitch still works.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (shell offset quality – mitered vertex normals)
+Last updated: 2026-11-27 (shell constant-thickness Boolean offset)
