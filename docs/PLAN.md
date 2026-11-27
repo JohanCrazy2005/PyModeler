@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
+- Done: Viewport picking further polish (multi-select Shift, box select via projected centers, select-other cycling with ~, mode keys O/E/T, green entity highlight, multi-hit ray helpers).
 - Done: Canvas constraint and dimension badges (simple text labels H/V/C/= etc. and type:value near midpoints/centers, tooltips, data(1) marker).
 - Done: Canvas badge polish (toggle, hover related highlight, click select related, double-click dimension edit). Full SketchCanvasWidget restored.
 - Done: Canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport).
@@ -100,7 +101,8 @@
 36. (done) Arc mode full mouse interaction on canvas.
 37. (done) Canvas multi-select (Shift) + box select for sketch entities.
 38. (done) Canvas constraint and dimension badges.
+39. (done) Viewport picking further polish (multi-select, box, select-other, mode keys, highlight).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas badge related selection + full canvas restore)
+Last updated: 2026-11-27 (viewport picking further polish)
