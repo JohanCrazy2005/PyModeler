@@ -34,7 +34,7 @@ Living checklist. Mark [x] when complete and tested.
 - [x] Sheet-metal rule + bend allowance
 - [x] Rectangular nesting + toolpath / G-code stubs
 - [x] Canvas badge polish: visibility toggle, hover highlight, double-click dimension edit, related-entity selection on badge click
-- [ ] Viewport picking further polish
+- [x] Viewport picking further polish (multi-select Shift, box select, select-other ~, mode keys O/E/T, green entity highlight, multi-hit helpers)
 - [ ] Improve shell offset quality (true constant-thickness / openings via Boolean)
 - [ ] Manufacturing drawing polish (dimension groups UI, handle association)
 - [ ] Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges
@@ -46,4 +46,4 @@ Living checklist. Mark [x] when complete and tested.
 - [ ] CAM toolpaths beyond stubs
 - [ ] Assemblies with more mate types
 
-Last updated: 2026-11-27 (canvas badge related selection + restored full canvas)
+Last updated: 2026-11-27 (viewport picking further polish)
