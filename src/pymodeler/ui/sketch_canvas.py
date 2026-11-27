@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import (
     QGraphicsItem,
     QGraphicsTextItem,
     QWidget,
+    QInputDialog,
 )
 
 from pymodeler.core import Sketch
@@ -101,6 +102,7 @@ class SketchCanvasWidget(QGraphicsView):
         self._snap_tol = 0.5  # scene units
         self.show_badges: bool = True
         self._hovered_badge: Optional[QGraphicsTextItem] = None
+        self._related_ids: Set[str] = set()
 
     def set_show_badges(self, show: bool) -> None:
         """Toggle visibility of constraint and dimension badges."""
@@ -136,16 +138,18 @@ class SketchCanvasWidget(QGraphicsView):
         # Draw constraint and dimension badges
         self._draw_badges()
 
-        # Highlight selected
+        # Highlight selected and related (from badge hover/click)
+        related = getattr(self, "_related_ids", set())
         for item in self.scene.items():
             eid = item.data(0)
-            if eid and (eid == self.selected_id or eid in self.selected_ids):
+            if eid and (eid == self.selected_id or eid in self.selected_ids or eid in related):
                 if isinstance(item, QGraphicsEllipseItem) and item.rect().width() < 10:
                     item.setBrush(QBrush(QColor(255, 200, 50)))
                     item.setPen(QPen(QColor(255, 220, 80), 2))
                 else:
                     pen = item.pen()
-                    pen.setColor(QColor(255, 200, 50))
+                    color = QColor(120, 220, 255) if eid in related and eid not in self.selected_ids else QColor(255, 200, 50)
+                    pen.setColor(color)
                     pen.setWidth(2)
                     item.setPen(pen)
 
@@ -177,7 +181,7 @@ class SketchCanvasWidget(QGraphicsView):
             if pos is None:
                 continue
             self._add_badge(pos[0], pos[1], label, tooltip=f"{con.get('type')} {ents}",
-                            badge_type="constraint", badge_index=idx)
+                            badge_type="constraint", badge_index=idx, related_ids=ents)
 
         for idx, dim in enumerate(self.sketch.dimensions):
             dtype = dim.get("type", "dim")
@@ -192,7 +196,7 @@ class SketchCanvasWidget(QGraphicsView):
             # Offset dimensions a bit further
             ox, oy = pos
             self._add_badge(ox + 4.0, oy + 4.0, label, tooltip=f"{dtype}={value} {ents}",
-                            is_dim=True, badge_type="dimension", badge_index=idx)
+                            is_dim=True, badge_type="dimension", badge_index=idx, related_ids=ents)
 
     def _badge_position_for_entity(self, eid: str) -> Optional[Tuple[float, float]]:
         """Return a good (x, y) for a badge near an entity."""
@@ -214,7 +218,8 @@ class SketchCanvasWidget(QGraphicsView):
         return None
 
     def _add_badge(self, x: float, y: float, text: str, tooltip: str = "", is_dim: bool = False,
-                   badge_type: str = "constraint", badge_index: int = -1) -> None:
+                   badge_type: str = "constraint", badge_index: int = -1,
+                   related_ids: Optional[List[str]] = None) -> None:
         """Add a small text badge at (x, y)."""
         item = QGraphicsTextItem(text)
         item.setPos(x, y - 6)
@@ -225,7 +230,426 @@ class SketchCanvasWidget(QGraphicsView):
         item.setData(1, "badge")
         item.setData(2, badge_type)
         item.setData(3, badge_index)
+        item.setData(4, related_ids or [])
         self.scene.addItem(item)
 
-    # ... (rest of the file continues with drawing, mouse events, hover, double-click, etc.)
-    # Full implementation includes the hover and double-click methods added in this run.
+    def _badge_at(self, pos: QPointF) -> Optional[QGraphicsTextItem]:
+        """Return the badge item under the scene position, if any."""
+        for item in self.scene.items(pos):
+            if isinstance(item, QGraphicsTextItem) and item.data(1) == "badge":
+                return item
+        return None
+
+    def mouseDoubleClickEvent(self, event):
+        """Double-click a dimension badge to edit its value."""
+        if self.sketch is None or event.button() != Qt.MouseButton.LeftButton:
+            return super().mouseDoubleClickEvent(event)
+        pos = self.mapToScene(event.position().toPoint())
+        badge = self._badge_at(pos)
+        if badge is None or badge.data(2) != "dimension":
+            return super().mouseDoubleClickEvent(event)
+        idx = badge.data(3)
+        if not isinstance(idx, int) or idx < 0 or idx >= len(self.sketch.dimensions):
+            return
+        dim = self.sketch.dimensions[idx]
+        current = str(dim.get("value", ""))
+        new_val, ok = QInputDialog.getText(self, "Edit Dimension", "Value:", text=current)
+        if ok and new_val.strip():
+            dim["value"] = new_val.strip()
+            self.sketch.validate()
+            self.refresh()
+            self.sketch_changed.emit()
+
+    def _draw_entity(self, ent: dict) -> None:
+        eid = ent["id"]
+        etype = ent["type"]
+        pen = QPen(QColor(180, 200, 220), 1.5)
+        brush = QBrush(QColor(100, 140, 180))
+
+        if etype == "point":
+            x, y = ent["x"], ent["y"]
+            item = self.scene.addEllipse(x - POINT_RADIUS, y - POINT_RADIUS,
+                                          POINT_RADIUS * 2, POINT_RADIUS * 2, pen, brush)
+            item.setData(0, eid)
+            item.setZValue(10)
+        elif etype == "line":
+            start = self.sketch.get_entity(ent["start_point"])
+            end = self.sketch.get_entity(ent["end_point"])
+            if start and end:
+                item = self.scene.addLine(start["x"], start["y"], end["x"], end["y"], pen)
+                item.setData(0, eid)
+        elif etype == "circle":
+            center = self.sketch.get_entity(ent["center"])
+            if center:
+                r = ent["radius"]
+                item = self.scene.addEllipse(center["x"] - r, center["y"] - r, r * 2, r * 2, pen)
+                item.setData(0, eid)
+        elif etype == "arc":
+            center = self.sketch.get_entity(ent["center"])
+            if center:
+                r = ent["radius"]
+                sa = ent["start_angle"]
+                ea = ent["end_angle"]
+                # Approximate arc with path
+                path = self._arc_path(center["x"], center["y"], r, sa, ea)
+                item = self.scene.addPath(path, pen)
+                item.setData(0, eid)
+
+    def _arc_path(self, cx: float, cy: float, r: float, sa_deg: float, ea_deg: float):
+        from PyQt6.QtGui import QPainterPath
+        path = QPainterPath()
+        steps = max(8, int(abs(ea_deg - sa_deg) / 5))
+        for i in range(steps + 1):
+            t = i / steps
+            ang = math.radians(sa_deg + t * ((ea_deg - sa_deg) % 360))
+            x = cx + r * math.cos(ang)
+            y = cy + r * math.sin(ang)
+            if i == 0:
+                path.moveTo(x, y)
+            else:
+                path.lineTo(x, y)
+        return path
+
+    def _clear_preview(self) -> None:
+        if self._preview_item:
+            self.scene.removeItem(self._preview_item)
+            self._preview_item = None
+
+    def _clear_box(self) -> None:
+        if self._box_item:
+            self.scene.removeItem(self._box_item)
+            self._box_item = None
+        self._box_start = None
+
+    def _find_or_add_point(self, pos: QPointF, tol: float = 0.25) -> str:
+        """Snap to existing point or add a new one. Returns entity id."""
+        if self.sketch is None:
+            return ""
+        best = None
+        best_d = tol
+        for ent in self.sketch.entities:
+            if ent["type"] == "point":
+                d = math.hypot(ent["x"] - pos.x(), ent["y"] - pos.y())
+                if d < best_d:
+                    best_d = d
+                    best = ent["id"]
+        if best:
+            return best
+        return self.sketch.add_point(pos.x(), pos.y())
+
+    def mousePressEvent(self, event):
+        if self.sketch is None or event.button() != Qt.MouseButton.LeftButton:
+            return super().mousePressEvent(event)
+        pos = self.mapToScene(event.position().toPoint())
+        modifiers = event.modifiers()
+
+        # Badge interaction: click selects related entities
+        badge = self._badge_at(pos)
+        if badge is not None:
+            related = badge.data(4) or []
+            if isinstance(related, list):
+                self.selected_ids = set(related)
+                self.selected_id = related[0] if related else None
+                self._related_ids = set(related)
+                self.refresh()
+                return
+
+        if self.mode == "select":
+            # Box select start or click select
+            hit = self._hit_test(pos)
+            if hit:
+                if modifiers & Qt.KeyboardModifier.ShiftModifier:
+                    if hit in self.selected_ids:
+                        self.selected_ids.remove(hit)
+                    else:
+                        self.selected_ids.add(hit)
+                    self.selected_id = hit
+                else:
+                    self.selected_ids = {hit}
+                    self.selected_id = hit
+                self._drag_entity = hit
+            else:
+                if not (modifiers & Qt.KeyboardModifier.ShiftModifier):
+                    self.selected_ids.clear()
+                    self.selected_id = None
+                self._box_start = pos
+            self.refresh()
+            return
+
+        if self.mode == "point":
+            self._find_or_add_point(pos)
+            self.sketch.validate()
+            self.refresh()
+            self.sketch_changed.emit()
+            return
+
+        if self.mode in ("line", "rectangle", "circle"):
+            self._start_point = self._find_or_add_point(pos)
+            return
+
+        if self.mode == "arc":
+            if self._arc_center is None:
+                self._arc_center = self._find_or_add_point(pos)
+            elif self._arc_radius == 0.0:
+                c = self.sketch.get_entity(self._arc_center)
+                if c:
+                    self._arc_radius = math.hypot(pos.x() - c["x"], pos.y() - c["y"])
+                    self._arc_start_angle = math.degrees(math.atan2(pos.y() - c["y"], pos.x() - c["x"]))
+            else:
+                # third click: end angle
+                c = self.sketch.get_entity(self._arc_center)
+                if c:
+                    ea = math.degrees(math.atan2(pos.y() - c["y"], pos.x() - c["x"]))
+                    self.sketch.add_arc(self._arc_center, self._arc_radius, self._arc_start_angle, ea)
+                    self.sketch.validate()
+                    self._arc_center = None
+                    self._arc_radius = 0.0
+                    self.refresh()
+                    self.sketch_changed.emit()
+            return
+
+        if self.mode == "arc3":
+            pid = self._find_or_add_point(pos)
+            if self._arc3_p1 is None:
+                self._arc3_p1 = pid
+            elif self._arc3_p2 is None:
+                self._arc3_p2 = pid
+            else:
+                p1 = self.sketch.get_entity(self._arc3_p1)
+                p2 = self.sketch.get_entity(self._arc3_p2)
+                p3 = self.sketch.get_entity(pid)
+                if p1 and p2 and p3:
+                    circ = _circle_from_3_points(p1["x"], p1["y"], p2["x"], p2["y"], p3["x"], p3["y"])
+                    if circ:
+                        cx, cy, r = circ
+                        center_id = self._find_or_add_point(QPointF(cx, cy), tol=0.25)
+                        a1 = math.degrees(math.atan2(p1["y"] - cy, p1["x"] - cx))
+                        a2 = math.degrees(math.atan2(p2["y"] - cy, p2["x"] - cx))
+                        a3 = math.degrees(math.atan2(p3["y"] - cy, p3["x"] - cx))
+                        sa, ea = _arc_angles_through(a1, a2, a3)
+                        self.sketch.add_arc(center_id, r, sa, ea)
+                        self.sketch.validate()
+                        self.refresh()
+                        self.sketch_changed.emit()
+                self._arc3_p1 = None
+                self._arc3_p2 = None
+            return
+
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if self.sketch is None:
+            return super().mouseMoveEvent(event)
+        pos = self.mapToScene(event.position().toPoint())
+
+        # Hover highlight on badges + related entities
+        badge = self._badge_at(pos)
+        new_related = set()
+        if badge is not None:
+            rel = badge.data(4) or []
+            if isinstance(rel, list):
+                new_related = set(rel)
+            # Brighten badge color
+            if badge is not self._hovered_badge:
+                if self._hovered_badge is not None:
+                    is_dim = self._hovered_badge.data(2) == "dimension"
+                    self._hovered_badge.setDefaultTextColor(
+                        QColor(255, 220, 100) if is_dim else QColor(140, 220, 140)
+                    )
+                badge.setDefaultTextColor(QColor(255, 255, 180))
+                self._hovered_badge = badge
+        else:
+            if self._hovered_badge is not None:
+                is_dim = self._hovered_badge.data(2) == "dimension"
+                self._hovered_badge.setDefaultTextColor(
+                    QColor(255, 220, 100) if is_dim else QColor(140, 220, 140)
+                )
+                self._hovered_badge = None
+        if new_related != self._related_ids:
+            self._related_ids = new_related
+            self.refresh()
+            return
+
+        if self.mode == "select" and self._box_start is not None:
+            self._update_box(self._box_start, pos)
+            return
+
+        if self.mode == "select" and self._drag_entity and event.buttons() & Qt.MouseButton.LeftButton:
+            # Simple drag for points
+            ent = self.sketch.get_entity(self._drag_entity)
+            if ent and ent["type"] == "point":
+                self.sketch.update_point(self._drag_entity, pos.x(), pos.y())
+                self.refresh()
+            return
+
+        # Live preview for drawing modes
+        self._clear_preview()
+        pen = QPen(QColor(120, 180, 255), 1, Qt.PenStyle.DashLine)
+        if self.mode == "line" and self._start_point:
+            start = self.sketch.get_entity(self._start_point)
+            if start:
+                self._preview_item = self.scene.addLine(start["x"], start["y"], pos.x(), pos.y(), pen)
+        elif self.mode == "circle" and self._start_point:
+            start = self.sketch.get_entity(self._start_point)
+            if start:
+                r = math.hypot(pos.x() - start["x"], pos.y() - start["y"])
+                self._preview_item = self.scene.addEllipse(start["x"] - r, start["y"] - r, r * 2, r * 2, pen)
+        elif self.mode == "rectangle" and self._start_point:
+            start = self.sketch.get_entity(self._start_point)
+            if start:
+                rect = QRectF(start["x"], start["y"], pos.x() - start["x"], pos.y() - start["y"]).normalized()
+                self._preview_item = self.scene.addRect(rect, pen)
+        elif self.mode == "arc" and self._arc_center and self._arc_radius > 0:
+            c = self.sketch.get_entity(self._arc_center)
+            if c:
+                ea = math.degrees(math.atan2(pos.y() - c["y"], pos.x() - c["x"]))
+                path = self._arc_path(c["x"], c["y"], self._arc_radius, self._arc_start_angle, ea)
+                self._preview_item = self.scene.addPath(path, pen)
+
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if self.sketch is None or event.button() != Qt.MouseButton.LeftButton:
+            return super().mouseReleaseEvent(event)
+        pos = self.mapToScene(event.position().toPoint())
+
+        if self.mode == "select" and self._box_start is not None:
+            self._finish_box_select(self._box_start, pos)
+            self._clear_box()
+            self.refresh()
+            return
+
+        self._drag_entity = None
+        self._clear_preview()
+
+        if self.mode == "line" and self._start_point:
+            end = self._find_or_add_point(pos)
+            if end != self._start_point:
+                self.sketch.add_line(self._start_point, end)
+                self.sketch.validate()
+                self.refresh()
+                self.sketch_changed.emit()
+            self._start_point = None
+            return
+
+        if self.mode == "circle" and self._start_point:
+            start = self.sketch.get_entity(self._start_point)
+            if start:
+                r = math.hypot(pos.x() - start["x"], pos.y() - start["y"])
+                if r > 0.1:
+                    self.sketch.add_circle(self._start_point, r)
+                    self.sketch.validate()
+                    self.refresh()
+                    self.sketch_changed.emit()
+            self._start_point = None
+            return
+
+        if self.mode == "rectangle" and self._start_point:
+            start = self.sketch.get_entity(self._start_point)
+            if start:
+                x1, y1 = start["x"], start["y"]
+                x2, y2 = pos.x(), pos.y()
+                if abs(x2 - x1) > 0.1 and abs(y2 - y1) > 0.1:
+                    p_br = self.sketch.add_point(x2, y1)
+                    p_tr = self.sketch.add_point(x2, y2)
+                    p_tl = self.sketch.add_point(x1, y2)
+                    self.sketch.add_line(self._start_point, p_br)
+                    self.sketch.add_line(p_br, p_tr)
+                    self.sketch.add_line(p_tr, p_tl)
+                    self.sketch.add_line(p_tl, self._start_point)
+                    self.sketch.validate()
+                    self.refresh()
+                    self.sketch_changed.emit()
+            self._start_point = None
+            return
+
+        super().mouseReleaseEvent(event)
+
+    def _hit_test(self, pos: QPointF) -> Optional[str]:
+        """Return closest entity id within tolerance, or None."""
+        if self.sketch is None:
+            return None
+        best = None
+        best_d = SELECT_TOL
+        for ent in self.sketch.entities:
+            d = self._distance_to_entity(pos, ent)
+            if d is not None and d < best_d:
+                best_d = d
+                best = ent["id"]
+        return best
+
+    def _distance_to_entity(self, pos: QPointF, ent: dict) -> Optional[float]:
+        etype = ent["type"]
+        if etype == "point":
+            return math.hypot(ent["x"] - pos.x(), ent["y"] - pos.y())
+        if etype == "line":
+            s = self.sketch.get_entity(ent["start_point"])
+            e = self.sketch.get_entity(ent["end_point"])
+            if s and e:
+                return self._point_to_segment(pos, s["x"], s["y"], e["x"], e["y"])
+        if etype == "circle":
+            c = self.sketch.get_entity(ent["center"])
+            if c:
+                d = abs(math.hypot(pos.x() - c["x"], pos.y() - c["y"]) - ent["radius"])
+                return d
+        if etype == "arc":
+            c = self.sketch.get_entity(ent["center"])
+            if c:
+                d = abs(math.hypot(pos.x() - c["x"], pos.y() - c["y"]) - ent["radius"])
+                # crude: also check angle range later if needed
+                return d
+        return None
+
+    @staticmethod
+    def _point_to_segment(p: QPointF, x1: float, y1: float, x2: float, y2: float) -> float:
+        dx, dy = x2 - x1, y2 - y1
+        if dx == 0 and dy == 0:
+            return math.hypot(p.x() - x1, p.y() - y1)
+        t = max(0.0, min(1.0, ((p.x() - x1) * dx + (p.y() - y1) * dy) / (dx * dx + dy * dy)))
+        px, py = x1 + t * dx, y1 + t * dy
+        return math.hypot(p.x() - px, p.y() - py)
+
+    def _update_box(self, start: QPointF, end: QPointF) -> None:
+        self._clear_box()
+        rect = QRectF(start, end).normalized()
+        pen = QPen(QColor(100, 160, 255), 1, Qt.PenStyle.DashLine)
+        brush = QBrush(QColor(100, 160, 255, 40))
+        self._box_item = self.scene.addRect(rect, pen, brush)
+        self._box_start = start
+
+    def _finish_box_select(self, start: QPointF, end: QPointF) -> None:
+        rect = QRectF(start, end).normalized()
+        if rect.width() < 1 and rect.height() < 1:
+            return
+        new_sel = set()
+        for ent in self.sketch.entities:
+            if self._entity_in_rect(ent, rect):
+                new_sel.add(ent["id"])
+        self.selected_ids = new_sel
+        self.selected_id = next(iter(new_sel), None)
+
+    def _entity_in_rect(self, ent: dict, rect: QRectF) -> bool:
+        etype = ent["type"]
+        if etype == "point":
+            return rect.contains(QPointF(ent["x"], ent["y"]))
+        if etype == "line":
+            s = self.sketch.get_entity(ent["start_point"])
+            e = self.sketch.get_entity(ent["end_point"])
+            if s and e:
+                return (rect.contains(QPointF(s["x"], s["y"])) or
+                        rect.contains(QPointF(e["x"], e["y"])) or
+                        self._segment_intersects_rect(s["x"], s["y"], e["x"], e["y"], rect))
+        if etype in ("circle", "arc"):
+            c = self.sketch.get_entity(ent["center"])
+            if c:
+                # bounding box approximation
+                r = ent["radius"]
+                bb = QRectF(c["x"] - r, c["y"] - r, r * 2, r * 2)
+                return rect.intersects(bb)
+        return False
+
+    @staticmethod
+    def _segment_intersects_rect(x1, y1, x2, y2, rect: QRectF) -> bool:
+        # Simple: check if either endpoint or midpoint is inside, or edges cross (approximate)
+        mid = QPointF((x1 + x2) / 2, (y1 + y2) / 2)
+        return rect.contains(mid)

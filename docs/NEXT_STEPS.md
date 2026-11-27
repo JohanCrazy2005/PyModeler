@@ -13,19 +13,24 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas badge polish: `show_badges` flag + `set_show_badges()`, hover highlight on badges, double-click dimension badge opens edit dialog and updates value.
-- Badges now store type + index in item data (2/3).
-- Research note in docs/research/sketch-canvas-badges.md.
-- Tests for toggle and dimension index storage.
+- Restored full SketchCanvasWidget (previous HEAD had truncated the file to a placeholder comment).
+- Canvas badge polish continued: badges store type + index + related entity IDs (data 2/3/4).
+- Hover on badge brightens glyph and highlights related entities (cyan).
+- Click on badge selects the related entities.
+- Double-click on dimension badge opens QInputDialog to edit value.
+- `show_badges` flag + `set_show_badges()`.
+- Research note updated in docs/research/sketch-canvas-badges.md.
+- Tests for toggle and related storage.
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
-4. Import/Export: basic STEP later if geometry kernel allows.
-5. Canvas badges further polish: proper glyphs / SVG, in-place edit, related-constraint selection.
+4. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
+5. Import/Export: basic STEP later if geometry kernel allows.
 
 ## Recently Completed
+- Canvas badge related selection + hover highlight + dimension edit + full canvas restore
 - Canvas badge polish (toggle, hover, double-click dimension edit)
 - Canvas constraint + dimension badges
 - Canvas multi-select + box select + restored working canvas
@@ -60,7 +65,8 @@ This file is updated by every automation run.
 - Pre-existing failures (materials schema drift, FeatureHistory.get_extrude_features, Part.get_body, occasional selection helper in sketch editor test) are known; do not expand scope to fix all of them unless the chosen task depends on them.
 - Canvas UI tests: use `QT_QPA_PLATFORM=offscreen` and ensure libEGL/libGL present on Linux CI.
 - Known broad test failures outside sketch_canvas are pre-existing; this run only required green sketch_canvas + no new breakage in touched modules.
+- Current HEAD previously had a truncated sketch_canvas.py; full implementation is restored.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas badge polish: toggle, hover, double-click edit)
+Last updated: 2026-11-27 (canvas badge related selection + full canvas restore)

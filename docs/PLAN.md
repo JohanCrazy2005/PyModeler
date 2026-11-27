@@ -30,6 +30,7 @@
 
 ## Current Status (2026-11-27)
 - Done: Canvas constraint and dimension badges (simple text labels H/V/C/= etc. and type:value near midpoints/centers, tooltips, data(1) marker).
+- Done: Canvas badge polish (toggle, hover related highlight, click select related, double-click dimension edit). Full SketchCanvasWidget restored.
 - Done: Canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport).
 - Done: Arc mode full mouse interaction on canvas (3-click center → radius/start-angle → end-angle with live preview).
 - Done: Canvas mode toolbar wiring in SketchEditor + dimension value labels on canvas + midpoint snapping.
@@ -102,4 +103,4 @@
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas constraint and dimension badges)
+Last updated: 2026-11-27 (canvas badge related selection + full canvas restore)

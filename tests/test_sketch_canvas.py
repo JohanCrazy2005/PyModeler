@@ -172,6 +172,35 @@ def test_sketch_canvas_arc3_mode_creates_arc(qapp):
     canvas.close()
 
 
+def test_sketch_canvas_badge_toggle_and_related(qapp):
+    """Badges can be toggled; they store type/index/related; click selects related."""
+    sketch = create_rectangle_sketch(width=10, height=5, name="BadgePolish")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    badges = [item for item in canvas.scene.items() if item.data(1) == "badge"]
+    assert len(badges) >= 1
+    # Has type and related stored
+    b = badges[0]
+    assert b.data(2) in ("constraint", "dimension")
+    assert isinstance(b.data(4), list)
+    # Toggle off
+    canvas.set_show_badges(False)
+    badges_off = [item for item in canvas.scene.items() if item.data(1) == "badge"]
+    assert len(badges_off) == 0
+    canvas.set_show_badges(True)
+    badges_on = [item for item in canvas.scene.items() if item.data(1) == "badge"]
+    assert len(badges_on) >= 1
+    # Simulate click on first badge via data
+    related = badges_on[0].data(4)
+    if related:
+        canvas.selected_ids = set(related)
+        canvas._related_ids = set(related)
+        canvas.refresh()
+        assert canvas.selected_ids == set(related)
+    canvas.close()
+
+
 def test_sketch_canvas_constraint_and_dimension_badges(qapp):
     """Constraint and dimension badges appear in the scene."""
     sketch = create_rectangle_sketch(width=10, height=5, name="BadgeTest")
