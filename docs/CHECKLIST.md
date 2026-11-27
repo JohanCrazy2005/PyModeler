@@ -76,6 +76,7 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [x] Arc mode full mouse interaction on canvas (3-click center → start/radius → end angle + live preview)
 - [x] Fixed SketchCanvas QPainter.RenderHint.Antialiasing (PyQt6 compatibility)
 - [x] 3-point arc mode (arc3): start → through → end, circle fit, CCW ordering, live preview, editor combo
+- [x] Canvas multi-select (Shift) + box select for sketch entities (parity with viewport)
 
 ## Ongoing
 - [ ] Keep all major modules schema-validated
@@ -83,4 +84,4 @@ Mark completed items. Prefer Phase 1 → Phase 2 → etc.
 - [ ] Research notes under docs/research/ for new areas
 - [ ] Living docs (CHECKLIST / PLAN / NEXT_STEPS) updated every run
 
-Last updated: 2026-11-27 (arc3 3-point arc + RenderHint fix)
+Last updated: 2026-11-27 (canvas multi-select + box select)
