@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
+- Done: Canvas constraint and dimension badges (simple text labels H/V/C/= etc. and type:value near midpoints/centers, tooltips, data(1) marker).
 - Done: Canvas multi-select (Shift toggle) + rubber-band box select for sketch entities (parity with viewport).
 - Done: Arc mode full mouse interaction on canvas (3-click center → radius/start-angle → end-angle with live preview).
 - Done: Canvas mode toolbar wiring in SketchEditor + dimension value labels on canvas + midpoint snapping.
@@ -97,7 +98,8 @@
 35. (done) Canvas mode toolbar + dimension labels + midpoint snap.
 36. (done) Arc mode full mouse interaction on canvas.
 37. (done) Canvas multi-select (Shift) + box select for sketch entities.
+38. (done) Canvas constraint and dimension badges.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas multi-select + box select)
+Last updated: 2026-11-27 (canvas constraint and dimension badges)

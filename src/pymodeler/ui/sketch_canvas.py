@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
     QGraphicsLineItem,
     QGraphicsPathItem,
     QGraphicsItem,
+    QGraphicsTextItem,
     QWidget,
 )
 
@@ -125,6 +126,9 @@ class SketchCanvasWidget(QGraphicsView):
         for ent in self.sketch.entities:
             self._draw_entity(ent)
 
+        # Draw constraint and dimension badges
+        self._draw_badges()
+
         # Highlight selected
         for item in self.scene.items():
             eid = item.data(0)
@@ -137,6 +141,79 @@ class SketchCanvasWidget(QGraphicsView):
                     pen.setColor(QColor(255, 200, 50))
                     pen.setWidth(2)
                     item.setPen(pen)
+
+    def _draw_badges(self) -> None:
+        """Draw simple constraint and dimension badges near related entities."""
+        if self.sketch is None:
+            return
+
+        # Constraint type to short label
+        ctype_labels = {
+            "horizontal": "H",
+            "vertical": "V",
+            "coincident": "C",
+            "parallel": "//",
+            "perpendicular": "⊥",
+            "equal": "=",
+            "tangent": "T",
+            "fixed": "F",
+            "concentric": "◎",
+            "midpoint": "M",
+        }
+
+        for con in self.sketch.constraints:
+            label = ctype_labels.get(con.get("type", ""), "?")
+            ents = con.get("entities") or []
+            if not ents:
+                continue
+            pos = self._badge_position_for_entity(ents[0])
+            if pos is None:
+                continue
+            self._add_badge(pos[0], pos[1], label, tooltip=f"{con.get('type')} {ents}")
+
+        for dim in self.sketch.dimensions:
+            dtype = dim.get("type", "dim")
+            value = dim.get("value", "")
+            label = f"{dtype[:1].upper()}:{value}"
+            ents = dim.get("entities") or []
+            if not ents:
+                continue
+            pos = self._badge_position_for_entity(ents[0])
+            if pos is None:
+                continue
+            # Offset dimensions a bit further
+            ox, oy = pos
+            self._add_badge(ox + 4.0, oy + 4.0, label, tooltip=f"{dtype}={value} {ents}", is_dim=True)
+
+    def _badge_position_for_entity(self, eid: str) -> Optional[Tuple[float, float]]:
+        """Return a good (x, y) for a badge near an entity."""
+        ent = self.sketch.get_entity(eid) if self.sketch else None
+        if not ent:
+            return None
+        etype = ent.get("type")
+        if etype == "point":
+            return (ent["x"], ent["y"])
+        if etype == "line":
+            s = self.sketch.get_entity(ent["start_point"])
+            e = self.sketch.get_entity(ent["end_point"])
+            if s and e:
+                return ((s["x"] + e["x"]) / 2.0, (s["y"] + e["y"]) / 2.0)
+        if etype in ("circle", "arc"):
+            c = self.sketch.get_entity(ent["center"])
+            if c:
+                return (c["x"], c["y"])
+        return None
+
+    def _add_badge(self, x: float, y: float, text: str, tooltip: str = "", is_dim: bool = False) -> None:
+        """Add a small text badge at (x, y)."""
+        item = QGraphicsTextItem(text)
+        item.setPos(x, y - 6)
+        item.setDefaultTextColor(QColor(255, 220, 100) if is_dim else QColor(140, 220, 140))
+        item.setZValue(20)
+        item.setToolTip(tooltip)
+        # Store a marker so tests can find badges
+        item.setData(1, "badge")
+        self.scene.addItem(item)
 
     def _draw_entity(self, ent: dict) -> None:
         eid = ent["id"]

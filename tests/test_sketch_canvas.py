@@ -172,6 +172,18 @@ def test_sketch_canvas_arc3_mode_creates_arc(qapp):
     canvas.close()
 
 
+def test_sketch_canvas_constraint_and_dimension_badges(qapp):
+    """Constraint and dimension badges appear in the scene."""
+    sketch = create_rectangle_sketch(width=10, height=5, name="BadgeTest")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    badges = [item for item in canvas.scene.items() if item.data(1) == "badge"]
+    # Rectangle has H/V/equal constraints + length dimensions
+    assert len(badges) >= 4
+    canvas.close()
+
+
 def test_sketch_canvas_multi_select_and_box(qapp):
     """Multi-select via Shift-style API and box select helper."""
     sketch = Sketch(name="MultiSelect")

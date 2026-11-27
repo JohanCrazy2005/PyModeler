@@ -26,6 +26,7 @@
 - Start with simple colored markers / text labels near entities (no full solver yet).
 - Place badges at midpoints of lines or near centers of circles/arcs/points.
 - Tooltip on badge shows constraint type and involved entity IDs.
+- **Done (2026-11-27)**: basic text badges (H/V/C/= etc., type:value) implemented in SketchCanvasWidget._draw_badges.
 - Later: proper glyph icons, full DOF analysis for under/fully/over status, and color entities accordingly.
 - Toggle visibility of badges via a button or always-on for now.
 
