@@ -13,18 +13,20 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas constraint and dimension badges: simple text labels (H/V/C/= etc. for constraints, type:value for dimensions) placed near midpoints/centers with tooltips.
-- Helpers `_draw_badges`, `_badge_position_for_entity`, `_add_badge` (data(1)="badge" for tests).
-- Test: badge presence on rectangle sketch.
+- Canvas badge polish: `show_badges` flag + `set_show_badges()`, hover highlight on badges, double-click dimension badge opens edit dialog and updates value.
+- Badges now store type + index in item data (2/3).
+- Research note in docs/research/sketch-canvas-badges.md.
+- Tests for toggle and dimension index storage.
 
 ### Next concrete tasks (Phase 4)
 1. Viewport picking further polish.
 2. Improve shell offset quality (true constant-thickness / openings via Boolean).
 3. Further manufacturing drawing polish (dimension groups UI grouping, exact handle association).
 4. Import/Export: basic STEP later if geometry kernel allows.
-5. Canvas constraint badges polish: glyphs, hover highlight, toggle visibility, double-click dimension edit.
+5. Canvas badges further polish: proper glyphs / SVG, in-place edit, related-constraint selection.
 
 ## Recently Completed
+- Canvas badge polish (toggle, hover, double-click dimension edit)
 - Canvas constraint + dimension badges
 - Canvas multi-select + box select + restored working canvas
 - 3-point arc mode (arc3) + RenderHint fix
@@ -61,4 +63,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas constraint and dimension badges)
+Last updated: 2026-11-27 (canvas badge polish: toggle, hover, double-click edit)
