@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
+- Done: Canvas badges further polish – drag-to-reposition (badge_offset in parameters) + in-place dimension text edit. Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Manufacturing drawing polish – ordinate groups UI in Sketch Editor ("Add Ordinate Group" from selected points, Group column, shared group_id) + tighter DXF nearest-entity tolerance for exact handle association. Research in docs/research/manufacturing-drawings.md.
 - Done: Shell offset quality improvement (mitered vertex-normal offset replacing centroid scale; both Boolean and wall paths use it; near-constant thickness on boxes; create_cube winding corrected for outward normals). Research updated in docs/research/shell-boolean-offset.md.
 - Done: Canvas constraint and dimension badges (simple text labels H/V/C/= etc. and type:value near midpoints/centers, tooltips, data(1) marker).
@@ -104,7 +105,8 @@
 38. (done) Canvas constraint and dimension badges.
 39. (done) Viewport picking further polish (multi-select, box, select-other, mode keys, highlight).
 40. (done) Manufacturing drawing polish – ordinate groups UI in Sketch Editor + tighter DXF entity association.
+41. (done) Canvas badges further polish – drag-to-reposition + in-place dimension edit.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (manufacturing drawing polish – ordinate groups UI)
+Last updated: 2026-11-27 (canvas badge polish – drag + in-place edit)
