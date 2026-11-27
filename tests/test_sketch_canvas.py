@@ -237,3 +237,20 @@ def test_sketch_canvas_multi_select_and_box(qapp):
     assert p2 in canvas.selected_ids
     assert p3 not in canvas.selected_ids
     canvas.close()
+
+
+def test_sketch_canvas_badge_offset_storage(qapp):
+    """Badge display offset is stored in parameters and applied on refresh."""
+    sketch = create_rectangle_sketch(width=10, height=5, name="OffsetTest")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    # Find a constraint and set offset
+    if sketch.constraints:
+        con = sketch.constraints[0]
+        canvas._set_badge_offset(con, 12.5, -3.0)
+        assert canvas._get_badge_offset(con) == (12.5, -3.0)
+        canvas.refresh()
+        # Offset should still be present after refresh
+        assert con.get("parameters", {}).get("badge_offset") == [12.5, -3.0]
+    canvas.close()
