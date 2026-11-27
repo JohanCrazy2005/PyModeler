@@ -13,20 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Manufacturing drawing polish (dimension groups UI grouping + exact handle association):
-  - Research note in `docs/research/manufacturing-drawings.md` (Fusion / Onshape / Inventor ordinate sets).
-  - Sketch Editor: new "Add Ordinate Group" button – select ≥2 points, creates shared-origin ordinate set via `add_ordinate_group` (group_id + leader_style stamped).
-  - Dimensions table: dedicated Group column; groups visible together.
-  - DXF import matching: tighter default tolerance (0.5) on `_nearest_entity` for exact handle association.
-  - Test: `test_sketch_editor_ordinate_group`.
+- Canvas badges further polish (drag-to-reposition + in-place dimension edit):
+  - Research updated in `docs/research/sketch-canvas-badges.md` (Fusion/Onshape drag + in-place).
+  - Badges store/apply `parameters.badge_offset` for user repositioning.
+  - Drag a badge with left mouse; offset persisted on release.
+  - Double-click dimension badge starts in-place text edit (commits on focus loss / release).
+  - Test coverage extended in `tests/test_sketch_canvas.py`.
 
 ### Next concrete tasks (Phase 4)
-1. Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges to reposition.
+1. True vector SVG glyphs for constraint badges (QPainter paths or QtSvg).
 2. Import/Export: basic STEP later if geometry kernel allows.
 3. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
 4. Further manufacturing drawing polish (group move-together behavior on canvas, origin indicator).
 
 ## Recently Completed
+- Canvas badge polish (drag-to-reposition + in-place dimension edit)
 - Manufacturing drawing polish (ordinate group UI + tighter entity association)
 - Shell constant-thickness Boolean offset + openings
 - Viewport picking further polish (multi-select, box, select-other, mode keys, highlight)
@@ -68,4 +69,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (manufacturing drawing polish – ordinate groups UI)
+Last updated: 2026-11-27 (canvas badge polish – drag + in-place edit)
