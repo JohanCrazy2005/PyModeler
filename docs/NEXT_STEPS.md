@@ -13,20 +13,22 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas ordinate badge alignment snapping.
+- Canvas dimension leader line visualization.
   - Research notes updated in `docs/research/sketch-canvas-badges.md`.
-  - `_snap_ordinate_badge` snaps X-ordinate badges to origin Y (horizontal leader) and Y-ordinate to origin X (vertical leader).
-  - Also snaps to nearby group mates for stacked alignment (tolerance 6 units).
-  - Applied live during drag and on release so stored `badge_offset` reflects the snapped position.
-  - Tests added for origin snap and group-mate snap.
+  - `_draw_dimension_leaders` draws thin dashed leaders from dimension badges to geometry.
+  - Ordinate leaders are axis-aligned (horizontal/vertical segments) to match badge snapping.
+  - Other dimensions get a simple straight leader.
+  - Leader items tagged `data(1)="leader"` for tests.
+  - Test `test_dimension_leader_lines_drawn` verifies presence and ordinate alignment.
 
 ### Next concrete tasks (Phase 4)
 1. Import/Export: basic STEP later if geometry kernel allows.
 2. Optional: more complex QtSvg icons if desired.
 3. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
-4. Further canvas polish (e.g., dimension leader line visualization on canvas).
+4. Further canvas polish (e.g., extension lines for linear dimensions, arrowheads on leaders).
 
 ## Recently Completed
+- Dimension leader line visualization on canvas
 - Ordinate badge alignment snapping (axis-aligned + group mate)
 - Shell openings produce rim walls + restored full ShellFeature
 - Ordinate group move-together + origin indicator on canvas
@@ -70,7 +72,8 @@ This file is updated by every automation run.
 - Canvas UI tests: use `QT_QPA_PLATFORM=offscreen` and ensure libEGL/libGL present on Linux CI.
 - Known broad test failures outside the touched modules are pre-existing.
 - Shell Boolean path requires `trimesh` + `manifold3d`; without them wall-stitch still works.
+- Note: `src/pymodeler/render/viewport.py` currently contains a placeholder string on main; do not let that block canvas work.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (ordinate badge alignment snapping)
+Last updated: 2026-11-27 (dimension leader line visualization)
