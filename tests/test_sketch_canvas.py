@@ -162,7 +162,7 @@ def test_ordinate_badge_snap_to_group_mate(qapp):
     canvas = SketchCanvasWidget()
     canvas.set_sketch(sketch)
     canvas.refresh()
-    badges = [it for it in canvas.scene.items() if it.data(1) == "badge" and it.data(2) == "dimension"]
+    badges = [it for it in canvas.scene.items() if it.data(1) == "badge" and item.data(2) == "dimension"]
     assert len(badges) >= 2
     b1, b2 = badges[0], badges[1]
     # Move b2 near b1's Y
@@ -369,4 +369,17 @@ def test_sketch_canvas_ordinate_origin_and_group_move(qapp):
     assert abs(off1[1] - 3.0) < 1e-6
     assert abs(off2[0] - 5.0) < 1e-6
     assert abs(off2[1] - 3.0) < 1e-6
+    canvas.close()
+
+
+def test_dimension_line_between_extensions(qapp):
+    """Linear dimensions draw a connecting dimension line between extension lines."""
+    sketch = create_rectangle_sketch(width=10, height=5, name="DimLine")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    dim_lines = [it for it in canvas.scene.items() if it.data(1) == "leader" and it.data(2) == "dimension_line"]
+    assert len(dim_lines) >= 1, "Expected at least one dimension line connecting extensions"
+    extensions = [it for it in canvas.scene.items() if it.data(1) == "leader" and it.data(2) == "extension"]
+    assert len(extensions) >= 2
     canvas.close()
