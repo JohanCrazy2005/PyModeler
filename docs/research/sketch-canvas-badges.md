@@ -62,3 +62,15 @@ This completes the "dimension leader line visualization on canvas" item from NEX
 - Covered by `test_dimension_leader_lines_and_arrowheads`.
 
 This completes the further canvas polish item (extension lines + arrowheads on leaders) from NEXT_STEPS.
+
+## Dimension Line Between Extensions (2026-11-28)
+
+**Research**: Standard CAD practice (Fusion 360, Onshape, ASME Y14.5) places a dimension line parallel to the measured distance, terminating in arrowheads at both ends, with extension lines projecting from the geometry points past the dimension line. The text sits on or near the dimension line. This is distinct from a simple leader from the text to a single attachment point.
+
+**Implementation**:
+- For length/aligned/distance dimensions, `_draw_dimension_leaders` now draws two short extension lines and a connecting dimension line between their outer ends.
+- Open V-shaped arrowheads are placed at both ends of the dimension line.
+- Items tagged `data(1)="leader"` / `data(2)="dimension_line"` or `"extension"` for tests.
+- Covered by `test_dimension_line_between_extensions`.
+
+This completes the optional further canvas polish item (dimension line between extensions) from NEXT_STEPS.
