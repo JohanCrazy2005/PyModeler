@@ -254,3 +254,22 @@ def test_sketch_canvas_badge_offset_storage(qapp):
         # Offset should still be present after refresh
         assert con.get("parameters", {}).get("badge_offset") == [12.5, -3.0]
     canvas.close()
+
+
+def test_sketch_canvas_vector_constraint_glyphs(qapp):
+    """Constraint badges render as QGraphicsPathItem vector glyphs."""
+    from PyQt6.QtWidgets import QGraphicsPathItem
+    sketch = create_rectangle_sketch(width=10, height=5, name="VectorGlyphs")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    badges = [item for item in canvas.scene.items() if item.data(1) == "badge"]
+    assert len(badges) >= 1
+    path_badges = [b for b in badges if isinstance(b, QGraphicsPathItem) and b.data(2) == "constraint"]
+    text_badges = [b for b in badges if b.data(2) == "dimension"]
+    # Rectangle has several H/V/equal constraints that should be paths
+    assert len(path_badges) >= 2, "Expected vector path glyphs for constraints"
+    assert all(isinstance(b, QGraphicsPathItem) for b in path_badges)
+    # Dimensions remain text
+    assert any(b.data(2) == "dimension" for b in badges)
+    canvas.close()
