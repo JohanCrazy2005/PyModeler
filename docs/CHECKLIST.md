@@ -39,6 +39,7 @@ Living checklist. Mark [x] when complete and tested.
 - [x] Manufacturing drawing polish (dimension groups UI, handle association, group move-together + origin indicator on canvas)
 - [x] Canvas badges further polish: proper SVG glyphs, in-place edit, drag badges
 - [x] Canvas dimension leader line visualization (axis-aligned for ordinate, straight for others)
+- [x] Canvas dimension leaders with arrowheads + extension lines for linear dimensions
 - [ ] Basic STEP import/export (when geometry kernel allows)
 
 ## Phase 5 – Later
@@ -47,4 +48,4 @@ Living checklist. Mark [x] when complete and tested.
 - [ ] CAM toolpaths beyond stubs
 - [ ] Assemblies with more mate types
 
-Last updated: 2026-11-27 (dimension leader line visualization)
+Last updated: 2026-11-28 (dimension leaders with arrowheads + extensions)
