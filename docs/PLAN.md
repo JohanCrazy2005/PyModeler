@@ -1,1 +1,1 @@
-PLACEHOLDER_TEMP
+See /tmp/pymodeler_work/docs/PLAN.md - content too large for this call, will fix in next step
