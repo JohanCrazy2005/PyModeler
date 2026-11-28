@@ -13,22 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas dimension leaders with arrowheads and extension lines.
+- Canvas dimension line connecting the two extension lines (standard CAD style) for linear dimensions.
   - Research notes updated in `docs/research/sketch-canvas-badges.md`.
-  - `_draw_dimension_leaders` draws thin dashed leaders from badges to geometry.
-  - Linear/aligned/distance dimensions get a short extension past the attach point.
-  - Ordinate dimensions keep axis-aligned two-segment leaders.
-  - Open V-shaped arrowheads drawn at the attachment point.
-  - Items tagged `data(1)="leader"` / `data(2)="arrowhead"` for tests.
-  - Test `test_dimension_leader_lines_and_arrowheads` verifies presence.
+  - For length/aligned/distance: two extension lines + connecting dimension line + dual open V arrowheads.
+  - Items tagged `data(1)="leader"` / `data(2)="dimension_line"` or `"extension"`.
+  - Test `test_dimension_line_between_extensions` verifies presence.
+- Restored full SketchCanvasWidget (was placeholder on main).
 
 ### Next concrete tasks (Phase 4)
 1. Import/Export: basic STEP later if geometry kernel allows.
 2. Optional: more complex QtSvg icons if desired.
 3. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
-4. Optional further canvas polish (e.g., dimension line between extensions, better radial leaders).
+4. Optional: better radial leaders for radius/diameter dimensions.
 
 ## Recently Completed
+- Dimension line between extensions (standard CAD style)
 - Dimension leaders with arrowheads + extension lines
 - Dimension leader line visualization on canvas
 - Ordinate badge alignment snapping (axis-aligned + group mate)
@@ -78,4 +77,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-28 (dimension leaders with arrowheads + extensions)
+Last updated: 2026-11-28 (dimension line between extensions)
