@@ -13,20 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas badges further polish (drag-to-reposition + in-place dimension edit):
-  - Research updated in `docs/research/sketch-canvas-badges.md` (Fusion/Onshape drag + in-place).
-  - Badges store/apply `parameters.badge_offset` for user repositioning.
-  - Drag a badge with left mouse; offset persisted on release.
-  - Double-click dimension badge starts in-place text edit (commits on focus loss / release).
-  - Test coverage extended in `tests/test_sketch_canvas.py`.
+- True vector glyphs for constraint badges (QPainterPath):
+  - Research updated in `docs/research/sketch-canvas-badges.md` (Onshape/Fusion vector-style icons).
+  - Constraint badges now `QGraphicsPathItem` with clean path definitions (H/V lines, //, ⊥, =, concentric, midpoint triangle, coincident, tangent, fixed).
+  - Hover brightens path pen/brush; dimensions stay editable text.
+  - Drag, click-select, in-place edit, offset persistence unchanged.
+  - Test coverage extended in `tests/test_sketch_canvas.py` (path items present for constraints).
 
 ### Next concrete tasks (Phase 4)
-1. True vector SVG glyphs for constraint badges (QPainter paths or QtSvg).
-2. Import/Export: basic STEP later if geometry kernel allows.
-3. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
-4. Further manufacturing drawing polish (group move-together behavior on canvas, origin indicator).
+1. Import/Export: basic STEP later if geometry kernel allows.
+2. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
+3. Further manufacturing drawing polish (group move-together behavior on canvas, origin indicator).
+4. Optional: more complex QtSvg icons if desired.
 
 ## Recently Completed
+- True vector SVG-style glyphs for constraint badges
 - Canvas badge polish (drag-to-reposition + in-place dimension edit)
 - Manufacturing drawing polish (ordinate group UI + tighter entity association)
 - Shell constant-thickness Boolean offset + openings
@@ -69,4 +70,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas badge polish – drag + in-place edit)
+Last updated: 2026-11-27 (true vector constraint glyphs)
