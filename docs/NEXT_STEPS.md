@@ -13,20 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Manufacturing drawing polish: ordinate group move-together + origin indicator on canvas.
-  - Research updated in `docs/research/manufacturing-drawings.md` (Onshape group move, Fusion origin).
-  - Origin glyph (cross+circle) drawn for each unique ordinate group_id.
-  - Dragging any group dimension badge applies the same offset delta to all members (relative spacing preserved).
-  - Live visual during drag; offsets stored in parameters.badge_offset.
-  - Test added in `tests/test_sketch_canvas.py`.
+- Shell openings now produce proper rim walls (not just face deletion).
+  - Research updated in `docs/research/shell-boolean-offset.md`.
+  - Wall-stitch path (and openings) adds connecting rim walls between outer and inner boundaries of removed faces.
+  - Named face selectors (`top`/`bottom`/…) resolved by extreme centroid.
+  - Restored full `ShellFeature` implementation in `shell_feature.py` (was a broken placeholder).
+  - Volume on `create_cube(10)` inside t=1 still 488; opening test passes with extra rim faces.
 
 ### Next concrete tasks (Phase 4)
 1. Import/Export: basic STEP later if geometry kernel allows.
-2. Optional: shell rim walls after Boolean openings (currently openings only delete outer faces).
-3. Optional: more complex QtSvg icons if desired.
-4. Further canvas polish (e.g., badge alignment snapping for ordinate leaders).
+2. Optional: more complex QtSvg icons if desired.
+3. Further canvas polish (e.g., badge alignment snapping for ordinate leaders).
+4. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
 
 ## Recently Completed
+- Shell openings produce rim walls + restored full ShellFeature
 - Ordinate group move-together + origin indicator on canvas
 - True vector SVG-style glyphs for constraint badges
 - Canvas badge polish (drag-to-reposition + in-place dimension edit)
@@ -71,4 +72,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (ordinate group move-together + origin indicator)
+Last updated: 2026-11-27 (shell rim walls on openings)

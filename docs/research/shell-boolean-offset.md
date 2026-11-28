@@ -48,3 +48,18 @@ Validated volumes on `create_cube(10)`:
 - both t=2 → 1216 (= 12³−8³)
 
 Wall-stitch fallback uses the same miter normals for consistent thickness when Boolean is unavailable.
+
+## Update 2026-11-27 – Rim walls on openings
+
+Previously openings only deleted the outer face(s) after the Boolean (or in the wall path), leaving a raw hole without side walls.
+
+Now the wall-stitch path (used for all openings, and as Boolean fallback) explicitly:
+
+- Skips the selected outer face(s).
+- Emits the reversed inner faces.
+- Builds connecting side walls on non-opening faces.
+- **Adds rim walls** along the boundary of every opening, connecting each outer edge of the removed face to the corresponding inner edge.
+
+Named face selectors (`top`, `bottom`, `front`, `back`, `left`, `right`) are resolved by extreme centroid for axis-aligned boxes. Integer indices continue to work.
+
+Result on a cube with top opening: closed side walls + rim around the opening, still near-constant thickness. Volume of the solid portion remains correct when the mesh is watertight after rim stitching.

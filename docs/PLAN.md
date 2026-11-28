@@ -29,7 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
-- Done: Manufacturing drawing polish – ordinate groups UI + group move-together behavior on canvas + origin indicator glyph. Research updated in docs/research/manufacturing-drawings.md.
+- Done: Shell openings produce proper rim walls (wall-stitch path connects outer/inner boundaries of removed faces). Full ShellFeature restored. Research updated in docs/research/shell-boolean-offset.md.
 - Done: True vector glyphs for constraint badges (QPainterPath / QGraphicsPathItem). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Canvas badges further polish – drag-to-reposition (badge_offset in parameters) + in-place dimension text edit. Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Manufacturing drawing polish – ordinate groups UI in Sketch Editor ("Add Ordinate Group" from selected points, Group column, shared group_id) + tighter DXF nearest-entity tolerance for exact handle association. Research in docs/research/manufacturing-drawings.md.
@@ -110,7 +110,8 @@
 41. (done) Canvas badges further polish – drag-to-reposition + in-place dimension edit.
 42. (done) True vector glyphs for constraint badges (QPainterPath).
 43. (done) Manufacturing drawing polish – ordinate group move-together + origin indicator on canvas.
+44. (done) Shell openings produce rim walls (not mere face deletion).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (ordinate group move-together + origin indicator)
+Last updated: 2026-11-27 (shell rim walls on openings)
