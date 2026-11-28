@@ -28,7 +28,8 @@
 - moderngl / PyOpenGL for viewport
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
-## Current Status (2026-11-27)
+## Current Status (2026-11-28)
+- Done: Canvas dimension leaders with arrowheads and short extension lines for linear dimensions. Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Canvas dimension leader line visualization (axis-aligned for ordinate, straight for others). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Canvas ordinate badge alignment snapping (axis-aligned to origin + group-mate snap for stacked leaders). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Shell openings produce proper rim walls (wall-stitch path connects outer/inner boundaries of removed faces). Full ShellFeature restored. Research updated in docs/research/shell-boolean-offset.md.
@@ -115,7 +116,8 @@
 44. (done) Shell openings produce rim walls (not mere face deletion).
 45. (done) Canvas ordinate badge alignment snapping (axis-aligned leaders + group mate).
 46. (done) Canvas dimension leader line visualization.
+47. (done) Canvas dimension leaders with arrowheads + extension lines.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (dimension leader line visualization)
+Last updated: 2026-11-28 (dimension leaders with arrowheads + extensions)
