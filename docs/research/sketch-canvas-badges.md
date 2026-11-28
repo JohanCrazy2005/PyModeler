@@ -34,3 +34,17 @@ Next polish ideas: dimension leader line visualization on canvas, optional QtSvg
 - Tests cover origin snap and group-mate snap.
 
 This completes the "badge alignment snapping for ordinate leaders" item from NEXT_STEPS.
+
+## Dimension Leader Line Visualization (2026-11-27)
+
+**Research**: Fusion 360 and Onshape display dimension text with leader lines (or extension lines) that connect the value to the measured geometry. Leaders are typically axis-aligned for linear/ordinate dimensions and radial for radius/diameter. The text can be dragged and the leaders update.
+
+**Implementation**:
+- `_draw_dimension_leaders` in SketchCanvasWidget draws thin dashed leader lines after badges.
+- For ordinary dimensions a straight leader goes from the badge position to the entity attachment point (midpoint/center).
+- For ordinate dimensions the leader is axis-aligned: horizontal-then-vertical (or vice-versa) so it matches the snapped badge alignment.
+- Leader items are tagged with `data(1)="leader"` and `data(2)="dimension_leader"` for test inspection.
+- Cosmetic pen so lines stay thin under zoom.
+- Covered by `test_dimension_leader_lines_drawn`.
+
+This completes the "dimension leader line visualization on canvas" item from NEXT_STEPS.
