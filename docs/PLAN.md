@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
+- Done: Canvas ordinate badge alignment snapping (axis-aligned to origin + group-mate snap for stacked leaders). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Shell openings produce proper rim walls (wall-stitch path connects outer/inner boundaries of removed faces). Full ShellFeature restored. Research updated in docs/research/shell-boolean-offset.md.
 - Done: True vector glyphs for constraint badges (QPainterPath / QGraphicsPathItem). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Canvas badges further polish – drag-to-reposition (badge_offset in parameters) + in-place dimension text edit. Research updated in docs/research/sketch-canvas-badges.md.
@@ -111,7 +112,8 @@
 42. (done) True vector glyphs for constraint badges (QPainterPath).
 43. (done) Manufacturing drawing polish – ordinate group move-together + origin indicator on canvas.
 44. (done) Shell openings produce rim walls (not mere face deletion).
+45. (done) Canvas ordinate badge alignment snapping (axis-aligned leaders + group mate).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (shell rim walls on openings)
+Last updated: 2026-11-27 (ordinate badge alignment snapping)

@@ -598,7 +598,62 @@ class SketchCanvasWidget(QGraphicsView):
 
         super().mousePressEvent(event)
 
-    def mouseMoveEvent(self, event):
+    def _snap_ordinate_badge(self, badge: QGraphicsItem, proposed: QPointF) -> QPointF:
+        """Snap ordinate dimension badge so its leader stays axis-aligned.
+
+        For axis='x' ordinate, snap Y to the origin Y (horizontal leader).
+        For axis='y', snap X to the origin X (vertical leader).
+        Also snap to nearby group mates for stacked alignment.
+        """
+        if self.sketch is None or badge.data(2) != "dimension":
+            return proposed
+        idx = badge.data(3)
+        if not isinstance(idx, int) or not (0 <= idx < len(self.sketch.dimensions)):
+            return proposed
+        dim = self.sketch.dimensions[idx]
+        if dim.get("type") != "ordinate":
+            return proposed
+        params = dim.get("parameters") or {}
+        axis = params.get("axis", "x")
+        origin = params.get("origin") or [0.0, 0.0]
+        if not isinstance(origin, (list, tuple)) or len(origin) < 2:
+            origin = [0.0, 0.0]
+        ox, oy = float(origin[0]), float(origin[1])
+        snap_tol = 6.0
+        sx, sy = proposed.x(), proposed.y()
+
+        # Primary axis-aligned snap to origin
+        if axis == "x":
+            if abs(sy - oy) < snap_tol:
+                sy = oy
+        elif axis == "y":
+            if abs(sx - ox) < snap_tol:
+                sx = ox
+
+        # Snap to other group members for stacked alignment
+        gid = badge.data(6)
+        if gid:
+            for item in self.scene.items():
+                if item is badge or item.data(1) != "badge" or item.data(6) != gid:
+                    continue
+                oidx = item.data(3)
+                if not isinstance(oidx, int) or not (0 <= oidx < len(self.sketch.dimensions)):
+                    continue
+                odim = self.sketch.dimensions[oidx]
+                if odim.get("type") != "ordinate":
+                    continue
+                oparams = odim.get("parameters") or {}
+                oaxis = oparams.get("axis", "x")
+                if oaxis != axis:
+                    continue
+                op = item.pos()
+                if axis == "x" and abs(sy - op.y()) < snap_tol:
+                    sy = op.y()
+                elif axis == "y" and abs(sx - op.x()) < snap_tol:
+                    sx = op.x()
+
+        return QPointF(sx, sy)
+
         if self.sketch is None:
             return super().mouseMoveEvent(event)
         pos = self.mapToScene(event.position().toPoint())
@@ -607,14 +662,16 @@ class SketchCanvasWidget(QGraphicsView):
         if self._dragging_badge is not None and event.buttons() & Qt.MouseButton.LeftButton:
             if self._badge_drag_start is not None and self._badge_orig_pos is not None:
                 delta = pos - self._badge_drag_start
-                self._dragging_badge.setPos(self._badge_orig_pos + delta)
-                # Move all group badges by the same delta
+                proposed = self._badge_orig_pos + delta
+                snapped = self._snap_ordinate_badge(self._dragging_badge, proposed)
+                self._dragging_badge.setPos(snapped)
+                # Move all group badges by the same delta (relative)
                 for gbadge in self._dragging_group_badges:
                     if gbadge is not self._dragging_badge and gbadge.scene() is not None:
-                        # Use stored base if available, else relative
                         base = gbadge.data(5)
                         if isinstance(base, tuple) and len(base) == 2:
-                            gbadge.setPos(QPointF(base[0], base[1]) + delta)
+                            g_proposed = QPointF(base[0], base[1]) + delta
+                            gbadge.setPos(self._snap_ordinate_badge(gbadge, g_proposed))
                         else:
                             gbadge.setPos(gbadge.pos() + delta)  # fallback
             return
@@ -695,10 +752,12 @@ class SketchCanvasWidget(QGraphicsView):
             badge = self._dragging_badge
             btype = badge.data(2)
             idx = badge.data(3)
+            # Use the final snapped position for the offset delta
+            final_pos = badge.pos()
             delta_dx, delta_dy = 0.0, 0.0
-            if self._badge_drag_start is not None:
-                delta_dx = pos.x() - self._badge_drag_start.x()
-                delta_dy = pos.y() - self._badge_drag_start.y()
+            if self._badge_orig_pos is not None:
+                delta_dx = final_pos.x() - self._badge_orig_pos.x()
+                delta_dy = final_pos.y() - self._badge_orig_pos.y()
             # Apply to the dragged badge
             if isinstance(idx, int) and idx >= 0 and self.sketch:
                 obj = None

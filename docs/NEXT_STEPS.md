@@ -13,20 +13,21 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Shell openings now produce proper rim walls (not just face deletion).
-  - Research updated in `docs/research/shell-boolean-offset.md`.
-  - Wall-stitch path (and openings) adds connecting rim walls between outer and inner boundaries of removed faces.
-  - Named face selectors (`top`/`bottom`/…) resolved by extreme centroid.
-  - Restored full `ShellFeature` implementation in `shell_feature.py` (was a broken placeholder).
-  - Volume on `create_cube(10)` inside t=1 still 488; opening test passes with extra rim faces.
+- Canvas ordinate badge alignment snapping.
+  - Research notes updated in `docs/research/sketch-canvas-badges.md`.
+  - `_snap_ordinate_badge` snaps X-ordinate badges to origin Y (horizontal leader) and Y-ordinate to origin X (vertical leader).
+  - Also snaps to nearby group mates for stacked alignment (tolerance 6 units).
+  - Applied live during drag and on release so stored `badge_offset` reflects the snapped position.
+  - Tests added for origin snap and group-mate snap.
 
 ### Next concrete tasks (Phase 4)
 1. Import/Export: basic STEP later if geometry kernel allows.
 2. Optional: more complex QtSvg icons if desired.
-3. Further canvas polish (e.g., badge alignment snapping for ordinate leaders).
-4. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
+3. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
+4. Further canvas polish (e.g., dimension leader line visualization on canvas).
 
 ## Recently Completed
+- Ordinate badge alignment snapping (axis-aligned + group mate)
 - Shell openings produce rim walls + restored full ShellFeature
 - Ordinate group move-together + origin indicator on canvas
 - True vector SVG-style glyphs for constraint badges
@@ -72,4 +73,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (shell rim walls on openings)
+Last updated: 2026-11-27 (ordinate badge alignment snapping)

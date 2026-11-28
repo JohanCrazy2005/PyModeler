@@ -125,7 +125,52 @@ def test_sketch_editor_includes_canvas(qapp):
     editor.close()
 
 
-def test_circle_from_3_points_and_arc_angles():
+def test_ordinate_badge_snap_aligns_to_origin(qapp):
+    """Ordinate X badges snap Y to the origin for horizontal leaders."""
+    sketch = Sketch(name="OrdSnap")
+    p1 = sketch.add_point(10.0, 0.0)
+    sketch.add_ordinate_dimension(p1, 10.0, axis="x", origin=[0.0, 0.0], group_id="og1")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    # Find the dimension badge
+    badge = None
+    for item in canvas.scene.items():
+        if item.data(1) == "badge" and item.data(2) == "dimension":
+            badge = item
+            break
+    assert badge is not None
+    # Propose a position slightly off the origin Y
+    proposed = QPointF(15.0, 2.5)
+    snapped = canvas._snap_ordinate_badge(badge, proposed)
+    assert abs(snapped.y() - 0.0) < 1e-6  # snapped to origin Y
+    assert abs(snapped.x() - 15.0) < 1e-6
+    # Far away should not snap
+    far = QPointF(15.0, 20.0)
+    not_snapped = canvas._snap_ordinate_badge(badge, far)
+    assert abs(not_snapped.y() - 20.0) < 1e-6
+    canvas.close()
+
+
+def test_ordinate_badge_snap_to_group_mate(qapp):
+    """Ordinate badges in a group snap to each other for stacked alignment."""
+    sketch = Sketch(name="OrdGroupSnap")
+    p1 = sketch.add_point(5.0, 0.0)
+    p2 = sketch.add_point(15.0, 0.0)
+    sketch.add_ordinate_dimension(p1, 5.0, axis="x", origin=[0.0, 0.0], group_id="g1")
+    sketch.add_ordinate_dimension(p2, 15.0, axis="x", origin=[0.0, 0.0], group_id="g1")
+    canvas = SketchCanvasWidget()
+    canvas.set_sketch(sketch)
+    canvas.refresh()
+    badges = [it for it in canvas.scene.items() if it.data(1) == "badge" and it.data(2) == "dimension"]
+    assert len(badges) >= 2
+    b1, b2 = badges[0], badges[1]
+    # Move b2 near b1's Y
+    proposed = QPointF(b2.pos().x() + 1, b1.pos().y() + 3.0)
+    snapped = canvas._snap_ordinate_badge(b2, proposed)
+    assert abs(snapped.y() - b1.pos().y()) < 1e-6
+    canvas.close()
+
     from pymodeler.ui.sketch_canvas import _circle_from_3_points, _arc_angles_through
     # Unit circle points: (1,0), (0,1), (-1,0) → center (0,0) r=1
     c = _circle_from_3_points(1.0, 0.0, 0.0, 1.0, -1.0, 0.0)

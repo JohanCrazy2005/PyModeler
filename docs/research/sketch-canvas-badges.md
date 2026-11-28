@@ -20,4 +20,17 @@ Research notes for canvas badge polish (glyphs, hover, visibility toggle, double
 - Full SketchCanvasWidget remains intact.
 - **True vector SVG-style glyphs**: Constraint badges now render as `QGraphicsPathItem` using `QPainterPath` definitions (horizontal/vertical lines, parallel bars, perpendicular L, equal bars, concentric circles, midpoint triangle, coincident dots, tangent, fixed). Scales cleanly, looks like CAD icons. Dimensions remain editable text. Hover brightens path pen/brush.
 
-Next polish ideas: group move-together for ordinate sets, origin indicator, optional QtSvg for more complex icons.
+Next polish ideas: dimension leader line visualization on canvas, optional QtSvg for more complex icons.
+
+## Ordinate Badge Alignment Snapping (2026-11-27)
+
+**Research**: Fusion 360 and Onshape ordinate dimensions keep leaders axis-aligned (horizontal for X-ordinates, vertical for Y). Groups stack with consistent spacing; dragging one snaps others into alignment. Users expect leaders to "stick" to the axis when close.
+
+**Implementation**:
+- `_snap_ordinate_badge` in SketchCanvasWidget.
+- For axis="x" snaps badge Y to origin Y (or nearby group mate Y) within 6 units.
+- For axis="y" snaps badge X to origin X (or group mate X).
+- Applied live during drag and used for the committed `badge_offset` on release.
+- Tests cover origin snap and group-mate snap.
+
+This completes the "badge alignment snapping for ordinate leaders" item from NEXT_STEPS.
