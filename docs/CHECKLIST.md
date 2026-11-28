@@ -46,4 +46,4 @@ Living checklist. Mark [x] when complete and tested.
 - [ ] CAM toolpaths beyond stubs
 - [ ] Assemblies with more mate types
 
-Last updated: 2026-11-27 (canvas badge polish – drag + in-place edit)
+Last updated: 2026-11-27 (true vector constraint glyphs)
