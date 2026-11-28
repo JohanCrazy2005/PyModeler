@@ -13,21 +13,23 @@ This file is updated by every automation run.
 **Phase 4 polish + early manufacturing helpers.**
 
 ### Done this run
-- Canvas dimension leader line visualization.
+- Canvas dimension leaders with arrowheads and extension lines.
   - Research notes updated in `docs/research/sketch-canvas-badges.md`.
-  - `_draw_dimension_leaders` draws thin dashed leaders from dimension badges to geometry.
-  - Ordinate leaders are axis-aligned (horizontal/vertical segments) to match badge snapping.
-  - Other dimensions get a simple straight leader.
-  - Leader items tagged `data(1)="leader"` for tests.
-  - Test `test_dimension_leader_lines_drawn` verifies presence and ordinate alignment.
+  - `_draw_dimension_leaders` draws thin dashed leaders from badges to geometry.
+  - Linear/aligned/distance dimensions get a short extension past the attach point.
+  - Ordinate dimensions keep axis-aligned two-segment leaders.
+  - Open V-shaped arrowheads drawn at the attachment point.
+  - Items tagged `data(1)="leader"` / `data(2)="arrowhead"` for tests.
+  - Test `test_dimension_leader_lines_and_arrowheads` verifies presence.
 
 ### Next concrete tasks (Phase 4)
 1. Import/Export: basic STEP later if geometry kernel allows.
 2. Optional: more complex QtSvg icons if desired.
 3. Optional: Boolean-path openings that also generate rim walls (currently openings use the wall-stitch path which already has rims).
-4. Further canvas polish (e.g., extension lines for linear dimensions, arrowheads on leaders).
+4. Optional further canvas polish (e.g., dimension line between extensions, better radial leaders).
 
 ## Recently Completed
+- Dimension leaders with arrowheads + extension lines
 - Dimension leader line visualization on canvas
 - Ordinate badge alignment snapping (axis-aligned + group mate)
 - Shell openings produce rim walls + restored full ShellFeature
@@ -76,4 +78,4 @@ This file is updated by every automation run.
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (dimension leader line visualization)
+Last updated: 2026-11-28 (dimension leaders with arrowheads + extensions)
