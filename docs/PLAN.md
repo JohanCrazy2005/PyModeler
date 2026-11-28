@@ -29,6 +29,7 @@
 - Optional: manifold3d for robust Booleans, CadQuery / OCP later for B-Rep
 
 ## Current Status (2026-11-27)
+- Done: True vector glyphs for constraint badges (QPainterPath / QGraphicsPathItem). Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Canvas badges further polish – drag-to-reposition (badge_offset in parameters) + in-place dimension text edit. Research updated in docs/research/sketch-canvas-badges.md.
 - Done: Manufacturing drawing polish – ordinate groups UI in Sketch Editor ("Add Ordinate Group" from selected points, Group column, shared group_id) + tighter DXF nearest-entity tolerance for exact handle association. Research in docs/research/manufacturing-drawings.md.
 - Done: Shell offset quality improvement (mitered vertex-normal offset replacing centroid scale; both Boolean and wall paths use it; near-constant thickness on boxes; create_cube winding corrected for outward normals). Research updated in docs/research/shell-boolean-offset.md.
@@ -106,7 +107,8 @@
 39. (done) Viewport picking further polish (multi-select, box, select-other, mode keys, highlight).
 40. (done) Manufacturing drawing polish – ordinate groups UI in Sketch Editor + tighter DXF entity association.
 41. (done) Canvas badges further polish – drag-to-reposition + in-place dimension edit.
+42. (done) True vector glyphs for constraint badges (QPainterPath).
 
 Keep PLAN, CHECKLIST, and NEXT_STEPS synchronized after every significant run.
 
-Last updated: 2026-11-27 (canvas badge polish – drag + in-place edit)
+Last updated: 2026-11-27 (true vector constraint glyphs)
