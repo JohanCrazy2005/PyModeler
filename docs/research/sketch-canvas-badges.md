@@ -48,3 +48,17 @@ This completes the "badge alignment snapping for ordinate leaders" item from NEX
 - Covered by `test_dimension_leader_lines_drawn`.
 
 This completes the "dimension leader line visualization on canvas" item from NEXT_STEPS.
+
+## Dimension Leaders with Arrowheads and Extension Lines (2026-11-28)
+
+**Research**: Fusion 360 and Onshape show linear dimensions with extension lines that project past the measured geometry and arrowheads (or tick marks) at the dimension line ends. Leaders for dragged text are usually thin, dashed or solid, and update live. Ordinate dimensions keep axis-aligned leaders ending in a small tick or arrow at the measured point.
+
+**Implementation**:
+- `_draw_dimension_leaders` draws dashed cosmetic leaders from the dimension badge position to the geometry attachment point.
+- Linear / aligned / distance dimensions receive a short extension segment past the attach point.
+- Ordinate dimensions use axis-aligned two-segment leaders matching the existing badge snap behavior.
+- `_add_arrowhead` draws a small open V-shaped arrowhead at the attachment point.
+- Leader and arrow items tagged with `data(1)="leader"` (and `data(2)` for type) so tests can inspect them.
+- Covered by `test_dimension_leader_lines_and_arrowheads`.
+
+This completes the further canvas polish item (extension lines + arrowheads on leaders) from NEXT_STEPS.
